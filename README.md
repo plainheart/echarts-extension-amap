@@ -4,7 +4,7 @@ ECharts 高德地图扩展，可以在高德地图上展现 [点图](http://echa
 
 ### 示例
 
-参见 [examples/index.html](http://github.com/plainheart/echarts-extension-amap/tree/master/examples/index.html)]
+参见 [examples/index.html](http://github.com/plainheart/echarts-extension-amap/tree/master/examples/index.html)
 
 ### 引入
 
