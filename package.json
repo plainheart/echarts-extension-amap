@@ -1,0 +1,35 @@
+{
+  "name": "echarts-extension-amap",
+  "version": "1.0.0",
+  "description": "An AMap(https://lbs.amap.com) extension for echarts(https://github.com/apache/incubator-echarts)",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack -p",
+    "dev": "webpack -d",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plainheart/echarts-extension-amap.git"
+  },
+  "keywords": [
+    "echarts",
+    "amap",
+    "autonavi",
+    "echarts-extention",
+    "data-visualization"
+  ],
+  "author": "plainheart",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/plainheart/echarts-extension-amap/issues"
+  },
+  "homepage": "https://github.com/plainheart/echarts-extension-amap#readme",
+  "devDependencies": {
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3"
+  },
+  "dependencies": {
+    "echarts": "^4.1.0"
+  }
+}
