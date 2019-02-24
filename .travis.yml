@@ -1,0 +1,14 @@
+language: node_js
+
+# Travis-CI Caching
+cache:
+  directories:
+    - node_modules
+
+# S: Build Lifecycle
+install:
+  - npm install
+
+script:
+  - npm run build
+# E: Build LifeCycle

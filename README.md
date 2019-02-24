@@ -1,3 +1,6 @@
+[![NPM version](https://img.shields.io/npm/v/brick.js.svg?style=flat)](https://www.npmjs.org/package/brick.js)
+[![Build Status](https://travis-ci.org/plainheart/echarts-extension-amap.svg?branch=master)](https://travis-ci.org/plainheart/echarts-extension-amap)
+
 ## 高德地图扩展
 
 ECharts 高德地图扩展，可以在高德地图上展现 [点图](http://echarts.baidu.com/option.html#series-scatter)，[线图](http://echarts.baidu.com/option.html#series-line)，[热力图](http://echarts.baidu.com/option.html#series-heatmap) 等可视化。
