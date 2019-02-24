@@ -3,9 +3,9 @@
 [![Downloads](https://img.shields.io/npm/dm/echarts-extension-amap.svg)](https://npmcharts.com/compare/echarts-extension-amap?minimal=true)
 [![License](https://img.shields.io/npm/l/echarts-extension-amap.svg)](https://www.npmjs.com/package/echarts-extension-amap)
 
-## 高德地图扩展
+## ECharts 高德地图扩展
 
-ECharts 高德地图扩展，可以在高德地图上展现 [点图](http://echarts.baidu.com/option.html#series-scatter)，[线图](http://echarts.baidu.com/option.html#series-line)，[热力图](http://echarts.baidu.com/option.html#series-heatmap) 等可视化。
+[ECharts](http://echarts.baidu.com) 高德地图扩展，可以在高德地图上展现 [点图](http://echarts.baidu.com/option.html#series-scatter)，[线图](http://echarts.baidu.com/option.html#series-line)，[热力图](http://echarts.baidu.com/option.html#series-heatmap) 等可视化。
 
 ### 示例
 
