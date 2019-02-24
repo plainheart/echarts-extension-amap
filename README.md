@@ -13,6 +13,12 @@
 
 ![示例](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
+### 安装
+
+```js
+npm install echarts-extension-amap --save
+```
+
 ### 引入
 
 可以直接引入打包好的扩展文件和高德地图的 Javascript API
@@ -31,6 +37,12 @@
 ```js
 require("echarts");
 require("echarts-extension-amap");
+```
+
+使用 CDN
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
 ```
 
 插件会自动注册相应的组件。
