@@ -11,6 +11,8 @@ ECharts 高德地图扩展，可以在高德地图上展现 [点图](http://echa
 
 参见 [examples/index.html](http://github.com/plainheart/echarts-extension-amap/tree/master/examples/index.html)
 
+![示例](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
+
 ### 引入
 
 可以直接引入打包好的扩展文件和高德地图的 Javascript API
