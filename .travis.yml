@@ -1,5 +1,9 @@
 language: node_js
 
+# nodejs version
+node_js:
+  - "10"
+
 # Travis-CI Caching
 cache:
   directories:
