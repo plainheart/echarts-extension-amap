@@ -17,7 +17,9 @@
     "amap",
     "autonavi",
     "echarts-extention",
-    "data-visualization"
+    "data-visualization",
+    "map",
+    "gaode"
   ],
   "author": "plainheart",
   "license": "MIT",
