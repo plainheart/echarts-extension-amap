@@ -42,7 +42,7 @@ require("echarts-extension-amap");
 使用 CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@latest/dist/echarts-extension-amap.min.js"></script>
 ```
 
 插件会自动注册相应的组件。
