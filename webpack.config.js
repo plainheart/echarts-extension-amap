@@ -1,5 +1,4 @@
 var webpack = require("webpack");
-var { version } = require("./package.json");
 var isProd = process.argv.indexOf("-p") > -1;
 
 module.exports = {
@@ -13,11 +12,6 @@ module.exports = {
     filename: "echarts-extension-" + (isProd ? "[name].min.js" : "[name].js")
   },
   devtool: "source-map",
-  plugins: [
-    new webpack.DefinePlugin({
-      "process.env.VERSION": `"${version}"`
-    })
-  ],
   externals: {
     echarts: "echarts"
   }

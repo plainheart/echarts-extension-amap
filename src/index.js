@@ -2,6 +2,8 @@
  * AMap component extension
  */
 
+import { version, name } from "../package.json";
+
 import * as echarts from "echarts";
 import AMapCoordSys from "./AMapCoordSys";
 
@@ -26,4 +28,4 @@ echarts.registerAction(
   }
 );
 
-export var version = process.env.VERSION;
+export { version, name };
