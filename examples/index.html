@@ -2,9 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <title></title>
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.13&key=ak&plugin=AMap.Scale,AMap.ToolBar"></script>
-    <script type="text/javascript" src="../node_modules/echarts/dist/echarts.js"></script>
+    <title>an example for echarts amap extension</title>
+    <!-- please replace {ak} with your ak & custom your plugins -->
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.13&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
+    <!-- echarts -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@4.1.0/dist/echarts.min.js"></script>
+    <!-- echarts amap extension -->
     <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script>
     <style type="text/css">
         * {
@@ -19,6 +22,7 @@
 </head>
 <body>
     <div id="echarts-amap"></div>
+    <!-- 数据来源于百度地图 仅作示例 与高德坐标稍有偏差 -->
     <script type="text/javascript">
         var data = [
             {name: '海门', value: 9},
@@ -496,9 +500,12 @@
                 }
             ]
         };
+        // initialize echart
         var chart = echarts.init(document.getElementById("echarts-amap"));
         chart.setOption(option);
+        // get amap instance
         var amap = chart.getModel().getComponent("amap").getAMap();
+        // operations below are the same as amap
         amap.addControl(new AMap.Scale());
         amap.addControl(new AMap.ToolBar());
     </script>
