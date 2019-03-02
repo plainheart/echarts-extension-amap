@@ -9,7 +9,8 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@4.1.0/dist/echarts.min.js"></script>
     <!-- <script type="text/javascript" src="../node_modules/echarts/dist/echarts.min.js"></script> -->
     <!-- echarts amap extension -->
-    <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script>
+    <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@latest/dist/echarts-extension-amap.min.js"></script>
     <style type="text/css">
         * {
             margin: 0;
@@ -452,6 +453,9 @@
                     symbolSize: function (val) {
                         return val[2] / 10;
                     },
+                    encode: {
+                      value: 2
+                    },
                     label: {
                         normal: {
                             formatter: '{b}',
@@ -477,6 +481,9 @@
                     }).slice(0, 6)),
                     symbolSize: function (val) {
                         return val[2] / 10;
+                    },
+                    encode: {
+                      value: 2
                     },
                     showEffectOn: 'render',
                     rippleEffect: {
