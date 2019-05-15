@@ -516,6 +516,10 @@
         // operations below are the same as amap
         amap.addControl(new AMap.Scale());
         amap.addControl(new AMap.ToolBar());
+        // add layers
+        var satelliteLayer = new AMap.TileLayer.Satellite();
+    	var roadNetLayer = new AMap.TileLayer.RoadNet();
+        amap.add([satelliteLayer, roadNetLayer]);
     </script>
 </body>
 </html>
