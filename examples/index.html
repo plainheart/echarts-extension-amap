@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <title>an example for echarts amap extension</title>
     <!-- please replace {ak} with your ak & custom your plugins -->
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.13&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
+    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.14&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
     <!-- echarts CDN -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@4.1.0/dist/echarts.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
     <!-- <script type="text/javascript" src="../node_modules/echarts/dist/echarts.min.js"></script> -->
     <!-- echarts amap extension -->
     <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
@@ -437,6 +437,9 @@
                 resizeEnable: true,
                 // 自定义地图样式主题
                 mapStyle:'amap://styles/dark'
+                // 说明：如果想要添加卫星、路网等图层
+                // 暂时先不要使用layers配置，因为存在Bug
+                // 建议使用amap.add的方式，使用方式参见最下方代码
             },
             tooltip : {
                 trigger: 'item'
