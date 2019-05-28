@@ -68,7 +68,7 @@ option = {
     echartsLayerZIndex: 2019
     // 说明：如果想要添加卫星、路网等图层
     // 暂时先不要使用layers配置，因为存在Bug
-    // 建议使用amap.add的方式，使用方式参见示例 examples/index.html
+    // 建议使用amap.add的方式，使用方式参见最下方代码
   },
   series: [
     {
@@ -89,6 +89,11 @@ var amap = chart
   .getModel()
   .getComponent("amap")
   .getAMap();
+// 添加控件
 amap.addControl(new AMap.Scale());
 amap.addControl(new AMap.ToolBar());
+// 添加图层
+var satelliteLayer = new AMap.TileLayer.Satellite();
+var roadNetLayer = new AMap.TileLayer.RoadNet();
+amap.add([satelliteLayer, roadNetLayer]);
 ```
