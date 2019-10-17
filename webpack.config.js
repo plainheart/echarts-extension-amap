@@ -11,7 +11,7 @@ module.exports = {
     path: __dirname + "/dist",
     filename: "echarts-extension-" + (isProd ? "[name].min.js" : "[name].js")
   },
-  devtool: "source-map",
+  devtool: isProd ? "source-map" : "cheap-module-source-map",
   externals: {
     echarts: "echarts"
   }
