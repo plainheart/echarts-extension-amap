@@ -7,15 +7,17 @@ export default echarts.extendComponentView({
     var rendering = true;
 
     var amap = aMapModel.getAMap();
-    var echartsLayer = aMapModel.__echartsLayer;
     var viewportRoot = api.getZr().painter.getViewportRoot();
     var coordSys = aMapModel.coordinateSystem;
+    var offsetEl = amap.getContainer();
+    var amape = offsetEl.querySelector(".amap-e");
+    var renderOnMoving = aMapModel.get("renderOnMoving");
+    var resizeEnable = amap.getStatus().resizeEnable;
 
     var moveHandler = function(e) {
       if (rendering) {
         return;
       }
-      var offsetEl = viewportRoot.parentNode.parentNode.parentNode;
       var mapOffset = [
         -parseInt(offsetEl.style.left, 10) || 0,
         -parseInt(offsetEl.style.top, 10) || 0
@@ -32,19 +34,17 @@ export default echarts.extendComponentView({
     };
 
     var zoomStartHandler = function(e) {
-      if (rendering) {
-        return;
-      }
-      echartsLayer.setOpacity(0);
+      renderOnMoving && amape.classList.remove("not-zoom");
+      moveHandler.call(this, e);
     };
 
     var zoomEndHandler = function(e) {
       if (rendering) {
         return;
       }
-      echartsLayer.setOpacity(1);
+      renderOnMoving && amape.classList.add("not-zoom");
       api.dispatchAction({
-        type: "amapRoam"
+        type: "amapRoam",
       });
     };
 
@@ -53,31 +53,41 @@ export default echarts.extendComponentView({
       moveHandler.call(this, e);
     };
 
-    var resizeEnable = amap.getStatus().resizeEnable;
-
-    amap.off("movestart", this._oldMoveHandler);
-    //amap.off("mapmove", this._oldMoveHandler);
-    amap.off("moveend", this._oldZoomEndHandler);
-    amap.off("complete", this._oldZoomEndHandler);
+    if (renderOnMoving) {
+      amap.off("mapmove", this._oldMoveHandler);
+    } else {
+      amap.off("moveend", this._oldMoveHandler);
+    }
     amap.off("zoomstart", this._oldZoomStartHandler);
     amap.off("zoomend", this._oldZoomEndHandler);
+
     resizeEnable && amap.off("resize", this._oldResizeHandler);
 
-    amap.on("movestart", moveHandler);
-    //amap.on("mapmove", moveHandler);
-    amap.on("moveend", zoomEndHandler);
-    amap.on("complete", zoomEndHandler);
+    if (renderOnMoving) {
+      amap.on("mapmove", moveHandler);
+    } else {
+      amap.on("moveend", moveHandler);
+    }
     amap.on("zoomstart", zoomStartHandler);
     amap.on("zoomend", zoomEndHandler);
+
     resizeEnable && amap.on("resize", resizeHandler);
 
     this._oldMoveHandler = moveHandler;
     this._oldZoomStartHandler = zoomStartHandler;
     this._oldZoomEndHandler = zoomEndHandler;
+
     resizeEnable && (this._oldResizeHandler = resizeHandler);
 
     rendering = false;
   },
 
-  dispose: function() {}
+  dispose: function(ecModel, api) {
+    console.log(ecModel)
+    var component = ecModel.getComponent("amap");
+    var amapInstance = component.getAMap();
+    amapInstance.destroy();
+    component.setAMap(null);
+    component.setEchartsLayer(null);
+  }
 });
