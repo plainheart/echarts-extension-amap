@@ -25,7 +25,7 @@ npm install echarts-extension-amap --save
 
 ```html
 <!--引入高德地图的Javascript API，这里需要使用你在高德地图开发者平台申请的 ak-->
-<script src="https://webapi.amap.com/maps?v=1.4.14&key=ak&plugin=AMap.Scale,AMap.ToolBar"></script>
+<script src="https://webapi.amap.com/maps?v=1.4.15&key=ak&plugin=AMap.Scale,AMap.ToolBar"></script>
 <!-- 引入 ECharts -->
 <script src="/path/to/echarts.min.js"></script>
 <!-- 引入高德地图扩展 -->
@@ -59,11 +59,13 @@ option = {
     // 高德地图初始中心经纬度
     center: [120.13066322374, 30.240018034923],
     // 高德地图初始缩放级别
-    zoom: 14,
+    zoom: 8,
     // 是否开启resize
     resizeEnable: true,
     // 自定义地图样式主题
     mapStyle: "amap://styles/dark",
+    // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
+    renderOnMoving: true,
     // 高德地图自定义EchartsLayer的zIndex，默认2000
     echartsLayerZIndex: 2019
     // 说明：如果想要添加卫星、路网等图层
