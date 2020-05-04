@@ -10,7 +10,6 @@ export default echarts.extendComponentView({
     var viewportRoot = api.getZr().painter.getViewportRoot();
     var coordSys = aMapModel.coordinateSystem;
     var offsetEl = amap.getContainer();
-    var amape = offsetEl.querySelector(".amap-e");
     var renderOnMoving = aMapModel.get("renderOnMoving");
     var resizeEnable = amap.getStatus().resizeEnable;
 
@@ -34,7 +33,11 @@ export default echarts.extendComponentView({
     };
 
     var zoomStartHandler = function(e) {
-      renderOnMoving && amape.classList.remove("not-zoom");
+      if (renderOnMoving) {
+        var amape = offsetEl.querySelector(".amap-e");
+        amape.classList.remove("not-zoom");
+      }
+
       moveHandler.call(this, e);
     };
 
@@ -42,7 +45,11 @@ export default echarts.extendComponentView({
       if (rendering) {
         return;
       }
-      renderOnMoving && amape.classList.add("not-zoom");
+      if (renderOnMoving) {
+        var amape = offsetEl.querySelector(".amap-e");
+        amape.classList.add("not-zoom");
+      }
+
       api.dispatchAction({
         type: "amapRoam",
       });
