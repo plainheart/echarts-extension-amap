@@ -7,9 +7,21 @@ function v2Equal(a, b) {
 export default echarts.extendComponentModel({
   type: "amap",
 
+  setAMap: function(amap) {
+    this.__amap = amap;
+  },
+
   getAMap: function() {
-    // __amap is injected when creating AMapCoordSys
+    // __amap is set when creating AMapCoordSys
     return this.__amap;
+  },
+
+  setEchartsLayer: function(layer) {
+    this.__echartsLayer = layer;
+  },
+
+  getEChartsLayer: function() {
+    return this.__echartsLayer;
   },
 
   setCenterAndZoom: function(center, zoom) {
@@ -26,6 +38,7 @@ export default echarts.extendComponentModel({
     center: [116.397428, 39.90923],
     zoom: 5,
     isHotspot: false,
-    echartsLayerZIndex: 2000
+    echartsLayerZIndex: 2000,
+    renderOnMoving: true
   }
 });

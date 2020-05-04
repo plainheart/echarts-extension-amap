@@ -94,6 +94,16 @@ function dataToCoordSize(dataSize, dataItem) {
 // For deciding which dimensions to use when creating list data
 AMapCoordSys.dimensions = AMapCoordSys.prototype.dimensions;
 
+function addCssRule(selector, rules, index) {
+  var sheet = document.getElementsByClassName("AMap.style")[0].sheet;
+  index = index || 0;
+  if (sheet.insertRule) {
+    sheet.insertRule(selector + "{" + rules + "}", index);
+  } else if (sheet.addRule) {
+    sheet.addRule(selector, rules, index);
+  }
+}
+
 AMapCoordSys.create = function(ecModel, api) {
   var amapCoordSys;
   var root = api.getDom();
@@ -108,7 +118,8 @@ AMapCoordSys.create = function(ecModel, api) {
     if (amapCoordSys) {
       throw new Error("Only one amap component can exist");
     }
-    if (!amapModel.__amap) {
+    var amap = amapModel.getAMap();
+    if (!amap) {
       // Not support IE8
       var amapRoot = root.querySelector(".ec-extension-amap");
       if (amapRoot) {
@@ -125,26 +136,41 @@ AMapCoordSys.create = function(ecModel, api) {
       root.appendChild(amapRoot);
 
       var options = amapModel.get();
-      var amap = (amapModel.__amap = new AMap.Map(amapRoot, options));
+      amap = new AMap.Map(amapRoot, options);
+      amapModel.setAMap(amap);
+
       var echartsLayer = new AMap.CustomLayer(viewportRoot, {
         zIndex: options.echartsLayerZIndex
       });
-      amapModel.__echartsLayer = echartsLayer;
+      amapModel.setEchartsLayer(echartsLayer);
       amap.add(echartsLayer);
+
+      options.renderOnMoving && viewportRoot.parentNode.classList.add('not-zoom');
+
+      addCssRule(".amap-e.not-zoom", "left: 0!important;top: 0!important;", Infinity);
 
       // Override
       painter.getViewportRootOffset = function() {
         return { offsetLeft: 0, offsetTop: 0 };
       };
     }
-    var amap = amapModel.__amap;
-    var center = amap.getCenter();
-    var zoom = amap.getZoom();
+
+    var center = amapModel.get("center");
+    var zoom = amapModel.get("zoom");
+    if (center && zoom) {
+      var amapCenter = amap.getCenter();
+      var amapZoom = amap.getZoom();
+      var centerOrZoomChanged = amapModel.centerOrZoomChanged([amapCenter.lng, amapCenter.lat], amapZoom);
+      if (centerOrZoomChanged) {
+        var pt = new AMap.LngLat(center[0], center[1]);
+        amap.setZoomAndCenter(zoom, pt);
+      }
+    }
 
     amapCoordSys = new AMapCoordSys(amap, api);
     amapCoordSys.setMapOffset(amapModel.__mapOffset || [0, 0]);
     amapCoordSys.setZoom(zoom);
-    amapCoordSys.setCenter([center.lng, center.lat]);
+    amapCoordSys.setCenter(center);
 
     amapModel.coordinateSystem = amapCoordSys;
   });

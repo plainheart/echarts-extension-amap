@@ -32,6 +32,6 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
-    "echarts": "^4.1.0"
+    "echarts": "^4.7.0"
   }
 }
