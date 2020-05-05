@@ -16,9 +16,10 @@ AMapCoordSys.prototype.setZoom = function(zoom) {
 };
 
 AMapCoordSys.prototype.setCenter = function(center) {
-  this._center = this._amap.lnglatToPixel(
-    new AMap.LngLat(center[0], center[1])
-  );
+  var lnglat = new AMap.LngLat(center[0], center[1]);
+  this._center = AMap.version >= 2.0
+    ? this._amap.lngLatToPixel(lnglat)
+    : this._amap.lnglatToPixel(lnglat);
 };
 
 AMapCoordSys.prototype.setMapOffset = function(mapOffset) {
@@ -95,7 +96,11 @@ function dataToCoordSize(dataSize, dataItem) {
 AMapCoordSys.dimensions = AMapCoordSys.prototype.dimensions;
 
 function addCssRule(selector, rules, index) {
-  var sheet = document.getElementsByClassName("AMap.style")[0].sheet;
+  // 2.0
+  var is2X = AMap.version >= 2;
+  var sheet = is2X
+    ? document.getElementById("AMap_Dynamic_style").sheet
+    : document.getElementsByClassName("AMap.style")[0].sheet;
   index = index || 0;
   if (sheet.insertRule) {
     sheet.insertRule(selector + "{" + rules + "}", index);
