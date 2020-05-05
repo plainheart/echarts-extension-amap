@@ -19,7 +19,10 @@
     "echarts-extention",
     "data-visualization",
     "map",
-    "gaode"
+    "gaode",
+    "echarts-amap",
+    "echarts4",
+    "amap-v2"
   ],
   "author": "plainheart",
   "license": "MIT",
