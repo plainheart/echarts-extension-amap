@@ -3,98 +3,106 @@
 [![Downloads](https://img.shields.io/npm/dm/echarts-extension-amap.svg)](https://npmcharts.com/compare/echarts-extension-amap?minimal=true)
 [![License](https://img.shields.io/npm/l/echarts-extension-amap.svg)](https://www.npmjs.com/package/echarts-extension-amap)
 
-## ECharts 高德地图扩展
+## AMap extension for ECharts
 
-[ECharts](http://echarts.baidu.com) 高德地图扩展，可以在高德地图上展现 [点图](http://echarts.baidu.com/option.html#series-scatter)，[线图](http://echarts.baidu.com/option.html#series-line)，[热力图](http://echarts.baidu.com/option.html#series-heatmap) 等可视化。
+[中文说明](https://github.com/apache/incubator-echarts/blob/master/README.zh-CN.md)
 
-### 示例
+This is an AMap extension for [ECharts](https://echarts.apache.org/zh/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/zh/option.html#series-scatter), [Line](https://echarts.apache.org/zh/option.html#series-line), [Heatmap](https://echarts.apache.org/zh/option.html#series-heatmap).
 
-参见 [examples/index.html](http://github.com/plainheart/echarts-extension-amap/tree/master/examples/index.html)
+### Examples
 
-![示例](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
+Refer to [examples/index.html](http://github.com/plainheart/echarts-extension-amap/tree/master/examples/index.html)
 
-### 安装
+![Preview](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
+
+### Installation
 
 ```js
 npm install echarts-extension-amap --save
 ```
 
-### 引入
+### Import
 
-可以直接引入打包好的扩展文件和高德地图的 Javascript API
+Import packaged distribution file `echarts-extension-amap.min.js` and add AMap API script and echarts script.
 
 ```html
-<!--引入高德地图的Javascript API，这里需要使用你在高德地图开发者平台申请的 ak-->
+<!-- import JavaScript API of AMap, please replace the ak with your own key and specify the version and plugins you need -->
 <script src="https://webapi.amap.com/maps?v=2.0&key=ak&plugin=AMap.Scale,AMap.ToolBar"></script>
-<!-- 引入 ECharts -->
+<!-- import echarts -->
 <script src="/path/to/echarts.min.js"></script>
-<!-- 引入高德地图扩展 -->
+<!-- import echarts-extension-amap -->
 <script src="dist/echarts-extension-amap.min.js"></script>
 ```
 
-如果是 webpack 打包，也可以 require 引入
+You can also import this extension by `require` if you are using `webpack`.
 
 ```js
 require("echarts");
 require("echarts-extension-amap");
 ```
 
-使用 CDN
+Or use a CDN
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@latest/dist/echarts-extension-amap.min.js"></script>
 ```
 
-插件会自动注册相应的组件。
+This extension will register itself as a component of `echarts` after it is imported.
 
-### 使用
+### Usage
 
-扩展主要提供了跟 geo 一样的坐标系和底图的绘制，因此配置方式非常简单，如下
+This extension can be configured simply like [geo](https://echarts.apache.org/en/option.html#geo).
 
 ```js
 option = {
-  // 加载 amap 组件
+  // load amap component
   amap: {
-    // 高德地图支持的初始化地图配置
-    // 高德地图初始中心经纬度
+    // initial options of AMap
+    // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
+    // initial map center [lng, lat]
     center: [108.39, 39.9],
-    // 高德地图初始缩放级别
+    // initial map zoom
     zoom: 4,
-    // 是否开启resize
+    // whether the map and echarts automatically handles browser window resize to update itself.
     resizeEnable: true,
-    // 自定义地图样式主题
+    // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
     mapStyle: "amap://styles/dark",
-    // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
+    // whether echarts layer should be rendered when the map is moving. Default is true.
+    // if false, it will only be re-rendered after the map `moveend`.
+    // It's better to set this option to false if data is large.
     renderOnMoving: true,
-    // 高德地图自定义EchartsLayer的zIndex，默认2000
+    // the zIndex of echarts layer for AMap, default value is 2000.
     echartsLayerZIndex: 2019
-    // 说明：如果想要添加卫星、路网等图层
-    // 暂时先不要使用layers配置，因为存在Bug
-    // 建议使用amap.add的方式，使用方式参见最下方代码
+    // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
+    // There is some bugs about it, we can use `amap.add` instead.
+    // Refer to the codes at the bottom.
+
+    // More initial options...
   },
   series: [
     {
       type: "scatter",
-      // 使用高德地图坐标系
+      // use `amap` as the coordinate system
       coordinateSystem: "amap",
-      // 数据格式跟在 geo 坐标系上一样，每一项都是 [经度，纬度，数值大小，其它维度...]
+      // data items [[lng, lat, value], [lng, lat, value], ...]
       data: [[120, 30, 8], [120.1, 30.2, 20]],
       encode: {
+        // encode the third element of data item as the `value` dimension
         value: 2
       }
     }
   ]
 };
 
-// 获取高德地图实例，使用高德地图自带的控件(需要在高德地图js API script标签手动引入)
+// Get the instance of AMap
 var amap = chart
   .getModel()
   .getComponent("amap")
   .getAMap();
-// 添加控件
+// Add some controls provided by AMap.
 amap.addControl(new AMap.Scale());
 amap.addControl(new AMap.ToolBar());
-// 添加图层
+// Add SatelliteLayer and RoadNetLayer to map
 var satelliteLayer = new AMap.TileLayer.Satellite();
 var roadNetLayer = new AMap.TileLayer.RoadNet();
 amap.add([satelliteLayer, roadNetLayer]);
