@@ -7,7 +7,7 @@
 
 [中文说明](https://github.com/apache/incubator-echarts/blob/master/README.zh-CN.md)
 
-This is an AMap extension for [ECharts](https://echarts.apache.org/zh/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/zh/option.html#series-scatter), [Line](https://echarts.apache.org/zh/option.html#series-line), [Heatmap](https://echarts.apache.org/zh/option.html#series-heatmap).
+This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Line](https://echarts.apache.org/en/option.html#series-line), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap).
 
 ### Examples
 
