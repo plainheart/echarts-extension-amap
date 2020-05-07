@@ -5,13 +5,13 @@
 
 ## ECharts 高德地图扩展
 
-[README_EN](https://github.com/apache/incubator-echarts/blob/master/README.md)
+[README_EN](https://github.com/plainheart/echarts-extension-amap/blob/master/README.md)
 
 [ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-line)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap) 等可视化。
 
 ### 示例
 
-参见 [examples/index.html](http://github.com/plainheart/echarts-extension-amap/tree/master/examples/index.html)
+参见 [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.htmll)
 
 ![示例](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
