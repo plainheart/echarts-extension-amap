@@ -40,7 +40,7 @@ AMapCoordSys.prototype.dataToPoint = function(data) {
 AMapCoordSys.prototype.pointToData = function(pt) {
   var mapOffset = this._mapOffset;
   var lnglat = this._amap.containerToLngLat(
-    AMap.Pixel(pt[0] + mapOffset[0], pt[1] + mapOffset[1])
+    new AMap.Pixel(pt[0] + mapOffset[0], pt[1] + mapOffset[1])
   );
   return [lnglat.lng, lnglat.lat];
 };
