@@ -74,7 +74,7 @@ option = {
     // the zIndex of echarts layer for AMap, default value is 2000.
     echartsLayerZIndex: 2019
     // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
-    // There is some bugs about it, we can use `amap.add` instead.
+    // There are some bugs about it, we can use `amap.add` instead.
     // Refer to the codes at the bottom.
 
     // More initial options...
