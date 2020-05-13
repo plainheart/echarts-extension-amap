@@ -11,7 +11,7 @@
 
 ### 示例
 
-参见 [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.htmll)
+参见 [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.html)
 
 ![示例](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
