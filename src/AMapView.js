@@ -67,6 +67,7 @@ export default echarts.extendComponentView({
 
     var resizeHandler = function(e) {
       clearTimeout(resizeDelay);
+
       resizeDelay = setTimeout(function() {
         echarts.getInstanceByDom(api.getDom()).resize();
       }, 100);

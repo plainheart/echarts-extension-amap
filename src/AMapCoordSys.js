@@ -9,6 +9,9 @@ function AMapCoordSys(amap, api) {
   this._api = api;
 }
 
+// exclude private or unsupported options
+AMapCoordSys.prototype._excludedOptions = ["echartsLayerZIndex", "renderOnMoving", "layers"];
+
 AMapCoordSys.prototype.dimensions = ["lng", "lat"];
 
 AMapCoordSys.prototype.setZoom = function(zoom) {
@@ -17,9 +20,7 @@ AMapCoordSys.prototype.setZoom = function(zoom) {
 
 AMapCoordSys.prototype.setCenter = function(center) {
   var lnglat = new AMap.LngLat(center[0], center[1]);
-  this._center = AMap.version >= 2.0
-    ? this._amap.lngLatToPixel(lnglat)
-    : this._amap.lnglatToPixel(lnglat);
+  this._center = this._amap.lngLatToContainer(lnglat);
 };
 
 AMapCoordSys.prototype.setMapOffset = function(mapOffset) {
@@ -112,6 +113,15 @@ function addCssRule(selector, rules, index) {
 AMapCoordSys.create = function(ecModel, api) {
   var amapCoordSys;
   var root = api.getDom();
+  var excludedOptions = AMapCoordSys.prototype._excludedOptions;
+
+  // FIXME: a hack for AMap 2.0
+  if (AMap.version >= 2) {
+    if(root.style.overflow !== 'auto') {
+      root.style.overflow = 'auto';
+      console.warn('[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.')
+    }
+  }
 
   ecModel.eachComponent("amap", function(amapModel) {
     var painter = api.getZr().painter;
@@ -139,12 +149,17 @@ AMapCoordSys.create = function(ecModel, api) {
       amapRoot.classList.add("ec-extension-amap");
       root.appendChild(amapRoot);
 
-      var options = amapModel.get();
-      amap = new AMap.Map(amapRoot, echarts.util.clone(options));
+      var options = echarts.util.clone(amapModel.get());
+      var echartsLayerZIndex = options.echartsLayerZIndex;
+      // delete excluded options
+      zrUtil.each(excludedOptions, function (key) {
+        delete options[key];
+      });
+      amap = new AMap.Map(amapRoot, options);
       amapModel.setAMap(amap);
 
       var echartsLayer = new AMap.CustomLayer(viewportRoot, {
-        zIndex: options.echartsLayerZIndex
+        zIndex: echartsLayerZIndex
       });
       amapModel.setEchartsLayer(echartsLayer);
       amap.add(echartsLayer);
