@@ -16,7 +16,7 @@ export default echarts.extendComponentModel({
     return this.__amap;
   },
 
-  setEchartsLayer: function(layer) {
+  setEChartsLayer: function(layer) {
     this.__echartsLayer = layer;
   },
 
