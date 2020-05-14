@@ -113,7 +113,6 @@ AMapCoordSys.create = function(ecModel, api) {
   var amapCoordSys;
   var root = api.getDom();
 
-  // TODO Dispose
   ecModel.eachComponent("amap", function(amapModel) {
     var painter = api.getZr().painter;
     var viewportRoot = painter.getViewportRoot();
@@ -141,7 +140,7 @@ AMapCoordSys.create = function(ecModel, api) {
       root.appendChild(amapRoot);
 
       var options = amapModel.get();
-      amap = new AMap.Map(amapRoot, options);
+      amap = new AMap.Map(amapRoot, echarts.util.clone(options));
       amapModel.setAMap(amap);
 
       var echartsLayer = new AMap.CustomLayer(viewportRoot, {

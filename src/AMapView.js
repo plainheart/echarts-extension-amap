@@ -10,13 +10,16 @@ export default echarts.extendComponentView({
     var viewportRoot = api.getZr().painter.getViewportRoot();
     var coordSys = aMapModel.coordinateSystem;
     var offsetEl = amap.getContainer();
+    var echartsLayer = aMapModel.getEChartsLayer();
     var renderOnMoving = aMapModel.get("renderOnMoving");
-    var resizeEnable = amap.getStatus().resizeEnable;
+    var resizeEnable = aMapModel.get("resizeEnable");
+    var resizeDelay;
 
     var moveHandler = function(e) {
       if (rendering) {
         return;
       }
+
       var mapOffset = [
         -parseInt(offsetEl.style.left, 10) || 0,
         -parseInt(offsetEl.style.top, 10) || 0
@@ -33,22 +36,29 @@ export default echarts.extendComponentView({
     };
 
     var zoomStartHandler = function(e) {
+      if (rendering) {
+        return;
+      }
+
+      echartsLayer.setOpacity(0);
+
       if (renderOnMoving) {
         var amape = offsetEl.querySelector(".amap-e");
         amape.classList.remove("not-zoom");
       }
-
-      moveHandler.call(this, e);
     };
 
     var zoomEndHandler = function(e) {
       if (rendering) {
         return;
       }
+
       if (renderOnMoving) {
         var amape = offsetEl.querySelector(".amap-e");
         amape.classList.add("not-zoom");
       }
+
+      echartsLayer.setOpacity(1);
 
       api.dispatchAction({
         type: "amapRoam",
@@ -56,25 +66,19 @@ export default echarts.extendComponentView({
     };
 
     var resizeHandler = function(e) {
-      echarts.getInstanceByDom(api.getDom()).resize();
-      moveHandler.call(this, e);
+      clearTimeout(resizeDelay);
+      resizeDelay = setTimeout(function() {
+        echarts.getInstanceByDom(api.getDom()).resize();
+      }, 100);
     };
 
-    if (renderOnMoving) {
-      amap.off("mapmove", this._oldMoveHandler);
-    } else {
-      amap.off("moveend", this._oldMoveHandler);
-    }
+    amap.off(renderOnMoving ? "mapmove" : "moveend", this._oldMoveHandler);
     amap.off("zoomstart", this._oldZoomStartHandler);
     amap.off("zoomend", this._oldZoomEndHandler);
 
     resizeEnable && amap.off("resize", this._oldResizeHandler);
 
-    if (renderOnMoving) {
-      amap.on("mapmove", moveHandler);
-    } else {
-      amap.on("moveend", moveHandler);
-    }
+    amap.on(renderOnMoving ? "mapmove" : "moveend", moveHandler);
     amap.on("zoomstart", zoomStartHandler);
     amap.on("zoomend", zoomEndHandler);
 

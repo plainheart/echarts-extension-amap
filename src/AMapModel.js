@@ -38,6 +38,7 @@ export default echarts.extendComponentModel({
     center: [116.397428, 39.90923],
     zoom: 5,
     isHotspot: false,
+    resizeEnable: true,
     echartsLayerZIndex: 2000,
     renderOnMoving: true
   }
