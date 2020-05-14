@@ -149,7 +149,7 @@ AMapCoordSys.create = function(ecModel, api) {
       amapRoot.classList.add("ec-extension-amap");
       root.appendChild(amapRoot);
 
-      var options = echarts.util.clone(amapModel.get());
+      var options = zrUtil.clone(amapModel.get());
       var echartsLayerZIndex = options.echartsLayerZIndex;
       // delete excluded options
       zrUtil.each(excludedOptions, function (key) {
