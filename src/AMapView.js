@@ -99,6 +99,6 @@ export default echarts.extendComponentView({
     var amapInstance = component.getAMap();
     amapInstance.destroy();
     component.setAMap(null);
-    component.setEchartsLayer(null);
+    component.setEChartsLayer(null);
   }
 });

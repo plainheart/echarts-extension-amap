@@ -161,7 +161,7 @@ AMapCoordSys.create = function(ecModel, api) {
       var echartsLayer = new AMap.CustomLayer(viewportRoot, {
         zIndex: echartsLayerZIndex
       });
-      amapModel.setEchartsLayer(echartsLayer);
+      amapModel.setEChartsLayer(echartsLayer);
       amap.add(echartsLayer);
 
       options.renderOnMoving && viewportRoot.parentNode.classList.add('not-zoom');
