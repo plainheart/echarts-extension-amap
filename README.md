@@ -11,7 +11,7 @@ This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html
 
 ### Examples
 
-Refer to [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.html)
+Refer to [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index_en.html)
 
 ![Preview](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
@@ -57,6 +57,8 @@ This extension can be configured simply like [geo](https://echarts.apache.org/en
 option = {
   // load amap component
   amap: {
+    // enable 3D mode
+    viewMode: '3D',
     // initial options of AMap
     // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
     // initial map center [lng, lat]
