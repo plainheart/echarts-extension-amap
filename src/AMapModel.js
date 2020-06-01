@@ -41,8 +41,8 @@ export default echarts.extendComponentModel({
 
     // extension options
     echartsLayerZIndex: 2000,
-    renderOnMoving: true,
-    hideOnZooming: true,
+    renderOnMoving: true
+    //hideOnZooming: true,
     //trackPitchAndRotation: false
   }
 });

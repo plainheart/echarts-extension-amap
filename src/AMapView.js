@@ -14,7 +14,7 @@ export default echarts.extendComponentView({
     var echartsLayer = amapModel.getEChartsLayer();
 
     var renderOnMoving = amapModel.get("renderOnMoving");
-    var hideOnZooming = amapModel.get("hideOnZooming");
+    //var hideOnZooming = amapModel.get("hideOnZooming");
     var resizeEnable = amapModel.get("resizeEnable");
 
     amape && amape.classList.add("ec-amap-not-zoom");
@@ -44,7 +44,7 @@ export default echarts.extendComponentView({
         return;
       }
 
-      hideOnZooming && echartsLayer.setOpacity(0.01);
+      /*hideOnZooming && */echartsLayer.setOpacity(0.01);
     };
 
     var zoomEndHandler = function(e) {
