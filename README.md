@@ -28,7 +28,7 @@ Import packaged distribution file `echarts-extension-amap.min.js` and add AMap A
 ```html
 <!-- import JavaScript API of AMap, please replace the ak with your own key and specify the version and plugins you need -->
 <script src="https://webapi.amap.com/maps?v=2.0&key=ak&plugin=AMap.Scale,AMap.ToolBar"></script>
-<!-- import echarts -->
+<!-- import ECharts -->
 <script src="/path/to/echarts.min.js"></script>
 <!-- import echarts-extension-amap -->
 <script src="dist/echarts-extension-amap.min.js"></script>
