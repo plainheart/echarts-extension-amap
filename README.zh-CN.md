@@ -57,6 +57,8 @@ require("echarts-extension-amap");
 option = {
   // 加载 amap 组件
   amap: {
+    // 3D模式
+    viewMode: '3D',
     // 高德地图支持的初始化地图配置
     // 高德地图初始中心经纬度
     center: [108.39, 39.9],
