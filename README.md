@@ -11,7 +11,7 @@ This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html
 
 ### Examples
 
-Refer to [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index_en.html)
+Refer to [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.html)
 
 ![Preview](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 

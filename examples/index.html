@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="renderer" content="webkit">
@@ -25,9 +25,9 @@
     <title>an example for echarts-extension-amap</title>
     <!-- please replace {ak} with your ak & customize your plugins -->
     <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
-    <!-- echarts CDN -->
+    <!-- ECharts CDN -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
-    <!-- echarts amap extension -->
+    <!-- ECharts amap extension -->
     <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@latest/dist/echarts-extension-amap.min.js"></script>
     <style type="text/css">
@@ -44,7 +44,7 @@
 </head>
 <body>
     <div id="echarts-amap"></div>
-    <!-- 数据来源于百度地图 仅作示例 与高德坐标稍有偏差 -->
+    <!-- data comes from Baidu Map, just for example -->
     <script type="text/javascript">
         var data = [
             {name: '海门', value: 9},
@@ -447,23 +447,31 @@
         };
 
         var option = {
-            // 加载 amap 组件
+            // amap component option
             amap: {
-                // 3D模式
+                // enable 3D mode
                 viewMode: '3D',
-                // 高德地图中心经纬度
+                // initial options of AMap
+                // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
+                // initial map center [lng, lat]
                 center: [108.39, 39.9],
-                // 高德地图缩放
+                // initial map zoom
                 zoom: 4,
-                // 启用resize
+                // whether the map and echarts automatically handles browser window resize to update itself.
                 resizeEnable: true,
-                // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
+                // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
+                mapStyle: "amap://styles/dark",
+                // whether echarts layer should be rendered when the map is moving. Default is true.
+                // if false, it will only be re-rendered after the map `moveend`.
+                // It's better to set this option to false if data is large.
                 renderOnMoving: true,
-                // 自定义地图样式主题
-                mapStyle:'amap://styles/dark'
-                // 说明：如果想要添加卫星、路网等图层
-                // 暂时先不要使用layers配置，因为存在Bug
-                // 建议使用amap.add的方式，使用方式参见最下方代码
+                // the zIndex of echarts layer for AMap, default value is 2000.
+                echartsLayerZIndex: 2019
+                // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
+                // There are some bugs about it, we can use `amap.add` instead.
+                // Refer to the codes at the bottom.
+
+                // More initial options...
             },
             tooltip : {
                 trigger: 'item'
@@ -473,9 +481,9 @@
                 {
                     name: 'PM2.5',
                     type: "scatter",
-                    // 使用高德地图坐标系
+                    // use `amap` as the coordinate system
                     coordinateSystem: "amap",
-                    // 数据格式跟在 geo 坐标系上一样，每一项都是 [经度，纬度，数值大小，其它维度...]
+                    // data items [[lng, lat, value], [lng, lat, value], ...]
                     data: convertData(data),
                     symbolSize: function (val) {
                         return val[2] / 10;
@@ -535,15 +543,15 @@
                 }
             ]
         };
-        // 初始化ECharts
+        // initialize echart
         var chart = echarts.init(document.getElementById("echarts-amap"));
         chart.setOption(option);
-        // 获取高德地图实例，使用高德地图自带的控件
+        // get amap instance
         var amap = chart.getModel().getComponent("amap").getAMap();
-        // 添加控件 和高德地图API用法相同
+        // operations below are the same as amap
         amap.addControl(new AMap.Scale());
         amap.addControl(new AMap.ToolBar());
-        // 添加图层
+        // add layers
         // var satelliteLayer = new AMap.TileLayer.Satellite();
         // var roadNetLayer = new AMap.TileLayer.RoadNet();
         // amap.add([satelliteLayer, roadNetLayer]);
