@@ -14,8 +14,9 @@ var AMapCoordSysProto = AMapCoordSys.prototype;
 // exclude private and unsupported options
 var excludedOptions = [
   "echartsLayerZIndex",
-  "hideOnZooming", "layers"
-  //"renderOnMoving"
+  "renderOnMoving",
+  "layers"
+  //"hideOnZooming"
   //"trackPitchAndRotation"
 ];
 
