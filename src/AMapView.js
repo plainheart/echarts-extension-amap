@@ -3,17 +3,21 @@ import * as echarts from "echarts";
 export default echarts.extendComponentView({
   type: "amap",
 
-  render: function(aMapModel, ecModel, api) {
+  render: function(amapModel, ecModel, api) {
     var rendering = true;
 
-    var amap = aMapModel.getAMap();
+    var amap = amapModel.getAMap();
     var viewportRoot = api.getZr().painter.getViewportRoot();
-    var coordSys = aMapModel.coordinateSystem;
     var offsetEl = amap.getContainer();
-    var echartsLayer = aMapModel.getEChartsLayer();
-    var renderOnMoving = aMapModel.get("renderOnMoving");
-    var resizeEnable = aMapModel.get("resizeEnable");
-    var resizeDelay;
+    var amape = offsetEl.querySelector(".amap-e");
+    var coordSys = amapModel.coordinateSystem;
+    var echartsLayer = amapModel.getEChartsLayer();
+
+    var renderOnMoving = amapModel.get("renderOnMoving");
+    var hideOnZooming = amapModel.get("hideOnZooming");
+    var resizeEnable = amapModel.get("resizeEnable");
+
+    amape && amape.classList.add("ec-amap-not-zoom");
 
     var moveHandler = function(e) {
       if (rendering) {
@@ -28,7 +32,7 @@ export default echarts.extendComponentView({
       viewportRoot.style.top = mapOffset[1] + "px";
 
       coordSys.setMapOffset(mapOffset);
-      aMapModel.__mapOffset = mapOffset;
+      amapModel.__mapOffset = mapOffset;
 
       api.dispatchAction({
         type: "amapRoam"
@@ -40,22 +44,12 @@ export default echarts.extendComponentView({
         return;
       }
 
-      echartsLayer.setOpacity(0);
-
-      if (renderOnMoving) {
-        var amape = offsetEl.querySelector(".amap-e");
-        amape.classList.remove("not-zoom");
-      }
+      hideOnZooming && echartsLayer.setOpacity(0.01);
     };
 
     var zoomEndHandler = function(e) {
       if (rendering) {
         return;
-      }
-
-      if (renderOnMoving) {
-        var amape = offsetEl.querySelector(".amap-e");
-        amape.classList.add("not-zoom");
       }
 
       echartsLayer.setOpacity(1);
@@ -65,25 +59,32 @@ export default echarts.extendComponentView({
       });
     };
 
-    var resizeHandler = function(e) {
-      clearTimeout(resizeDelay);
+    var resizeHandler;
 
-      resizeDelay = setTimeout(function() {
-        echarts.getInstanceByDom(api.getDom()).resize();
-      }, 100);
-    };
-
-    amap.off(renderOnMoving ? "mapmove" : "moveend", this._oldMoveHandler);
+    amap.off("mapmove", this._oldMoveHandler);
+    amap.off("moveend", this._oldMoveHandler);
+    amap.off("amaprender", this._oldMoveHandler);
     amap.off("zoomstart", this._oldZoomStartHandler);
     amap.off("zoomend", this._oldZoomEndHandler);
-
-    resizeEnable && amap.off("resize", this._oldResizeHandler);
+    amap.off("resize", this._oldResizeHandler);
 
     amap.on(renderOnMoving ? "mapmove" : "moveend", moveHandler);
+    amap.on("amaprender", moveHandler);
     amap.on("zoomstart", zoomStartHandler);
     amap.on("zoomend", zoomEndHandler);
 
-    resizeEnable && amap.on("resize", resizeHandler);
+    if (resizeEnable) {
+      resizeHandler = function(e) {
+        clearTimeout(this._resizeDelay);
+
+        this._resizeDelay = setTimeout(function() {
+          echarts.getInstanceByDom(api.getDom()).resize();
+        }, 100);
+      };
+
+      resizeHandler = echarts.util.bind(resizeHandler, this);
+      amap.on("resize", resizeHandler);
+    }
 
     this._oldMoveHandler = moveHandler;
     this._oldZoomStartHandler = zoomStartHandler;
@@ -95,10 +96,12 @@ export default echarts.extendComponentView({
   },
 
   dispose: function(ecModel, api) {
+    clearTimeout(this._resizeDelay);
+
     var component = ecModel.getComponent("amap");
-    var amapInstance = component.getAMap();
-    amapInstance.destroy();
+    component.getAMap().destroy();
     component.setAMap(null);
     component.setEChartsLayer(null);
+    component.coordinateSystem.setAMap(null);
   }
 });

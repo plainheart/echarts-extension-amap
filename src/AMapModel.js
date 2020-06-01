@@ -12,7 +12,6 @@ export default echarts.extendComponentModel({
   },
 
   getAMap: function() {
-    // __amap is set when creating AMapCoordSys
     return this.__amap;
   },
 
@@ -39,7 +38,11 @@ export default echarts.extendComponentModel({
     zoom: 5,
     isHotspot: false,
     resizeEnable: true,
+
+    // extension options
     echartsLayerZIndex: 2000,
-    renderOnMoving: true
+    renderOnMoving: true,
+    hideOnZooming: true,
+    trackPitchAndRotation: false
   }
 });

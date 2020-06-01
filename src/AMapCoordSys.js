@@ -9,36 +9,46 @@ function AMapCoordSys(amap, api) {
   this._api = api;
 }
 
-// exclude private or unsupported options
-AMapCoordSys.prototype._excludedOptions = ["echartsLayerZIndex", "renderOnMoving", "layers"];
+var AMapCoordSysProto = AMapCoordSys.prototype;
 
-AMapCoordSys.prototype.dimensions = ["lng", "lat"];
+// exclude private and unsupported options
+var excludedOptions = [
+  "echartsLayerZIndex", "renderOnMoving",
+  "hideOnZooming", "trackPitchAndRotation",
+  "layers"
+];
 
-AMapCoordSys.prototype.setZoom = function(zoom) {
+AMapCoordSysProto.dimensions = ["lng", "lat"];
+
+AMapCoordSysProto.setZoom = function(zoom) {
   this._zoom = zoom;
 };
 
-AMapCoordSys.prototype.setCenter = function(center) {
+AMapCoordSysProto.setCenter = function(center) {
   var lnglat = new AMap.LngLat(center[0], center[1]);
   this._center = this._amap.lngLatToContainer(lnglat);
 };
 
-AMapCoordSys.prototype.setMapOffset = function(mapOffset) {
+AMapCoordSysProto.setMapOffset = function(mapOffset) {
   this._mapOffset = mapOffset;
 };
 
-AMapCoordSys.prototype.getAMap = function() {
+AMapCoordSysProto.setAMap = function(amap) {
+  this._amap = amap;
+};
+
+AMapCoordSysProto.getAMap = function() {
   return this._amap;
 };
 
-AMapCoordSys.prototype.dataToPoint = function(data) {
+AMapCoordSysProto.dataToPoint = function(data) {
   var lnglat = new AMap.LngLat(data[0], data[1]);
   var px = this._amap.lngLatToContainer(lnglat);
   var mapOffset = this._mapOffset;
   return [px.x - mapOffset[0], px.y - mapOffset[1]];
 };
 
-AMapCoordSys.prototype.pointToData = function(pt) {
+AMapCoordSysProto.pointToData = function(pt) {
   var mapOffset = this._mapOffset;
   var lnglat = this._amap.containerToLngLat(
     new AMap.Pixel(pt[0] + mapOffset[0], pt[1] + mapOffset[1])
@@ -46,16 +56,16 @@ AMapCoordSys.prototype.pointToData = function(pt) {
   return [lnglat.lng, lnglat.lat];
 };
 
-AMapCoordSys.prototype.getViewRect = function() {
+AMapCoordSysProto.getViewRect = function() {
   var api = this._api;
   return new graphic.BoundingRect(0, 0, api.getWidth(), api.getHeight());
 };
 
-AMapCoordSys.prototype.getRoamTransform = function() {
+AMapCoordSysProto.getRoamTransform = function() {
   return matrix.create();
 };
 
-AMapCoordSys.prototype.prepareCustoms = function(data) {
+AMapCoordSysProto.prepareCustoms = function(data) {
   var rect = this.getViewRect();
   return {
     coordSys: {
@@ -93,9 +103,6 @@ function dataToCoordSize(dataSize, dataItem) {
   );
 }
 
-// For deciding which dimensions to use when creating list data
-AMapCoordSys.dimensions = AMapCoordSys.prototype.dimensions;
-
 function addCssRule(selector, rules, index) {
   // 2.0
   var is2X = AMap.version >= 2;
@@ -110,10 +117,53 @@ function addCssRule(selector, rules, index) {
   }
 }
 
+// For deciding which dimensions to use when creating list data
+AMapCoordSys.dimensions = AMapCoordSysProto.dimensions;
+
+var nativeRotation = AMap.Map.prototype.setRotation;
+var nativePitch = AMap.Map.prototype.setPitch;
+
+function setRotation(rotation) {
+  var amap = this.getAMap();
+  // for 2.x which has animation for rotation
+  nativeRotation.apply(amap, [rotation, true]);
+
+  var rotateEnable = amap.getStatus().rotateEnable;
+  if (rotateEnable) {
+    var amapCoordSys = this.coordinateSystem;
+    var newRotation = amap.getRotation();
+    // emit amaprender event
+    newRotation !== amapCoordSys._rotation && amap.emit('amaprender', {
+      type: 'rotation',
+      oldRotation: amapCoordSys._rotation,
+      newRotation: newRotation
+    });
+    amapCoordSys._rotation = newRotation;
+  }
+}
+
+function setPitch(pitch) {
+  var amap = this.getAMap();
+  // for 2.x which has animation for pitch
+  nativePitch.apply(amap, [pitch, true]);
+
+  var pitchEnable = amap.getStatus().pitchEnable;
+  if (pitchEnable) {
+    var amapCoordSys = this.coordinateSystem;
+    var newPitch = amap.getPitch();
+    // emit amaprender event
+    newPitch !== amapCoordSys._pitch && amap.emit('amaprender', {
+      type: 'pitch',
+      oldPitch: amapCoordSys._pitch,
+      newPitch: newPitch
+    });
+    amapCoordSys._pitch = newPitch;
+  }
+}
+
 AMapCoordSys.create = function(ecModel, api) {
   var amapCoordSys;
   var root = api.getDom();
-  var excludedOptions = AMapCoordSys.prototype._excludedOptions;
 
   // FIXME: a hack for AMap 2.0
   if (AMap.version >= 2) {
@@ -152,9 +202,10 @@ AMapCoordSys.create = function(ecModel, api) {
       var options = zrUtil.clone(amapModel.get());
       var echartsLayerZIndex = options.echartsLayerZIndex;
       // delete excluded options
-      zrUtil.each(excludedOptions, function (key) {
+      zrUtil.each(excludedOptions, function(key) {
         delete options[key];
       });
+
       amap = new AMap.Map(amapRoot, options);
       amapModel.setAMap(amap);
 
@@ -164,15 +215,18 @@ AMapCoordSys.create = function(ecModel, api) {
       amapModel.setEChartsLayer(echartsLayer);
       amap.add(echartsLayer);
 
-      options.renderOnMoving && viewportRoot.parentNode.classList.add('not-zoom');
-
-      addCssRule(".amap-e.not-zoom", "left: 0!important;top: 0!important;", Infinity);
+      addCssRule(".ec-amap-not-zoom", "left:0!important;top:0!important", Infinity);
 
       // Override
       painter.getViewportRootOffset = function() {
         return { offsetLeft: 0, offsetTop: 0 };
       };
     }
+
+    // track pitch and rotation
+    var trackPitchAndRotation = amapModel.get('trackPitchAndRotation');
+    AMap.Map.prototype.setRotation = trackPitchAndRotation ? setRotation.bind(amapModel) : nativeRotation;
+    AMap.Map.prototype.setPitch = trackPitchAndRotation ? setPitch.bind(amapModel) : nativePitch;
 
     var center = amapModel.get("center");
     var zoom = amapModel.get("zoom");

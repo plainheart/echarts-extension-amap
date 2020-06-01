@@ -20,10 +20,10 @@ echarts.registerAction(
     update: "updateLayout"
   },
   function(payload, ecModel) {
-    ecModel.eachComponent("amap", function(aMapModel) {
-      var amap = aMapModel.getAMap();
+    ecModel.eachComponent("amap", function(amapModel) {
+      var amap = amapModel.getAMap();
       var center = amap.getCenter();
-      aMapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom());
+      amapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom());
     });
   }
 );
