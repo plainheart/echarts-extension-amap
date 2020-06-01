@@ -14,8 +14,8 @@ var AMapCoordSysProto = AMapCoordSys.prototype;
 // exclude private and unsupported options
 var excludedOptions = [
   "echartsLayerZIndex", "renderOnMoving",
-  "hideOnZooming", "trackPitchAndRotation",
-  "layers"
+  "hideOnZooming", "layers"
+  //"trackPitchAndRotation"
 ];
 
 AMapCoordSysProto.dimensions = ["lng", "lat"];
@@ -120,46 +120,46 @@ function addCssRule(selector, rules, index) {
 // For deciding which dimensions to use when creating list data
 AMapCoordSys.dimensions = AMapCoordSysProto.dimensions;
 
-var nativeRotation = AMap.Map.prototype.setRotation;
-var nativePitch = AMap.Map.prototype.setPitch;
+// var nativeRotation = AMap.Map.prototype.setRotation;
+// var nativePitch = AMap.Map.prototype.setPitch;
 
-function setRotation(rotation) {
-  var amap = this.getAMap();
-  // for 2.x which has animation for rotation
-  nativeRotation.apply(amap, [rotation, true]);
+// function setRotation(rotation) {
+//   var amap = this.getAMap();
+//   // for 2.x which has animation for rotation
+//   nativeRotation.apply(amap, [rotation, true]);
 
-  var rotateEnable = amap.getStatus().rotateEnable;
-  if (rotateEnable) {
-    var amapCoordSys = this.coordinateSystem;
-    var newRotation = amap.getRotation();
-    // emit amaprender event
-    newRotation !== amapCoordSys._rotation && amap.emit('amaprender', {
-      type: 'rotation',
-      oldRotation: amapCoordSys._rotation,
-      newRotation: newRotation
-    });
-    amapCoordSys._rotation = newRotation;
-  }
-}
+//   var rotateEnable = amap.getStatus().rotateEnable;
+//   if (rotateEnable) {
+//     var amapCoordSys = this.coordinateSystem;
+//     var newRotation = amap.getRotation();
+//     // emit amaprender event
+//     newRotation !== amapCoordSys._rotation && amap.emit('amaprender', {
+//       type: 'rotation',
+//       oldRotation: amapCoordSys._rotation,
+//       newRotation: newRotation
+//     });
+//     amapCoordSys._rotation = newRotation;
+//   }
+// }
 
-function setPitch(pitch) {
-  var amap = this.getAMap();
-  // for 2.x which has animation for pitch
-  nativePitch.apply(amap, [pitch, true]);
+// function setPitch(pitch) {
+//   var amap = this.getAMap();
+//   // for 2.x which has animation for pitch
+//   nativePitch.apply(amap, [pitch, true]);
 
-  var pitchEnable = amap.getStatus().pitchEnable;
-  if (pitchEnable) {
-    var amapCoordSys = this.coordinateSystem;
-    var newPitch = amap.getPitch();
-    // emit amaprender event
-    newPitch !== amapCoordSys._pitch && amap.emit('amaprender', {
-      type: 'pitch',
-      oldPitch: amapCoordSys._pitch,
-      newPitch: newPitch
-    });
-    amapCoordSys._pitch = newPitch;
-  }
-}
+//   var pitchEnable = amap.getStatus().pitchEnable;
+//   if (pitchEnable) {
+//     var amapCoordSys = this.coordinateSystem;
+//     var newPitch = amap.getPitch();
+//     // emit amaprender event
+//     newPitch !== amapCoordSys._pitch && amap.emit('amaprender', {
+//       type: 'pitch',
+//       oldPitch: amapCoordSys._pitch,
+//       newPitch: newPitch
+//     });
+//     amapCoordSys._pitch = newPitch;
+//   }
+// }
 
 AMapCoordSys.create = function(ecModel, api) {
   var amapCoordSys;
@@ -224,9 +224,9 @@ AMapCoordSys.create = function(ecModel, api) {
     }
 
     // track pitch and rotation
-    var trackPitchAndRotation = amapModel.get('trackPitchAndRotation');
-    AMap.Map.prototype.setRotation = trackPitchAndRotation ? setRotation.bind(amapModel) : nativeRotation;
-    AMap.Map.prototype.setPitch = trackPitchAndRotation ? setPitch.bind(amapModel) : nativePitch;
+    //var trackPitchAndRotation = amapModel.get('trackPitchAndRotation');
+    //AMap.Map.prototype.setRotation = trackPitchAndRotation ? setRotation.bind(amapModel) : nativeRotation;
+    //AMap.Map.prototype.setPitch = trackPitchAndRotation ? setPitch.bind(amapModel) : nativePitch;
 
     var center = amapModel.get("center");
     var zoom = amapModel.get("zoom");

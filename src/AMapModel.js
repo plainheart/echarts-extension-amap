@@ -43,6 +43,6 @@ export default echarts.extendComponentModel({
     echartsLayerZIndex: 2000,
     renderOnMoving: true,
     hideOnZooming: true,
-    trackPitchAndRotation: false
+    //trackPitchAndRotation: false
   }
 });

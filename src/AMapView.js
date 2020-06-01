@@ -61,14 +61,22 @@ export default echarts.extendComponentView({
 
     var resizeHandler;
 
-    amap.off("mapmove", this._oldMoveHandler);
+    var is2X = AMap.version >= 2;
+
+    //amap.off("mapmove", this._oldMoveHandler);
+    // 1.x amap.getCameraState();
+    // 2.x amap.getView().getStatus();
     amap.off("moveend", this._oldMoveHandler);
+    amap.off("viewchange", this._oldMoveHandler);
+    amap.off("camerachange", this._oldMoveHandler);
     amap.off("amaprender", this._oldMoveHandler);
     amap.off("zoomstart", this._oldZoomStartHandler);
     amap.off("zoomend", this._oldZoomEndHandler);
     amap.off("resize", this._oldResizeHandler);
 
-    amap.on(renderOnMoving ? "mapmove" : "moveend", moveHandler);
+    amap.on(renderOnMoving
+      ? is2X ? "viewchange" : "camerachange"
+      : "moveend", moveHandler);
     amap.on("amaprender", moveHandler);
     amap.on("zoomstart", zoomStartHandler);
     amap.on("zoomend", zoomEndHandler);
