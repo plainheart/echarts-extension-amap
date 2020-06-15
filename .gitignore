@@ -74,3 +74,6 @@ typings/
 # Service worker
 sw.*
 package-lock.json
+
+# test
+test/

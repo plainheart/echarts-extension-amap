@@ -169,9 +169,9 @@ AMapCoordSys.create = function(ecModel, api) {
 
   // FIXME: a hack for AMap 2.0
   if (AMap.version >= 2) {
-    if(root.style.overflow !== 'auto') {
-      root.style.overflow = 'auto';
-      console.warn('[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.')
+    if(root.style.overflow !== "auto") {
+      root.style.overflow = "auto";
+      console.warn("[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.");
     }
   }
 

@@ -111,5 +111,6 @@ export default echarts.extendComponentView({
     component.setAMap(null);
     component.setEChartsLayer(null);
     component.coordinateSystem.setAMap(null);
+    component.coordinateSystem = null;
   }
 });
