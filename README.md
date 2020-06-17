@@ -60,6 +60,7 @@ option = {
   // load amap component
   amap: {
     // enable 3D mode
+    // Note that it's suggested to enable 3D mode to improve echarts rendering.
     viewMode: '3D',
     // initial options of AMap
     // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details

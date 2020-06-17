@@ -1,4 +1,7 @@
+/* global AMap */
+
 import * as echarts from "echarts";
+import debounce from "lodash.debounce";
 
 export default echarts.extendComponentView({
   type: "amap",
@@ -62,22 +65,31 @@ export default echarts.extendComponentView({
     var resizeHandler;
 
     var is2X = AMap.version >= 2;
+    var is3DMode = amap.getViewMode_() === "3D";
 
     //amap.off("mapmove", this._oldMoveHandler);
     // 1.x amap.getCameraState();
     // 2.x amap.getView().getStatus();
+    amap.off("mapmove", this._oldMoveHandler);
     amap.off("moveend", this._oldMoveHandler);
     amap.off("viewchange", this._oldMoveHandler);
     amap.off("camerachange", this._oldMoveHandler);
-    amap.off("amaprender", this._oldMoveHandler);
+    //amap.off("amaprender", this._oldMoveHandler);
     amap.off("zoomstart", this._oldZoomStartHandler);
     amap.off("zoomend", this._oldZoomEndHandler);
     amap.off("resize", this._oldResizeHandler);
 
     amap.on(renderOnMoving
-      ? is2X ? "viewchange" : "camerachange"
-      : "moveend", moveHandler);
-    amap.on("amaprender", moveHandler);
+      ? (is2X ? "viewchange" : is3DMode ? "camerachange" : "mapmove")
+      : "moveend",
+      // FIXME: event `camerachange` won't be triggered
+      // if 3D mode is not enabled for AMap 1.x.
+      // if animation is disabled,
+      // there will be a bad experience in zooming and dragging operations.
+      !is2X && !is3DMode
+        ? (moveHandler = debounce(moveHandler, 120))
+        : moveHandler);
+    //amap.on("amaprender", moveHandler);
     amap.on("zoomstart", zoomStartHandler);
     amap.on("zoomend", zoomEndHandler);
 

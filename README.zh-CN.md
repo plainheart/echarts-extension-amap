@@ -59,7 +59,7 @@ require("echarts-extension-amap");
 option = {
   // 加载 amap 组件
   amap: {
-    // 3D模式
+    // 3D模式，无论你使用的是1.x版本还是2.x版本，都建议开启此项以获得更好的渲染体验
     viewMode: '3D',
     // 高德地图支持的初始化地图配置
     // 高德地图初始中心经纬度
