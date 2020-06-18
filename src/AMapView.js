@@ -20,6 +20,10 @@ export default echarts.extendComponentView({
     //var hideOnZooming = amapModel.get("hideOnZooming");
     var resizeEnable = amapModel.get("resizeEnable");
 
+    var is2X = AMap.version >= 2;
+    var is3DMode = amap.getViewMode_() === "3D";
+    var not2X3D = !is2X && !is3DMode;
+
     amape && amape.classList.add("ec-amap-not-zoom");
 
     var moveHandler = function(e) {
@@ -47,7 +51,12 @@ export default echarts.extendComponentView({
         return;
       }
 
-      /*hideOnZooming && */echartsLayer.setOpacity(0.01);
+      // fix flicker in 3D mode for 1.x when zoom is over min or max value
+      if (!is2X && is3DMode) {
+        return;
+      }
+
+      /*hideOnZooming && */echartsLayer.setOpacity(not2X3D ? 0 : 0.01);
     };
 
     var zoomEndHandler = function(e) {
@@ -55,17 +64,22 @@ export default echarts.extendComponentView({
         return;
       }
 
-      echartsLayer.setOpacity(1);
+      not2X3D || echartsLayer.setOpacity(1);
 
       api.dispatchAction({
         type: "amapRoam",
       });
+
+      if (not2X3D) {
+        clearTimeout(this._layerOpacityTimeout);
+
+        this._layerOpacityTimeout = setTimeout(function() {
+          echartsLayer.setOpacity(1);
+        }, 0);
+      }
     };
 
     var resizeHandler;
-
-    var is2X = AMap.version >= 2;
-    var is3DMode = amap.getViewMode_() === "3D";
 
     //amap.off("mapmove", this._oldMoveHandler);
     // 1.x amap.getCameraState();
@@ -86,12 +100,12 @@ export default echarts.extendComponentView({
       // if 3D mode is not enabled for AMap 1.x.
       // if animation is disabled,
       // there will be a bad experience in zooming and dragging operations.
-      !is2X && !is3DMode
-        ? (moveHandler = debounce(moveHandler, 120))
+      not2X3D
+        ? (moveHandler = debounce(moveHandler, 0))
         : moveHandler);
     //amap.on("amaprender", moveHandler);
     amap.on("zoomstart", zoomStartHandler);
-    amap.on("zoomend", zoomEndHandler);
+    amap.on("zoomend", zoomEndHandler = echarts.util.bind(zoomEndHandler, this));
 
     if (resizeEnable) {
       resizeHandler = function(e) {
@@ -116,6 +130,7 @@ export default echarts.extendComponentView({
   },
 
   dispose: function(ecModel, api) {
+    clearTimeout(this._layerOpacityTimeout);
     clearTimeout(this._resizeDelay);
 
     var component = ecModel.getComponent("amap");
