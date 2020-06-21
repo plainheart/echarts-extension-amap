@@ -15,7 +15,9 @@
 
 参见 [examples/index_zh_CN.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index_zh_CN.html)
 
-![示例](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
+![空气质量](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
+
+![天气预报](https://user-images.githubusercontent.com/26999792/85219748-03b9ba00-b3d9-11ea-9cd0-0e8a09bd06ca.png)
 
 ### 安装
 
