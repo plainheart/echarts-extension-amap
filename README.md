@@ -3,7 +3,7 @@
 [![Downloads](https://img.shields.io/npm/dm/echarts-extension-amap.svg)](https://npmcharts.com/compare/echarts-extension-amap?minimal=true)
 [![License](https://img.shields.io/npm/l/echarts-extension-amap.svg)](https://www.npmjs.com/package/echarts-extension-amap)
 
-## AMap extension for ECharts
+## AMap extension for Apache ECharts (incubating)
 
 [中文说明](https://github.com/plainheart/echarts-extension-amap/blob/master/README.zh-CN.md)
 

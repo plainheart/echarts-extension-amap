@@ -3,7 +3,7 @@
 [![Downloads](https://img.shields.io/npm/dm/echarts-extension-amap.svg)](https://npmcharts.com/compare/echarts-extension-amap?minimal=true)
 [![License](https://img.shields.io/npm/l/echarts-extension-amap.svg)](https://www.npmjs.com/package/echarts-extension-amap)
 
-## ECharts 高德地图扩展
+## Apache ECharts (incubating) 高德地图扩展
 
 [README_EN](https://github.com/plainheart/echarts-extension-amap/blob/master/README.md)
 
