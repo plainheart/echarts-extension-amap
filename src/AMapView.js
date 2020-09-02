@@ -42,7 +42,12 @@ export default echarts.extendComponentView({
       amapModel.__mapOffset = mapOffset;
 
       api.dispatchAction({
-        type: "amapRoam"
+        type: "amapRoam",
+        animation: {
+          // compatible with ECharts 5.x
+          // no delay for rendering but remain animation of elements
+          duration: 0
+        }
       });
     };
 
@@ -68,6 +73,9 @@ export default echarts.extendComponentView({
 
       api.dispatchAction({
         type: "amapRoam",
+        animation: {
+          duration: 0
+        }
       });
 
       if (not2X3D) {
