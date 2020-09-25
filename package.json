@@ -1,6 +1,6 @@
 {
   "name": "echarts-extension-amap",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "An AMap(https://lbs.amap.com) extension for Apache ECharts (incubating) (https://github.com/apache/incubator-echarts)",
   "main": "dist/echarts-extension-amap.min.js",
   "scripts": {

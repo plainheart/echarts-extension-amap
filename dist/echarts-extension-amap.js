@@ -2,12 +2,12 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("echarts"));
 	else if(typeof define === 'function' && define.amd)
-		define(["echarts"], factory);
+		define("amap", ["echarts"], factory);
 	else if(typeof exports === 'object')
 		exports["amap"] = factory(require("echarts"));
 	else
-		root["amap"] = factory(root["echarts"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE_echarts__) {
+		root["echarts"] = root["echarts"] || {}, root["echarts"]["amap"] = factory(root["echarts"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_echarts__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -103,7 +103,385 @@ return /******/ (function(modules) { // webpackBootstrap
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("/* WEBPACK VAR INJECTION */(function(global) {/**\n * lodash (Custom Build) <https://lodash.com/>\n * Build: `lodash modularize exports=\"npm\" -o ./`\n * Copyright jQuery Foundation and other contributors <https://jquery.org/>\n * Released under MIT license <https://lodash.com/license>\n * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>\n * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors\n */\n\n/** Used as the `TypeError` message for \"Functions\" methods. */\nvar FUNC_ERROR_TEXT = 'Expected a function';\n\n/** Used as references for various `Number` constants. */\nvar NAN = 0 / 0;\n\n/** `Object#toString` result references. */\nvar symbolTag = '[object Symbol]';\n\n/** Used to match leading and trailing whitespace. */\nvar reTrim = /^\\s+|\\s+$/g;\n\n/** Used to detect bad signed hexadecimal string values. */\nvar reIsBadHex = /^[-+]0x[0-9a-f]+$/i;\n\n/** Used to detect binary string values. */\nvar reIsBinary = /^0b[01]+$/i;\n\n/** Used to detect octal string values. */\nvar reIsOctal = /^0o[0-7]+$/i;\n\n/** Built-in method references without a dependency on `root`. */\nvar freeParseInt = parseInt;\n\n/** Detect free variable `global` from Node.js. */\nvar freeGlobal = typeof global == 'object' && global && global.Object === Object && global;\n\n/** Detect free variable `self`. */\nvar freeSelf = typeof self == 'object' && self && self.Object === Object && self;\n\n/** Used as a reference to the global object. */\nvar root = freeGlobal || freeSelf || Function('return this')();\n\n/** Used for built-in method references. */\nvar objectProto = Object.prototype;\n\n/**\n * Used to resolve the\n * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)\n * of values.\n */\nvar objectToString = objectProto.toString;\n\n/* Built-in method references for those with the same name as other `lodash` methods. */\nvar nativeMax = Math.max,\n    nativeMin = Math.min;\n\n/**\n * Gets the timestamp of the number of milliseconds that have elapsed since\n * the Unix epoch (1 January 1970 00:00:00 UTC).\n *\n * @static\n * @memberOf _\n * @since 2.4.0\n * @category Date\n * @returns {number} Returns the timestamp.\n * @example\n *\n * _.defer(function(stamp) {\n *   console.log(_.now() - stamp);\n * }, _.now());\n * // => Logs the number of milliseconds it took for the deferred invocation.\n */\nvar now = function() {\n  return root.Date.now();\n};\n\n/**\n * Creates a debounced function that delays invoking `func` until after `wait`\n * milliseconds have elapsed since the last time the debounced function was\n * invoked. The debounced function comes with a `cancel` method to cancel\n * delayed `func` invocations and a `flush` method to immediately invoke them.\n * Provide `options` to indicate whether `func` should be invoked on the\n * leading and/or trailing edge of the `wait` timeout. The `func` is invoked\n * with the last arguments provided to the debounced function. Subsequent\n * calls to the debounced function return the result of the last `func`\n * invocation.\n *\n * **Note:** If `leading` and `trailing` options are `true`, `func` is\n * invoked on the trailing edge of the timeout only if the debounced function\n * is invoked more than once during the `wait` timeout.\n *\n * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred\n * until to the next tick, similar to `setTimeout` with a timeout of `0`.\n *\n * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)\n * for details over the differences between `_.debounce` and `_.throttle`.\n *\n * @static\n * @memberOf _\n * @since 0.1.0\n * @category Function\n * @param {Function} func The function to debounce.\n * @param {number} [wait=0] The number of milliseconds to delay.\n * @param {Object} [options={}] The options object.\n * @param {boolean} [options.leading=false]\n *  Specify invoking on the leading edge of the timeout.\n * @param {number} [options.maxWait]\n *  The maximum time `func` is allowed to be delayed before it's invoked.\n * @param {boolean} [options.trailing=true]\n *  Specify invoking on the trailing edge of the timeout.\n * @returns {Function} Returns the new debounced function.\n * @example\n *\n * // Avoid costly calculations while the window size is in flux.\n * jQuery(window).on('resize', _.debounce(calculateLayout, 150));\n *\n * // Invoke `sendMail` when clicked, debouncing subsequent calls.\n * jQuery(element).on('click', _.debounce(sendMail, 300, {\n *   'leading': true,\n *   'trailing': false\n * }));\n *\n * // Ensure `batchLog` is invoked once after 1 second of debounced calls.\n * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });\n * var source = new EventSource('/stream');\n * jQuery(source).on('message', debounced);\n *\n * // Cancel the trailing debounced invocation.\n * jQuery(window).on('popstate', debounced.cancel);\n */\nfunction debounce(func, wait, options) {\n  var lastArgs,\n      lastThis,\n      maxWait,\n      result,\n      timerId,\n      lastCallTime,\n      lastInvokeTime = 0,\n      leading = false,\n      maxing = false,\n      trailing = true;\n\n  if (typeof func != 'function') {\n    throw new TypeError(FUNC_ERROR_TEXT);\n  }\n  wait = toNumber(wait) || 0;\n  if (isObject(options)) {\n    leading = !!options.leading;\n    maxing = 'maxWait' in options;\n    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;\n    trailing = 'trailing' in options ? !!options.trailing : trailing;\n  }\n\n  function invokeFunc(time) {\n    var args = lastArgs,\n        thisArg = lastThis;\n\n    lastArgs = lastThis = undefined;\n    lastInvokeTime = time;\n    result = func.apply(thisArg, args);\n    return result;\n  }\n\n  function leadingEdge(time) {\n    // Reset any `maxWait` timer.\n    lastInvokeTime = time;\n    // Start the timer for the trailing edge.\n    timerId = setTimeout(timerExpired, wait);\n    // Invoke the leading edge.\n    return leading ? invokeFunc(time) : result;\n  }\n\n  function remainingWait(time) {\n    var timeSinceLastCall = time - lastCallTime,\n        timeSinceLastInvoke = time - lastInvokeTime,\n        result = wait - timeSinceLastCall;\n\n    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;\n  }\n\n  function shouldInvoke(time) {\n    var timeSinceLastCall = time - lastCallTime,\n        timeSinceLastInvoke = time - lastInvokeTime;\n\n    // Either this is the first call, activity has stopped and we're at the\n    // trailing edge, the system time has gone backwards and we're treating\n    // it as the trailing edge, or we've hit the `maxWait` limit.\n    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||\n      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));\n  }\n\n  function timerExpired() {\n    var time = now();\n    if (shouldInvoke(time)) {\n      return trailingEdge(time);\n    }\n    // Restart the timer.\n    timerId = setTimeout(timerExpired, remainingWait(time));\n  }\n\n  function trailingEdge(time) {\n    timerId = undefined;\n\n    // Only invoke if we have `lastArgs` which means `func` has been\n    // debounced at least once.\n    if (trailing && lastArgs) {\n      return invokeFunc(time);\n    }\n    lastArgs = lastThis = undefined;\n    return result;\n  }\n\n  function cancel() {\n    if (timerId !== undefined) {\n      clearTimeout(timerId);\n    }\n    lastInvokeTime = 0;\n    lastArgs = lastCallTime = lastThis = timerId = undefined;\n  }\n\n  function flush() {\n    return timerId === undefined ? result : trailingEdge(now());\n  }\n\n  function debounced() {\n    var time = now(),\n        isInvoking = shouldInvoke(time);\n\n    lastArgs = arguments;\n    lastThis = this;\n    lastCallTime = time;\n\n    if (isInvoking) {\n      if (timerId === undefined) {\n        return leadingEdge(lastCallTime);\n      }\n      if (maxing) {\n        // Handle invocations in a tight loop.\n        timerId = setTimeout(timerExpired, wait);\n        return invokeFunc(lastCallTime);\n      }\n    }\n    if (timerId === undefined) {\n      timerId = setTimeout(timerExpired, wait);\n    }\n    return result;\n  }\n  debounced.cancel = cancel;\n  debounced.flush = flush;\n  return debounced;\n}\n\n/**\n * Checks if `value` is the\n * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)\n * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)\n *\n * @static\n * @memberOf _\n * @since 0.1.0\n * @category Lang\n * @param {*} value The value to check.\n * @returns {boolean} Returns `true` if `value` is an object, else `false`.\n * @example\n *\n * _.isObject({});\n * // => true\n *\n * _.isObject([1, 2, 3]);\n * // => true\n *\n * _.isObject(_.noop);\n * // => true\n *\n * _.isObject(null);\n * // => false\n */\nfunction isObject(value) {\n  var type = typeof value;\n  return !!value && (type == 'object' || type == 'function');\n}\n\n/**\n * Checks if `value` is object-like. A value is object-like if it's not `null`\n * and has a `typeof` result of \"object\".\n *\n * @static\n * @memberOf _\n * @since 4.0.0\n * @category Lang\n * @param {*} value The value to check.\n * @returns {boolean} Returns `true` if `value` is object-like, else `false`.\n * @example\n *\n * _.isObjectLike({});\n * // => true\n *\n * _.isObjectLike([1, 2, 3]);\n * // => true\n *\n * _.isObjectLike(_.noop);\n * // => false\n *\n * _.isObjectLike(null);\n * // => false\n */\nfunction isObjectLike(value) {\n  return !!value && typeof value == 'object';\n}\n\n/**\n * Checks if `value` is classified as a `Symbol` primitive or object.\n *\n * @static\n * @memberOf _\n * @since 4.0.0\n * @category Lang\n * @param {*} value The value to check.\n * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.\n * @example\n *\n * _.isSymbol(Symbol.iterator);\n * // => true\n *\n * _.isSymbol('abc');\n * // => false\n */\nfunction isSymbol(value) {\n  return typeof value == 'symbol' ||\n    (isObjectLike(value) && objectToString.call(value) == symbolTag);\n}\n\n/**\n * Converts `value` to a number.\n *\n * @static\n * @memberOf _\n * @since 4.0.0\n * @category Lang\n * @param {*} value The value to process.\n * @returns {number} Returns the number.\n * @example\n *\n * _.toNumber(3.2);\n * // => 3.2\n *\n * _.toNumber(Number.MIN_VALUE);\n * // => 5e-324\n *\n * _.toNumber(Infinity);\n * // => Infinity\n *\n * _.toNumber('3.2');\n * // => 3.2\n */\nfunction toNumber(value) {\n  if (typeof value == 'number') {\n    return value;\n  }\n  if (isSymbol(value)) {\n    return NAN;\n  }\n  if (isObject(value)) {\n    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;\n    value = isObject(other) ? (other + '') : other;\n  }\n  if (typeof value != 'string') {\n    return value === 0 ? value : +value;\n  }\n  value = value.replace(reTrim, '');\n  var isBinary = reIsBinary.test(value);\n  return (isBinary || reIsOctal.test(value))\n    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)\n    : (reIsBadHex.test(value) ? NAN : +value);\n}\n\nmodule.exports = debounce;\n\n/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ \"./node_modules/webpack/buildin/global.js\")))//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9ub2RlX21vZHVsZXMvbG9kYXNoLmRlYm91bmNlL2luZGV4LmpzLmpzIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vW25hbWVdLy4vbm9kZV9tb2R1bGVzL2xvZGFzaC5kZWJvdW5jZS9pbmRleC5qcz9mN2ZlIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogbG9kYXNoIChDdXN0b20gQnVpbGQpIDxodHRwczovL2xvZGFzaC5jb20vPlxuICogQnVpbGQ6IGBsb2Rhc2ggbW9kdWxhcml6ZSBleHBvcnRzPVwibnBtXCIgLW8gLi9gXG4gKiBDb3B5cmlnaHQgalF1ZXJ5IEZvdW5kYXRpb24gYW5kIG90aGVyIGNvbnRyaWJ1dG9ycyA8aHR0cHM6Ly9qcXVlcnkub3JnLz5cbiAqIFJlbGVhc2VkIHVuZGVyIE1JVCBsaWNlbnNlIDxodHRwczovL2xvZGFzaC5jb20vbGljZW5zZT5cbiAqIEJhc2VkIG9uIFVuZGVyc2NvcmUuanMgMS44LjMgPGh0dHA6Ly91bmRlcnNjb3JlanMub3JnL0xJQ0VOU0U+XG4gKiBDb3B5cmlnaHQgSmVyZW15IEFzaGtlbmFzLCBEb2N1bWVudENsb3VkIGFuZCBJbnZlc3RpZ2F0aXZlIFJlcG9ydGVycyAmIEVkaXRvcnNcbiAqL1xuXG4vKiogVXNlZCBhcyB0aGUgYFR5cGVFcnJvcmAgbWVzc2FnZSBmb3IgXCJGdW5jdGlvbnNcIiBtZXRob2RzLiAqL1xudmFyIEZVTkNfRVJST1JfVEVYVCA9ICdFeHBlY3RlZCBhIGZ1bmN0aW9uJztcblxuLyoqIFVzZWQgYXMgcmVmZXJlbmNlcyBmb3IgdmFyaW91cyBgTnVtYmVyYCBjb25zdGFudHMuICovXG52YXIgTkFOID0gMCAvIDA7XG5cbi8qKiBgT2JqZWN0I3RvU3RyaW5nYCByZXN1bHQgcmVmZXJlbmNlcy4gKi9cbnZhciBzeW1ib2xUYWcgPSAnW29iamVjdCBTeW1ib2xdJztcblxuLyoqIFVzZWQgdG8gbWF0Y2ggbGVhZGluZyBhbmQgdHJhaWxpbmcgd2hpdGVzcGFjZS4gKi9cbnZhciByZVRyaW0gPSAvXlxccyt8XFxzKyQvZztcblxuLyoqIFVzZWQgdG8gZGV0ZWN0IGJhZCBzaWduZWQgaGV4YWRlY2ltYWwgc3RyaW5nIHZhbHVlcy4gKi9cbnZhciByZUlzQmFkSGV4ID0gL15bLStdMHhbMC05YS1mXSskL2k7XG5cbi8qKiBVc2VkIHRvIGRldGVjdCBiaW5hcnkgc3RyaW5nIHZhbHVlcy4gKi9cbnZhciByZUlzQmluYXJ5ID0gL14wYlswMV0rJC9pO1xuXG4vKiogVXNlZCB0byBkZXRlY3Qgb2N0YWwgc3RyaW5nIHZhbHVlcy4gKi9cbnZhciByZUlzT2N0YWwgPSAvXjBvWzAtN10rJC9pO1xuXG4vKiogQnVpbHQtaW4gbWV0aG9kIHJlZmVyZW5jZXMgd2l0aG91dCBhIGRlcGVuZGVuY3kgb24gYHJvb3RgLiAqL1xudmFyIGZyZWVQYXJzZUludCA9IHBhcnNlSW50O1xuXG4vKiogRGV0ZWN0IGZyZWUgdmFyaWFibGUgYGdsb2JhbGAgZnJvbSBOb2RlLmpzLiAqL1xudmFyIGZyZWVHbG9iYWwgPSB0eXBlb2YgZ2xvYmFsID09ICdvYmplY3QnICYmIGdsb2JhbCAmJiBnbG9iYWwuT2JqZWN0ID09PSBPYmplY3QgJiYgZ2xvYmFsO1xuXG4vKiogRGV0ZWN0IGZyZWUgdmFyaWFibGUgYHNlbGZgLiAqL1xudmFyIGZyZWVTZWxmID0gdHlwZW9mIHNlbGYgPT0gJ29iamVjdCcgJiYgc2VsZiAmJiBzZWxmLk9iamVjdCA9PT0gT2JqZWN0ICYmIHNlbGY7XG5cbi8qKiBVc2VkIGFzIGEgcmVmZXJlbmNlIHRvIHRoZSBnbG9iYWwgb2JqZWN0LiAqL1xudmFyIHJvb3QgPSBmcmVlR2xvYmFsIHx8IGZyZWVTZWxmIHx8IEZ1bmN0aW9uKCdyZXR1cm4gdGhpcycpKCk7XG5cbi8qKiBVc2VkIGZvciBidWlsdC1pbiBtZXRob2QgcmVmZXJlbmNlcy4gKi9cbnZhciBvYmplY3RQcm90byA9IE9iamVjdC5wcm90b3R5cGU7XG5cbi8qKlxuICogVXNlZCB0byByZXNvbHZlIHRoZVxuICogW2B0b1N0cmluZ1RhZ2BdKGh0dHA6Ly9lY21hLWludGVybmF0aW9uYWwub3JnL2VjbWEtMjYyLzcuMC8jc2VjLW9iamVjdC5wcm90b3R5cGUudG9zdHJpbmcpXG4gKiBvZiB2YWx1ZXMuXG4gKi9cbnZhciBvYmplY3RUb1N0cmluZyA9IG9iamVjdFByb3RvLnRvU3RyaW5nO1xuXG4vKiBCdWlsdC1pbiBtZXRob2QgcmVmZXJlbmNlcyBmb3IgdGhvc2Ugd2l0aCB0aGUgc2FtZSBuYW1lIGFzIG90aGVyIGBsb2Rhc2hgIG1ldGhvZHMuICovXG52YXIgbmF0aXZlTWF4ID0gTWF0aC5tYXgsXG4gICAgbmF0aXZlTWluID0gTWF0aC5taW47XG5cbi8qKlxuICogR2V0cyB0aGUgdGltZXN0YW1wIG9mIHRoZSBudW1iZXIgb2YgbWlsbGlzZWNvbmRzIHRoYXQgaGF2ZSBlbGFwc2VkIHNpbmNlXG4gKiB0aGUgVW5peCBlcG9jaCAoMSBKYW51YXJ5IDE5NzAgMDA6MDA6MDAgVVRDKS5cbiAqXG4gKiBAc3RhdGljXG4gKiBAbWVtYmVyT2YgX1xuICogQHNpbmNlIDIuNC4wXG4gKiBAY2F0ZWdvcnkgRGF0ZVxuICogQHJldHVybnMge251bWJlcn0gUmV0dXJucyB0aGUgdGltZXN0YW1wLlxuICogQGV4YW1wbGVcbiAqXG4gKiBfLmRlZmVyKGZ1bmN0aW9uKHN0YW1wKSB7XG4gKiAgIGNvbnNvbGUubG9nKF8ubm93KCkgLSBzdGFtcCk7XG4gKiB9LCBfLm5vdygpKTtcbiAqIC8vID0+IExvZ3MgdGhlIG51bWJlciBvZiBtaWxsaXNlY29uZHMgaXQgdG9vayBmb3IgdGhlIGRlZmVycmVkIGludm9jYXRpb24uXG4gKi9cbnZhciBub3cgPSBmdW5jdGlvbigpIHtcbiAgcmV0dXJuIHJvb3QuRGF0ZS5ub3coKTtcbn07XG5cbi8qKlxuICogQ3JlYXRlcyBhIGRlYm91bmNlZCBmdW5jdGlvbiB0aGF0IGRlbGF5cyBpbnZva2luZyBgZnVuY2AgdW50aWwgYWZ0ZXIgYHdhaXRgXG4gKiBtaWxsaXNlY29uZHMgaGF2ZSBlbGFwc2VkIHNpbmNlIHRoZSBsYXN0IHRpbWUgdGhlIGRlYm91bmNlZCBmdW5jdGlvbiB3YXNcbiAqIGludm9rZWQuIFRoZSBkZWJvdW5jZWQgZnVuY3Rpb24gY29tZXMgd2l0aCBhIGBjYW5jZWxgIG1ldGhvZCB0byBjYW5jZWxcbiAqIGRlbGF5ZWQgYGZ1bmNgIGludm9jYXRpb25zIGFuZCBhIGBmbHVzaGAgbWV0aG9kIHRvIGltbWVkaWF0ZWx5IGludm9rZSB0aGVtLlxuICogUHJvdmlkZSBgb3B0aW9uc2AgdG8gaW5kaWNhdGUgd2hldGhlciBgZnVuY2Agc2hvdWxkIGJlIGludm9rZWQgb24gdGhlXG4gKiBsZWFkaW5nIGFuZC9vciB0cmFpbGluZyBlZGdlIG9mIHRoZSBgd2FpdGAgdGltZW91dC4gVGhlIGBmdW5jYCBpcyBpbnZva2VkXG4gKiB3aXRoIHRoZSBsYXN0IGFyZ3VtZW50cyBwcm92aWRlZCB0byB0aGUgZGVib3VuY2VkIGZ1bmN0aW9uLiBTdWJzZXF1ZW50XG4gKiBjYWxscyB0byB0aGUgZGVib3VuY2VkIGZ1bmN0aW9uIHJldHVybiB0aGUgcmVzdWx0IG9mIHRoZSBsYXN0IGBmdW5jYFxuICogaW52b2NhdGlvbi5cbiAqXG4gKiAqKk5vdGU6KiogSWYgYGxlYWRpbmdgIGFuZCBgdHJhaWxpbmdgIG9wdGlvbnMgYXJlIGB0cnVlYCwgYGZ1bmNgIGlzXG4gKiBpbnZva2VkIG9uIHRoZSB0cmFpbGluZyBlZGdlIG9mIHRoZSB0aW1lb3V0IG9ubHkgaWYgdGhlIGRlYm91bmNlZCBmdW5jdGlvblxuICogaXMgaW52b2tlZCBtb3JlIHRoYW4gb25jZSBkdXJpbmcgdGhlIGB3YWl0YCB0aW1lb3V0LlxuICpcbiAqIElmIGB3YWl0YCBpcyBgMGAgYW5kIGBsZWFkaW5nYCBpcyBgZmFsc2VgLCBgZnVuY2AgaW52b2NhdGlvbiBpcyBkZWZlcnJlZFxuICogdW50aWwgdG8gdGhlIG5leHQgdGljaywgc2ltaWxhciB0byBgc2V0VGltZW91dGAgd2l0aCBhIHRpbWVvdXQgb2YgYDBgLlxuICpcbiAqIFNlZSBbRGF2aWQgQ29yYmFjaG8ncyBhcnRpY2xlXShodHRwczovL2Nzcy10cmlja3MuY29tL2RlYm91bmNpbmctdGhyb3R0bGluZy1leHBsYWluZWQtZXhhbXBsZXMvKVxuICogZm9yIGRldGFpbHMgb3ZlciB0aGUgZGlmZmVyZW5jZXMgYmV0d2VlbiBgXy5kZWJvdW5jZWAgYW5kIGBfLnRocm90dGxlYC5cbiAqXG4gKiBAc3RhdGljXG4gKiBAbWVtYmVyT2YgX1xuICogQHNpbmNlIDAuMS4wXG4gKiBAY2F0ZWdvcnkgRnVuY3Rpb25cbiAqIEBwYXJhbSB7RnVuY3Rpb259IGZ1bmMgVGhlIGZ1bmN0aW9uIHRvIGRlYm91bmNlLlxuICogQHBhcmFtIHtudW1iZXJ9IFt3YWl0PTBdIFRoZSBudW1iZXIgb2YgbWlsbGlzZWNvbmRzIHRvIGRlbGF5LlxuICogQHBhcmFtIHtPYmplY3R9IFtvcHRpb25zPXt9XSBUaGUgb3B0aW9ucyBvYmplY3QuXG4gKiBAcGFyYW0ge2Jvb2xlYW59IFtvcHRpb25zLmxlYWRpbmc9ZmFsc2VdXG4gKiAgU3BlY2lmeSBpbnZva2luZyBvbiB0aGUgbGVhZGluZyBlZGdlIG9mIHRoZSB0aW1lb3V0LlxuICogQHBhcmFtIHtudW1iZXJ9IFtvcHRpb25zLm1heFdhaXRdXG4gKiAgVGhlIG1heGltdW0gdGltZSBgZnVuY2AgaXMgYWxsb3dlZCB0byBiZSBkZWxheWVkIGJlZm9yZSBpdCdzIGludm9rZWQuXG4gKiBAcGFyYW0ge2Jvb2xlYW59IFtvcHRpb25zLnRyYWlsaW5nPXRydWVdXG4gKiAgU3BlY2lmeSBpbnZva2luZyBvbiB0aGUgdHJhaWxpbmcgZWRnZSBvZiB0aGUgdGltZW91dC5cbiAqIEByZXR1cm5zIHtGdW5jdGlvbn0gUmV0dXJucyB0aGUgbmV3IGRlYm91bmNlZCBmdW5jdGlvbi5cbiAqIEBleGFtcGxlXG4gKlxuICogLy8gQXZvaWQgY29zdGx5IGNhbGN1bGF0aW9ucyB3aGlsZSB0aGUgd2luZG93IHNpemUgaXMgaW4gZmx1eC5cbiAqIGpRdWVyeSh3aW5kb3cpLm9uKCdyZXNpemUnLCBfLmRlYm91bmNlKGNhbGN1bGF0ZUxheW91dCwgMTUwKSk7XG4gKlxuICogLy8gSW52b2tlIGBzZW5kTWFpbGAgd2hlbiBjbGlja2VkLCBkZWJvdW5jaW5nIHN1YnNlcXVlbnQgY2FsbHMuXG4gKiBqUXVlcnkoZWxlbWVudCkub24oJ2NsaWNrJywgXy5kZWJvdW5jZShzZW5kTWFpbCwgMzAwLCB7XG4gKiAgICdsZWFkaW5nJzogdHJ1ZSxcbiAqICAgJ3RyYWlsaW5nJzogZmFsc2VcbiAqIH0pKTtcbiAqXG4gKiAvLyBFbnN1cmUgYGJhdGNoTG9nYCBpcyBpbnZva2VkIG9uY2UgYWZ0ZXIgMSBzZWNvbmQgb2YgZGVib3VuY2VkIGNhbGxzLlxuICogdmFyIGRlYm91bmNlZCA9IF8uZGVib3VuY2UoYmF0Y2hMb2csIDI1MCwgeyAnbWF4V2FpdCc6IDEwMDAgfSk7XG4gKiB2YXIgc291cmNlID0gbmV3IEV2ZW50U291cmNlKCcvc3RyZWFtJyk7XG4gKiBqUXVlcnkoc291cmNlKS5vbignbWVzc2FnZScsIGRlYm91bmNlZCk7XG4gKlxuICogLy8gQ2FuY2VsIHRoZSB0cmFpbGluZyBkZWJvdW5jZWQgaW52b2NhdGlvbi5cbiAqIGpRdWVyeSh3aW5kb3cpLm9uKCdwb3BzdGF0ZScsIGRlYm91bmNlZC5jYW5jZWwpO1xuICovXG5mdW5jdGlvbiBkZWJvdW5jZShmdW5jLCB3YWl0LCBvcHRpb25zKSB7XG4gIHZhciBsYXN0QXJncyxcbiAgICAgIGxhc3RUaGlzLFxuICAgICAgbWF4V2FpdCxcbiAgICAgIHJlc3VsdCxcbiAgICAgIHRpbWVySWQsXG4gICAgICBsYXN0Q2FsbFRpbWUsXG4gICAgICBsYXN0SW52b2tlVGltZSA9IDAsXG4gICAgICBsZWFkaW5nID0gZmFsc2UsXG4gICAgICBtYXhpbmcgPSBmYWxzZSxcbiAgICAgIHRyYWlsaW5nID0gdHJ1ZTtcblxuICBpZiAodHlwZW9mIGZ1bmMgIT0gJ2Z1bmN0aW9uJykge1xuICAgIHRocm93IG5ldyBUeXBlRXJyb3IoRlVOQ19FUlJPUl9URVhUKTtcbiAgfVxuICB3YWl0ID0gdG9OdW1iZXIod2FpdCkgfHwgMDtcbiAgaWYgKGlzT2JqZWN0KG9wdGlvbnMpKSB7XG4gICAgbGVhZGluZyA9ICEhb3B0aW9ucy5sZWFkaW5nO1xuICAgIG1heGluZyA9ICdtYXhXYWl0JyBpbiBvcHRpb25zO1xuICAgIG1heFdhaXQgPSBtYXhpbmcgPyBuYXRpdmVNYXgodG9OdW1iZXIob3B0aW9ucy5tYXhXYWl0KSB8fCAwLCB3YWl0KSA6IG1heFdhaXQ7XG4gICAgdHJhaWxpbmcgPSAndHJhaWxpbmcnIGluIG9wdGlvbnMgPyAhIW9wdGlvbnMudHJhaWxpbmcgOiB0cmFpbGluZztcbiAgfVxuXG4gIGZ1bmN0aW9uIGludm9rZUZ1bmModGltZSkge1xuICAgIHZhciBhcmdzID0gbGFzdEFyZ3MsXG4gICAgICAgIHRoaXNBcmcgPSBsYXN0VGhpcztcblxuICAgIGxhc3RBcmdzID0gbGFzdFRoaXMgPSB1bmRlZmluZWQ7XG4gICAgbGFzdEludm9rZVRpbWUgPSB0aW1lO1xuICAgIHJlc3VsdCA9IGZ1bmMuYXBwbHkodGhpc0FyZywgYXJncyk7XG4gICAgcmV0dXJuIHJlc3VsdDtcbiAgfVxuXG4gIGZ1bmN0aW9uIGxlYWRpbmdFZGdlKHRpbWUpIHtcbiAgICAvLyBSZXNldCBhbnkgYG1heFdhaXRgIHRpbWVyLlxuICAgIGxhc3RJbnZva2VUaW1lID0gdGltZTtcbiAgICAvLyBTdGFydCB0aGUgdGltZXIgZm9yIHRoZSB0cmFpbGluZyBlZGdlLlxuICAgIHRpbWVySWQgPSBzZXRUaW1lb3V0KHRpbWVyRXhwaXJlZCwgd2FpdCk7XG4gICAgLy8gSW52b2tlIHRoZSBsZWFkaW5nIGVkZ2UuXG4gICAgcmV0dXJuIGxlYWRpbmcgPyBpbnZva2VGdW5jKHRpbWUpIDogcmVzdWx0O1xuICB9XG5cbiAgZnVuY3Rpb24gcmVtYWluaW5nV2FpdCh0aW1lKSB7XG4gICAgdmFyIHRpbWVTaW5jZUxhc3RDYWxsID0gdGltZSAtIGxhc3RDYWxsVGltZSxcbiAgICAgICAgdGltZVNpbmNlTGFzdEludm9rZSA9IHRpbWUgLSBsYXN0SW52b2tlVGltZSxcbiAgICAgICAgcmVzdWx0ID0gd2FpdCAtIHRpbWVTaW5jZUxhc3RDYWxsO1xuXG4gICAgcmV0dXJuIG1heGluZyA/IG5hdGl2ZU1pbihyZXN1bHQsIG1heFdhaXQgLSB0aW1lU2luY2VMYXN0SW52b2tlKSA6IHJlc3VsdDtcbiAgfVxuXG4gIGZ1bmN0aW9uIHNob3VsZEludm9rZSh0aW1lKSB7XG4gICAgdmFyIHRpbWVTaW5jZUxhc3RDYWxsID0gdGltZSAtIGxhc3RDYWxsVGltZSxcbiAgICAgICAgdGltZVNpbmNlTGFzdEludm9rZSA9IHRpbWUgLSBsYXN0SW52b2tlVGltZTtcblxuICAgIC8vIEVpdGhlciB0aGlzIGlzIHRoZSBmaXJzdCBjYWxsLCBhY3Rpdml0eSBoYXMgc3RvcHBlZCBhbmQgd2UncmUgYXQgdGhlXG4gICAgLy8gdHJhaWxpbmcgZWRnZSwgdGhlIHN5c3RlbSB0aW1lIGhhcyBnb25lIGJhY2t3YXJkcyBhbmQgd2UncmUgdHJlYXRpbmdcbiAgICAvLyBpdCBhcyB0aGUgdHJhaWxpbmcgZWRnZSwgb3Igd2UndmUgaGl0IHRoZSBgbWF4V2FpdGAgbGltaXQuXG4gICAgcmV0dXJuIChsYXN0Q2FsbFRpbWUgPT09IHVuZGVmaW5lZCB8fCAodGltZVNpbmNlTGFzdENhbGwgPj0gd2FpdCkgfHxcbiAgICAgICh0aW1lU2luY2VMYXN0Q2FsbCA8IDApIHx8IChtYXhpbmcgJiYgdGltZVNpbmNlTGFzdEludm9rZSA+PSBtYXhXYWl0KSk7XG4gIH1cblxuICBmdW5jdGlvbiB0aW1lckV4cGlyZWQoKSB7XG4gICAgdmFyIHRpbWUgPSBub3coKTtcbiAgICBpZiAoc2hvdWxkSW52b2tlKHRpbWUpKSB7XG4gICAgICByZXR1cm4gdHJhaWxpbmdFZGdlKHRpbWUpO1xuICAgIH1cbiAgICAvLyBSZXN0YXJ0IHRoZSB0aW1lci5cbiAgICB0aW1lcklkID0gc2V0VGltZW91dCh0aW1lckV4cGlyZWQsIHJlbWFpbmluZ1dhaXQodGltZSkpO1xuICB9XG5cbiAgZnVuY3Rpb24gdHJhaWxpbmdFZGdlKHRpbWUpIHtcbiAgICB0aW1lcklkID0gdW5kZWZpbmVkO1xuXG4gICAgLy8gT25seSBpbnZva2UgaWYgd2UgaGF2ZSBgbGFzdEFyZ3NgIHdoaWNoIG1lYW5zIGBmdW5jYCBoYXMgYmVlblxuICAgIC8vIGRlYm91bmNlZCBhdCBsZWFzdCBvbmNlLlxuICAgIGlmICh0cmFpbGluZyAmJiBsYXN0QXJncykge1xuICAgICAgcmV0dXJuIGludm9rZUZ1bmModGltZSk7XG4gICAgfVxuICAgIGxhc3RBcmdzID0gbGFzdFRoaXMgPSB1bmRlZmluZWQ7XG4gICAgcmV0dXJuIHJlc3VsdDtcbiAgfVxuXG4gIGZ1bmN0aW9uIGNhbmNlbCgpIHtcbiAgICBpZiAodGltZXJJZCAhPT0gdW5kZWZpbmVkKSB7XG4gICAgICBjbGVhclRpbWVvdXQodGltZXJJZCk7XG4gICAgfVxuICAgIGxhc3RJbnZva2VUaW1lID0gMDtcbiAgICBsYXN0QXJncyA9IGxhc3RDYWxsVGltZSA9IGxhc3RUaGlzID0gdGltZXJJZCA9IHVuZGVmaW5lZDtcbiAgfVxuXG4gIGZ1bmN0aW9uIGZsdXNoKCkge1xuICAgIHJldHVybiB0aW1lcklkID09PSB1bmRlZmluZWQgPyByZXN1bHQgOiB0cmFpbGluZ0VkZ2Uobm93KCkpO1xuICB9XG5cbiAgZnVuY3Rpb24gZGVib3VuY2VkKCkge1xuICAgIHZhciB0aW1lID0gbm93KCksXG4gICAgICAgIGlzSW52b2tpbmcgPSBzaG91bGRJbnZva2UodGltZSk7XG5cbiAgICBsYXN0QXJncyA9IGFyZ3VtZW50cztcbiAgICBsYXN0VGhpcyA9IHRoaXM7XG4gICAgbGFzdENhbGxUaW1lID0gdGltZTtcblxuICAgIGlmIChpc0ludm9raW5nKSB7XG4gICAgICBpZiAodGltZXJJZCA9PT0gdW5kZWZpbmVkKSB7XG4gICAgICAgIHJldHVybiBsZWFkaW5nRWRnZShsYXN0Q2FsbFRpbWUpO1xuICAgICAgfVxuICAgICAgaWYgKG1heGluZykge1xuICAgICAgICAvLyBIYW5kbGUgaW52b2NhdGlvbnMgaW4gYSB0aWdodCBsb29wLlxuICAgICAgICB0aW1lcklkID0gc2V0VGltZW91dCh0aW1lckV4cGlyZWQsIHdhaXQpO1xuICAgICAgICByZXR1cm4gaW52b2tlRnVuYyhsYXN0Q2FsbFRpbWUpO1xuICAgICAgfVxuICAgIH1cbiAgICBpZiAodGltZXJJZCA9PT0gdW5kZWZpbmVkKSB7XG4gICAgICB0aW1lcklkID0gc2V0VGltZW91dCh0aW1lckV4cGlyZWQsIHdhaXQpO1xuICAgIH1cbiAgICByZXR1cm4gcmVzdWx0O1xuICB9XG4gIGRlYm91bmNlZC5jYW5jZWwgPSBjYW5jZWw7XG4gIGRlYm91bmNlZC5mbHVzaCA9IGZsdXNoO1xuICByZXR1cm4gZGVib3VuY2VkO1xufVxuXG4vKipcbiAqIENoZWNrcyBpZiBgdmFsdWVgIGlzIHRoZVxuICogW2xhbmd1YWdlIHR5cGVdKGh0dHA6Ly93d3cuZWNtYS1pbnRlcm5hdGlvbmFsLm9yZy9lY21hLTI2Mi83LjAvI3NlYy1lY21hc2NyaXB0LWxhbmd1YWdlLXR5cGVzKVxuICogb2YgYE9iamVjdGAuIChlLmcuIGFycmF5cywgZnVuY3Rpb25zLCBvYmplY3RzLCByZWdleGVzLCBgbmV3IE51bWJlcigwKWAsIGFuZCBgbmV3IFN0cmluZygnJylgKVxuICpcbiAqIEBzdGF0aWNcbiAqIEBtZW1iZXJPZiBfXG4gKiBAc2luY2UgMC4xLjBcbiAqIEBjYXRlZ29yeSBMYW5nXG4gKiBAcGFyYW0geyp9IHZhbHVlIFRoZSB2YWx1ZSB0byBjaGVjay5cbiAqIEByZXR1cm5zIHtib29sZWFufSBSZXR1cm5zIGB0cnVlYCBpZiBgdmFsdWVgIGlzIGFuIG9iamVjdCwgZWxzZSBgZmFsc2VgLlxuICogQGV4YW1wbGVcbiAqXG4gKiBfLmlzT2JqZWN0KHt9KTtcbiAqIC8vID0+IHRydWVcbiAqXG4gKiBfLmlzT2JqZWN0KFsxLCAyLCAzXSk7XG4gKiAvLyA9PiB0cnVlXG4gKlxuICogXy5pc09iamVjdChfLm5vb3ApO1xuICogLy8gPT4gdHJ1ZVxuICpcbiAqIF8uaXNPYmplY3QobnVsbCk7XG4gKiAvLyA9PiBmYWxzZVxuICovXG5mdW5jdGlvbiBpc09iamVjdCh2YWx1ZSkge1xuICB2YXIgdHlwZSA9IHR5cGVvZiB2YWx1ZTtcbiAgcmV0dXJuICEhdmFsdWUgJiYgKHR5cGUgPT0gJ29iamVjdCcgfHwgdHlwZSA9PSAnZnVuY3Rpb24nKTtcbn1cblxuLyoqXG4gKiBDaGVja3MgaWYgYHZhbHVlYCBpcyBvYmplY3QtbGlrZS4gQSB2YWx1ZSBpcyBvYmplY3QtbGlrZSBpZiBpdCdzIG5vdCBgbnVsbGBcbiAqIGFuZCBoYXMgYSBgdHlwZW9mYCByZXN1bHQgb2YgXCJvYmplY3RcIi5cbiAqXG4gKiBAc3RhdGljXG4gKiBAbWVtYmVyT2YgX1xuICogQHNpbmNlIDQuMC4wXG4gKiBAY2F0ZWdvcnkgTGFuZ1xuICogQHBhcmFtIHsqfSB2YWx1ZSBUaGUgdmFsdWUgdG8gY2hlY2suXG4gKiBAcmV0dXJucyB7Ym9vbGVhbn0gUmV0dXJucyBgdHJ1ZWAgaWYgYHZhbHVlYCBpcyBvYmplY3QtbGlrZSwgZWxzZSBgZmFsc2VgLlxuICogQGV4YW1wbGVcbiAqXG4gKiBfLmlzT2JqZWN0TGlrZSh7fSk7XG4gKiAvLyA9PiB0cnVlXG4gKlxuICogXy5pc09iamVjdExpa2UoWzEsIDIsIDNdKTtcbiAqIC8vID0+IHRydWVcbiAqXG4gKiBfLmlzT2JqZWN0TGlrZShfLm5vb3ApO1xuICogLy8gPT4gZmFsc2VcbiAqXG4gKiBfLmlzT2JqZWN0TGlrZShudWxsKTtcbiAqIC8vID0+IGZhbHNlXG4gKi9cbmZ1bmN0aW9uIGlzT2JqZWN0TGlrZSh2YWx1ZSkge1xuICByZXR1cm4gISF2YWx1ZSAmJiB0eXBlb2YgdmFsdWUgPT0gJ29iamVjdCc7XG59XG5cbi8qKlxuICogQ2hlY2tzIGlmIGB2YWx1ZWAgaXMgY2xhc3NpZmllZCBhcyBhIGBTeW1ib2xgIHByaW1pdGl2ZSBvciBvYmplY3QuXG4gKlxuICogQHN0YXRpY1xuICogQG1lbWJlck9mIF9cbiAqIEBzaW5jZSA0LjAuMFxuICogQGNhdGVnb3J5IExhbmdcbiAqIEBwYXJhbSB7Kn0gdmFsdWUgVGhlIHZhbHVlIHRvIGNoZWNrLlxuICogQHJldHVybnMge2Jvb2xlYW59IFJldHVybnMgYHRydWVgIGlmIGB2YWx1ZWAgaXMgYSBzeW1ib2wsIGVsc2UgYGZhbHNlYC5cbiAqIEBleGFtcGxlXG4gKlxuICogXy5pc1N5bWJvbChTeW1ib2wuaXRlcmF0b3IpO1xuICogLy8gPT4gdHJ1ZVxuICpcbiAqIF8uaXNTeW1ib2woJ2FiYycpO1xuICogLy8gPT4gZmFsc2VcbiAqL1xuZnVuY3Rpb24gaXNTeW1ib2wodmFsdWUpIHtcbiAgcmV0dXJuIHR5cGVvZiB2YWx1ZSA9PSAnc3ltYm9sJyB8fFxuICAgIChpc09iamVjdExpa2UodmFsdWUpICYmIG9iamVjdFRvU3RyaW5nLmNhbGwodmFsdWUpID09IHN5bWJvbFRhZyk7XG59XG5cbi8qKlxuICogQ29udmVydHMgYHZhbHVlYCB0byBhIG51bWJlci5cbiAqXG4gKiBAc3RhdGljXG4gKiBAbWVtYmVyT2YgX1xuICogQHNpbmNlIDQuMC4wXG4gKiBAY2F0ZWdvcnkgTGFuZ1xuICogQHBhcmFtIHsqfSB2YWx1ZSBUaGUgdmFsdWUgdG8gcHJvY2Vzcy5cbiAqIEByZXR1cm5zIHtudW1iZXJ9IFJldHVybnMgdGhlIG51bWJlci5cbiAqIEBleGFtcGxlXG4gKlxuICogXy50b051bWJlcigzLjIpO1xuICogLy8gPT4gMy4yXG4gKlxuICogXy50b051bWJlcihOdW1iZXIuTUlOX1ZBTFVFKTtcbiAqIC8vID0+IDVlLTMyNFxuICpcbiAqIF8udG9OdW1iZXIoSW5maW5pdHkpO1xuICogLy8gPT4gSW5maW5pdHlcbiAqXG4gKiBfLnRvTnVtYmVyKCczLjInKTtcbiAqIC8vID0+IDMuMlxuICovXG5mdW5jdGlvbiB0b051bWJlcih2YWx1ZSkge1xuICBpZiAodHlwZW9mIHZhbHVlID09ICdudW1iZXInKSB7XG4gICAgcmV0dXJuIHZhbHVlO1xuICB9XG4gIGlmIChpc1N5bWJvbCh2YWx1ZSkpIHtcbiAgICByZXR1cm4gTkFOO1xuICB9XG4gIGlmIChpc09iamVjdCh2YWx1ZSkpIHtcbiAgICB2YXIgb3RoZXIgPSB0eXBlb2YgdmFsdWUudmFsdWVPZiA9PSAnZnVuY3Rpb24nID8gdmFsdWUudmFsdWVPZigpIDogdmFsdWU7XG4gICAgdmFsdWUgPSBpc09iamVjdChvdGhlcikgPyAob3RoZXIgKyAnJykgOiBvdGhlcjtcbiAgfVxuICBpZiAodHlwZW9mIHZhbHVlICE9ICdzdHJpbmcnKSB7XG4gICAgcmV0dXJuIHZhbHVlID09PSAwID8gdmFsdWUgOiArdmFsdWU7XG4gIH1cbiAgdmFsdWUgPSB2YWx1ZS5yZXBsYWNlKHJlVHJpbSwgJycpO1xuICB2YXIgaXNCaW5hcnkgPSByZUlzQmluYXJ5LnRlc3QodmFsdWUpO1xuICByZXR1cm4gKGlzQmluYXJ5IHx8IHJlSXNPY3RhbC50ZXN0KHZhbHVlKSlcbiAgICA/IGZyZWVQYXJzZUludCh2YWx1ZS5zbGljZSgyKSwgaXNCaW5hcnkgPyAyIDogOClcbiAgICA6IChyZUlzQmFkSGV4LnRlc3QodmFsdWUpID8gTkFOIDogK3ZhbHVlKTtcbn1cblxubW9kdWxlLmV4cG9ydHMgPSBkZWJvdW5jZTtcbiJdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTs7QSIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///./node_modules/lodash.debounce/index.js\n");
+/* WEBPACK VAR INJECTION */(function(global) {/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/** Used as references for various `Number` constants. */
+var NAN = 0 / 0;
+
+/** `Object#toString` result references. */
+var symbolTag = '[object Symbol]';
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/** Used to detect bad signed hexadecimal string values. */
+var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+/** Used to detect binary string values. */
+var reIsBinary = /^0b[01]+$/i;
+
+/** Used to detect octal string values. */
+var reIsOctal = /^0o[0-7]+$/i;
+
+/** Built-in method references without a dependency on `root`. */
+var freeParseInt = parseInt;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = freeGlobal || freeSelf || Function('return this')();
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max,
+    nativeMin = Math.min;
+
+/**
+ * Gets the timestamp of the number of milliseconds that have elapsed since
+ * the Unix epoch (1 January 1970 00:00:00 UTC).
+ *
+ * @static
+ * @memberOf _
+ * @since 2.4.0
+ * @category Date
+ * @returns {number} Returns the timestamp.
+ * @example
+ *
+ * _.defer(function(stamp) {
+ *   console.log(_.now() - stamp);
+ * }, _.now());
+ * // => Logs the number of milliseconds it took for the deferred invocation.
+ */
+var now = function() {
+  return root.Date.now();
+};
+
+/**
+ * Creates a debounced function that delays invoking `func` until after `wait`
+ * milliseconds have elapsed since the last time the debounced function was
+ * invoked. The debounced function comes with a `cancel` method to cancel
+ * delayed `func` invocations and a `flush` method to immediately invoke them.
+ * Provide `options` to indicate whether `func` should be invoked on the
+ * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+ * with the last arguments provided to the debounced function. Subsequent
+ * calls to the debounced function return the result of the last `func`
+ * invocation.
+ *
+ * **Note:** If `leading` and `trailing` options are `true`, `func` is
+ * invoked on the trailing edge of the timeout only if the debounced function
+ * is invoked more than once during the `wait` timeout.
+ *
+ * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+ * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+ *
+ * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+ * for details over the differences between `_.debounce` and `_.throttle`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to debounce.
+ * @param {number} [wait=0] The number of milliseconds to delay.
+ * @param {Object} [options={}] The options object.
+ * @param {boolean} [options.leading=false]
+ *  Specify invoking on the leading edge of the timeout.
+ * @param {number} [options.maxWait]
+ *  The maximum time `func` is allowed to be delayed before it's invoked.
+ * @param {boolean} [options.trailing=true]
+ *  Specify invoking on the trailing edge of the timeout.
+ * @returns {Function} Returns the new debounced function.
+ * @example
+ *
+ * // Avoid costly calculations while the window size is in flux.
+ * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+ *
+ * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+ * jQuery(element).on('click', _.debounce(sendMail, 300, {
+ *   'leading': true,
+ *   'trailing': false
+ * }));
+ *
+ * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+ * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+ * var source = new EventSource('/stream');
+ * jQuery(source).on('message', debounced);
+ *
+ * // Cancel the trailing debounced invocation.
+ * jQuery(window).on('popstate', debounced.cancel);
+ */
+function debounce(func, wait, options) {
+  var lastArgs,
+      lastThis,
+      maxWait,
+      result,
+      timerId,
+      lastCallTime,
+      lastInvokeTime = 0,
+      leading = false,
+      maxing = false,
+      trailing = true;
+
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  wait = toNumber(wait) || 0;
+  if (isObject(options)) {
+    leading = !!options.leading;
+    maxing = 'maxWait' in options;
+    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+    trailing = 'trailing' in options ? !!options.trailing : trailing;
+  }
+
+  function invokeFunc(time) {
+    var args = lastArgs,
+        thisArg = lastThis;
+
+    lastArgs = lastThis = undefined;
+    lastInvokeTime = time;
+    result = func.apply(thisArg, args);
+    return result;
+  }
+
+  function leadingEdge(time) {
+    // Reset any `maxWait` timer.
+    lastInvokeTime = time;
+    // Start the timer for the trailing edge.
+    timerId = setTimeout(timerExpired, wait);
+    // Invoke the leading edge.
+    return leading ? invokeFunc(time) : result;
+  }
+
+  function remainingWait(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime,
+        result = wait - timeSinceLastCall;
+
+    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+  }
+
+  function shouldInvoke(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime;
+
+    // Either this is the first call, activity has stopped and we're at the
+    // trailing edge, the system time has gone backwards and we're treating
+    // it as the trailing edge, or we've hit the `maxWait` limit.
+    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+  }
+
+  function timerExpired() {
+    var time = now();
+    if (shouldInvoke(time)) {
+      return trailingEdge(time);
+    }
+    // Restart the timer.
+    timerId = setTimeout(timerExpired, remainingWait(time));
+  }
+
+  function trailingEdge(time) {
+    timerId = undefined;
+
+    // Only invoke if we have `lastArgs` which means `func` has been
+    // debounced at least once.
+    if (trailing && lastArgs) {
+      return invokeFunc(time);
+    }
+    lastArgs = lastThis = undefined;
+    return result;
+  }
+
+  function cancel() {
+    if (timerId !== undefined) {
+      clearTimeout(timerId);
+    }
+    lastInvokeTime = 0;
+    lastArgs = lastCallTime = lastThis = timerId = undefined;
+  }
+
+  function flush() {
+    return timerId === undefined ? result : trailingEdge(now());
+  }
+
+  function debounced() {
+    var time = now(),
+        isInvoking = shouldInvoke(time);
+
+    lastArgs = arguments;
+    lastThis = this;
+    lastCallTime = time;
+
+    if (isInvoking) {
+      if (timerId === undefined) {
+        return leadingEdge(lastCallTime);
+      }
+      if (maxing) {
+        // Handle invocations in a tight loop.
+        timerId = setTimeout(timerExpired, wait);
+        return invokeFunc(lastCallTime);
+      }
+    }
+    if (timerId === undefined) {
+      timerId = setTimeout(timerExpired, wait);
+    }
+    return result;
+  }
+  debounced.cancel = cancel;
+  debounced.flush = flush;
+  return debounced;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+}
+
+/**
+ * Converts `value` to a number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {number} Returns the number.
+ * @example
+ *
+ * _.toNumber(3.2);
+ * // => 3.2
+ *
+ * _.toNumber(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toNumber(Infinity);
+ * // => Infinity
+ *
+ * _.toNumber('3.2');
+ * // => 3.2
+ */
+function toNumber(value) {
+  if (typeof value == 'number') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return NAN;
+  }
+  if (isObject(value)) {
+    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+    value = isObject(other) ? (other + '') : other;
+  }
+  if (typeof value != 'string') {
+    return value === 0 ? value : +value;
+  }
+  value = value.replace(reTrim, '');
+  var isBinary = reIsBinary.test(value);
+  return (isBinary || reIsOctal.test(value))
+    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+    : (reIsBadHex.test(value) ? NAN : +value);
+}
+
+module.exports = debounce;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
@@ -114,7 +492,27 @@ eval("/* WEBPACK VAR INJECTION */(function(global) {/**\n * lodash (Custom Build
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("var g;\n\n// This works in non-strict mode\ng = (function() {\n\treturn this;\n})();\n\ntry {\n\t// This works if eval is allowed (see CSP)\n\tg = g || new Function(\"return this\")();\n} catch (e) {\n\t// This works if the window reference is available\n\tif (typeof window === \"object\") g = window;\n}\n\n// g can still be undefined, but nothing to do about it...\n// We return undefined, instead of nothing here, so it's\n// easier to handle this case. if(!global) { ...}\n\nmodule.exports = g;\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9ub2RlX21vZHVsZXMvd2VicGFjay9idWlsZGluL2dsb2JhbC5qcy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovL1tuYW1lXS8od2VicGFjaykvYnVpbGRpbi9nbG9iYWwuanM/Y2QwMCJdLCJzb3VyY2VzQ29udGVudCI6WyJ2YXIgZztcblxuLy8gVGhpcyB3b3JrcyBpbiBub24tc3RyaWN0IG1vZGVcbmcgPSAoZnVuY3Rpb24oKSB7XG5cdHJldHVybiB0aGlzO1xufSkoKTtcblxudHJ5IHtcblx0Ly8gVGhpcyB3b3JrcyBpZiBldmFsIGlzIGFsbG93ZWQgKHNlZSBDU1ApXG5cdGcgPSBnIHx8IG5ldyBGdW5jdGlvbihcInJldHVybiB0aGlzXCIpKCk7XG59IGNhdGNoIChlKSB7XG5cdC8vIFRoaXMgd29ya3MgaWYgdGhlIHdpbmRvdyByZWZlcmVuY2UgaXMgYXZhaWxhYmxlXG5cdGlmICh0eXBlb2Ygd2luZG93ID09PSBcIm9iamVjdFwiKSBnID0gd2luZG93O1xufVxuXG4vLyBnIGNhbiBzdGlsbCBiZSB1bmRlZmluZWQsIGJ1dCBub3RoaW5nIHRvIGRvIGFib3V0IGl0Li4uXG4vLyBXZSByZXR1cm4gdW5kZWZpbmVkLCBpbnN0ZWFkIG9mIG5vdGhpbmcgaGVyZSwgc28gaXQnc1xuLy8gZWFzaWVyIHRvIGhhbmRsZSB0aGlzIGNhc2UuIGlmKCFnbG9iYWwpIHsgLi4ufVxuXG5tb2R1bGUuZXhwb3J0cyA9IGc7XG4iXSwibWFwcGluZ3MiOiJBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7Iiwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///./node_modules/webpack/buildin/global.js\n");
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
 
 /***/ }),
 
@@ -125,7 +523,7 @@ eval("var g;\n\n// This works in non-strict mode\ng = (function() {\n\treturn th
 /*! exports provided: name, version, description, main, scripts, repository, keywords, author, license, bugs, homepage, devDependencies, dependencies, default */
 /***/ (function(module) {
 
-eval("module.exports = JSON.parse(\"{\\\"name\\\":\\\"echarts-extension-amap\\\",\\\"version\\\":\\\"1.5.0\\\",\\\"description\\\":\\\"An AMap(https://lbs.amap.com) extension for Apache ECharts (incubating) (https://github.com/apache/incubator-echarts)\\\",\\\"main\\\":\\\"dist/echarts-extension-amap.min.js\\\",\\\"scripts\\\":{\\\"build\\\":\\\"webpack -p\\\",\\\"dev\\\":\\\"webpack -d\\\",\\\"watch\\\":\\\"webpack -d --watch\\\",\\\"test\\\":\\\"echo \\\\\\\"Error: no test specified\\\\\\\" && exit 1\\\"},\\\"repository\\\":{\\\"type\\\":\\\"git\\\",\\\"url\\\":\\\"git+https://github.com/plainheart/echarts-extension-amap.git\\\"},\\\"keywords\\\":[\\\"echarts\\\",\\\"amap\\\",\\\"autonavi\\\",\\\"echarts-extension\\\",\\\"data-visualization\\\",\\\"map\\\",\\\"gaode\\\",\\\"echarts-amap\\\",\\\"echarts4\\\",\\\"echarts5\\\",\\\"amap-v2\\\"],\\\"author\\\":\\\"plainheart\\\",\\\"license\\\":\\\"MIT\\\",\\\"bugs\\\":{\\\"url\\\":\\\"https://github.com/plainheart/echarts-extension-amap/issues\\\"},\\\"homepage\\\":\\\"https://github.com/plainheart/echarts-extension-amap#readme\\\",\\\"devDependencies\\\":{\\\"webpack\\\":\\\"^4.29.5\\\",\\\"webpack-cli\\\":\\\"^3.2.3\\\"},\\\"dependencies\\\":{\\\"echarts\\\":\\\"^4.7.0\\\",\\\"lodash.debounce\\\":\\\"^4.0.8\\\"}}\");//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9wYWNrYWdlLmpzb24uanMiLCJzb3VyY2VzIjpbXSwibWFwcGluZ3MiOiIiLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./package.json\n");
+module.exports = JSON.parse("{\"name\":\"echarts-extension-amap\",\"version\":\"1.6.0\",\"description\":\"An AMap(https://lbs.amap.com) extension for Apache ECharts (incubating) (https://github.com/apache/incubator-echarts)\",\"main\":\"dist/echarts-extension-amap.min.js\",\"scripts\":{\"build\":\"webpack --env=production --optimize-minimize --progress --colors\",\"dev\":\"webpack --env=development\",\"watch\":\"webpack --env=development --watch\",\"test\":\"echo \\\"Error: no test specified\\\" && exit 1\"},\"repository\":{\"type\":\"git\",\"url\":\"git+https://github.com/plainheart/echarts-extension-amap.git\"},\"keywords\":[\"echarts\",\"amap\",\"autonavi\",\"echarts-extension\",\"data-visualization\",\"map\",\"gaode\",\"echarts-amap\",\"echarts4\",\"echarts5\",\"amap-v2\"],\"author\":\"plainheart\",\"license\":\"MIT\",\"bugs\":{\"url\":\"https://github.com/plainheart/echarts-extension-amap/issues\"},\"homepage\":\"https://github.com/plainheart/echarts-extension-amap#readme\",\"devDependencies\":{\"webpack\":\"^4.29.5\",\"webpack-cli\":\"^3.2.3\"},\"dependencies\":{\"lodash.debounce\":\"^4.0.8\"}}");
 
 /***/ }),
 
@@ -137,7 +535,270 @@ eval("module.exports = JSON.parse(\"{\\\"name\\\":\\\"echarts-extension-amap\\\"
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! echarts */ \"echarts\");\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_0__);\n/* global AMap */\r\n\r\n\r\n\r\nfunction AMapCoordSys(amap, api) {\r\n  this._amap = amap;\r\n  this.dimensions = [\"lng\", \"lat\"];\r\n  this._mapOffset = [0, 0];\r\n  this._api = api;\r\n}\r\n\r\nvar AMapCoordSysProto = AMapCoordSys.prototype;\r\n\r\n// exclude private and unsupported options\r\nvar excludedOptions = [\r\n  \"echartsLayerZIndex\",\r\n  \"renderOnMoving\",\r\n  \"layers\"\r\n  //\"hideOnZooming\"\r\n  //\"trackPitchAndRotation\"\r\n];\r\n\r\nAMapCoordSysProto.dimensions = [\"lng\", \"lat\"];\r\n\r\nAMapCoordSysProto.setZoom = function(zoom) {\r\n  this._zoom = zoom;\r\n};\r\n\r\nAMapCoordSysProto.setCenter = function(center) {\r\n  var lnglat = new AMap.LngLat(center[0], center[1]);\r\n  this._center = this._amap.lngLatToContainer(lnglat);\r\n};\r\n\r\nAMapCoordSysProto.setMapOffset = function(mapOffset) {\r\n  this._mapOffset = mapOffset;\r\n};\r\n\r\nAMapCoordSysProto.setAMap = function(amap) {\r\n  this._amap = amap;\r\n};\r\n\r\nAMapCoordSysProto.getAMap = function() {\r\n  return this._amap;\r\n};\r\n\r\nAMapCoordSysProto.dataToPoint = function(data) {\r\n  var lnglat = new AMap.LngLat(data[0], data[1]);\r\n  var px = this._amap.lngLatToContainer(lnglat);\r\n  var mapOffset = this._mapOffset;\r\n  return [px.x - mapOffset[0], px.y - mapOffset[1]];\r\n};\r\n\r\nAMapCoordSysProto.pointToData = function(pt) {\r\n  var mapOffset = this._mapOffset;\r\n  var lnglat = this._amap.containerToLngLat(\r\n    new AMap.Pixel(pt[0] + mapOffset[0], pt[1] + mapOffset[1])\r\n  );\r\n  return [lnglat.lng, lnglat.lat];\r\n};\r\n\r\nAMapCoordSysProto.getViewRect = function() {\r\n  var api = this._api;\r\n  return new echarts__WEBPACK_IMPORTED_MODULE_0__[\"graphic\"].BoundingRect(0, 0, api.getWidth(), api.getHeight());\r\n};\r\n\r\nAMapCoordSysProto.getRoamTransform = function() {\r\n  return echarts__WEBPACK_IMPORTED_MODULE_0__[\"matrix\"].create();\r\n};\r\n\r\nAMapCoordSysProto.prepareCustoms = function(data) {\r\n  var rect = this.getViewRect();\r\n  return {\r\n    coordSys: {\r\n      // The name exposed to user is always 'cartesian2d' but not 'grid'.\r\n      type: \"amap\",\r\n      x: rect.x,\r\n      y: rect.y,\r\n      width: rect.width,\r\n      height: rect.height\r\n    },\r\n    api: {\r\n      coord: echarts__WEBPACK_IMPORTED_MODULE_0__[\"util\"].bind(this.dataToPoint, this),\r\n      size: echarts__WEBPACK_IMPORTED_MODULE_0__[\"util\"].bind(dataToCoordSize, this)\r\n    }\r\n  };\r\n};\r\n\r\nfunction dataToCoordSize(dataSize, dataItem) {\r\n  dataItem = dataItem || [0, 0];\r\n  return echarts__WEBPACK_IMPORTED_MODULE_0__[\"util\"].map(\r\n    [0, 1],\r\n    function(dimIdx) {\r\n      var val = dataItem[dimIdx];\r\n      var halfSize = dataSize[dimIdx] / 2;\r\n      var p1 = [];\r\n      var p2 = [];\r\n      p1[dimIdx] = val - halfSize;\r\n      p2[dimIdx] = val + halfSize;\r\n      p1[1 - dimIdx] = p2[1 - dimIdx] = dataItem[1 - dimIdx];\r\n      return Math.abs(\r\n        this.dataToPoint(p1)[dimIdx] - this.dataToPoint(p2)[dimIdx]\r\n      );\r\n    },\r\n    this\r\n  );\r\n}\r\n\r\nfunction addCssRule(selector, rules, index) {\r\n  // 2.0\r\n  var is2X = AMap.version >= 2;\r\n  var sheet = is2X\r\n    ? document.getElementById(\"AMap_Dynamic_style\").sheet\r\n    : document.getElementsByClassName(\"AMap.style\")[0].sheet;\r\n  index = index || 0;\r\n  if (sheet.insertRule) {\r\n    sheet.insertRule(selector + \"{\" + rules + \"}\", index);\r\n  } else if (sheet.addRule) {\r\n    sheet.addRule(selector, rules, index);\r\n  }\r\n}\r\n\r\n// For deciding which dimensions to use when creating list data\r\nAMapCoordSys.dimensions = AMapCoordSysProto.dimensions;\r\n\r\n// var nativeRotation = AMap.Map.prototype.setRotation;\r\n// var nativePitch = AMap.Map.prototype.setPitch;\r\n\r\n// function setRotation(rotation) {\r\n//   var amap = this.getAMap();\r\n//   // for 2.x which has animation for rotation\r\n//   nativeRotation.apply(amap, [rotation, true]);\r\n\r\n//   var rotateEnable = amap.getStatus().rotateEnable;\r\n//   if (rotateEnable) {\r\n//     var amapCoordSys = this.coordinateSystem;\r\n//     var newRotation = amap.getRotation();\r\n//     // emit amaprender event\r\n//     newRotation !== amapCoordSys._rotation && amap.emit('amaprender', {\r\n//       type: 'rotation',\r\n//       oldRotation: amapCoordSys._rotation,\r\n//       newRotation: newRotation\r\n//     });\r\n//     amapCoordSys._rotation = newRotation;\r\n//   }\r\n// }\r\n\r\n// function setPitch(pitch) {\r\n//   var amap = this.getAMap();\r\n//   // for 2.x which has animation for pitch\r\n//   nativePitch.apply(amap, [pitch, true]);\r\n\r\n//   var pitchEnable = amap.getStatus().pitchEnable;\r\n//   if (pitchEnable) {\r\n//     var amapCoordSys = this.coordinateSystem;\r\n//     var newPitch = amap.getPitch();\r\n//     // emit amaprender event\r\n//     newPitch !== amapCoordSys._pitch && amap.emit('amaprender', {\r\n//       type: 'pitch',\r\n//       oldPitch: amapCoordSys._pitch,\r\n//       newPitch: newPitch\r\n//     });\r\n//     amapCoordSys._pitch = newPitch;\r\n//   }\r\n// }\r\n\r\nAMapCoordSys.create = function(ecModel, api) {\r\n  var amapCoordSys;\r\n  var root = api.getDom();\r\n\r\n  // FIXME: a hack for AMap 2.0\r\n  if (AMap.version >= 2) {\r\n    if(root.style.overflow !== \"auto\") {\r\n      root.style.overflow = \"auto\";\r\n      console.warn(\"[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.\");\r\n    }\r\n  }\r\n\r\n  ecModel.eachComponent(\"amap\", function(amapModel) {\r\n    var painter = api.getZr().painter;\r\n    var viewportRoot = painter.getViewportRoot();\r\n    if (typeof AMap === \"undefined\") {\r\n      throw new Error(\"AMap api is not loaded\");\r\n    }\r\n    if (amapCoordSys) {\r\n      throw new Error(\"Only one amap component can exist\");\r\n    }\r\n    var amap = amapModel.getAMap();\r\n    if (!amap) {\r\n      // Not support IE8\r\n      var amapRoot = root.querySelector(\".ec-extension-amap\");\r\n      if (amapRoot) {\r\n        // Reset viewport left and top, which will be changed\r\n        // in moving handler in AMapView\r\n        viewportRoot.style.left = \"0px\";\r\n        viewportRoot.style.top = \"0px\";\r\n        root.removeChild(amapRoot);\r\n      }\r\n      amapRoot = document.createElement(\"div\");\r\n      amapRoot.style.cssText = \"width:100%;height:100%\";\r\n      // Not support IE8\r\n      amapRoot.classList.add(\"ec-extension-amap\");\r\n      root.appendChild(amapRoot);\r\n\r\n      var options = echarts__WEBPACK_IMPORTED_MODULE_0__[\"util\"].clone(amapModel.get());\r\n      var echartsLayerZIndex = options.echartsLayerZIndex;\r\n      // delete excluded options\r\n      echarts__WEBPACK_IMPORTED_MODULE_0__[\"util\"].each(excludedOptions, function(key) {\r\n        delete options[key];\r\n      });\r\n\r\n      amap = new AMap.Map(amapRoot, options);\r\n      amapModel.setAMap(amap);\r\n\r\n      var echartsLayer = new AMap.CustomLayer(viewportRoot, {\r\n        zIndex: echartsLayerZIndex\r\n      });\r\n      amapModel.setEChartsLayer(echartsLayer);\r\n      amap.add(echartsLayer);\r\n\r\n      addCssRule(\".ec-amap-not-zoom\", \"left:0!important;top:0!important\", Infinity);\r\n\r\n      // Override\r\n      painter.getViewportRootOffset = function() {\r\n        return { offsetLeft: 0, offsetTop: 0 };\r\n      };\r\n    }\r\n\r\n    // track pitch and rotation\r\n    //var trackPitchAndRotation = amapModel.get('trackPitchAndRotation');\r\n    //AMap.Map.prototype.setRotation = trackPitchAndRotation ? setRotation.bind(amapModel) : nativeRotation;\r\n    //AMap.Map.prototype.setPitch = trackPitchAndRotation ? setPitch.bind(amapModel) : nativePitch;\r\n\r\n    var center = amapModel.get(\"center\");\r\n    var zoom = amapModel.get(\"zoom\");\r\n    if (center && zoom) {\r\n      var amapCenter = amap.getCenter();\r\n      var amapZoom = amap.getZoom();\r\n      var centerOrZoomChanged = amapModel.centerOrZoomChanged([amapCenter.lng, amapCenter.lat], amapZoom);\r\n      if (centerOrZoomChanged) {\r\n        var pt = new AMap.LngLat(center[0], center[1]);\r\n        amap.setZoomAndCenter(zoom, pt);\r\n      }\r\n    }\r\n\r\n    amapCoordSys = new AMapCoordSys(amap, api);\r\n    amapCoordSys.setMapOffset(amapModel.__mapOffset || [0, 0]);\r\n    amapCoordSys.setZoom(zoom);\r\n    amapCoordSys.setCenter(center);\r\n\r\n    amapModel.coordinateSystem = amapCoordSys;\r\n  });\r\n\r\n  ecModel.eachSeries(function(seriesModel) {\r\n    if (seriesModel.get(\"coordinateSystem\") === \"amap\") {\r\n      seriesModel.coordinateSystem = amapCoordSys;\r\n    }\r\n  });\r\n};\r\n\r\n/* harmony default export */ __webpack_exports__[\"default\"] = (AMapCoordSys);\r\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvQU1hcENvb3JkU3lzLmpzLmpzIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vW25hbWVdLy4vc3JjL0FNYXBDb29yZFN5cy5qcz8xZDUzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qIGdsb2JhbCBBTWFwICovXHJcblxyXG5pbXBvcnQgeyB1dGlsIGFzIHpyVXRpbCwgZ3JhcGhpYywgbWF0cml4IH0gZnJvbSBcImVjaGFydHNcIjtcclxuXHJcbmZ1bmN0aW9uIEFNYXBDb29yZFN5cyhhbWFwLCBhcGkpIHtcclxuICB0aGlzLl9hbWFwID0gYW1hcDtcclxuICB0aGlzLmRpbWVuc2lvbnMgPSBbXCJsbmdcIiwgXCJsYXRcIl07XHJcbiAgdGhpcy5fbWFwT2Zmc2V0ID0gWzAsIDBdO1xyXG4gIHRoaXMuX2FwaSA9IGFwaTtcclxufVxyXG5cclxudmFyIEFNYXBDb29yZFN5c1Byb3RvID0gQU1hcENvb3JkU3lzLnByb3RvdHlwZTtcclxuXHJcbi8vIGV4Y2x1ZGUgcHJpdmF0ZSBhbmQgdW5zdXBwb3J0ZWQgb3B0aW9uc1xyXG52YXIgZXhjbHVkZWRPcHRpb25zID0gW1xyXG4gIFwiZWNoYXJ0c0xheWVyWkluZGV4XCIsXHJcbiAgXCJyZW5kZXJPbk1vdmluZ1wiLFxyXG4gIFwibGF5ZXJzXCJcclxuICAvL1wiaGlkZU9uWm9vbWluZ1wiXHJcbiAgLy9cInRyYWNrUGl0Y2hBbmRSb3RhdGlvblwiXHJcbl07XHJcblxyXG5BTWFwQ29vcmRTeXNQcm90by5kaW1lbnNpb25zID0gW1wibG5nXCIsIFwibGF0XCJdO1xyXG5cclxuQU1hcENvb3JkU3lzUHJvdG8uc2V0Wm9vbSA9IGZ1bmN0aW9uKHpvb20pIHtcclxuICB0aGlzLl96b29tID0gem9vbTtcclxufTtcclxuXHJcbkFNYXBDb29yZFN5c1Byb3RvLnNldENlbnRlciA9IGZ1bmN0aW9uKGNlbnRlcikge1xyXG4gIHZhciBsbmdsYXQgPSBuZXcgQU1hcC5MbmdMYXQoY2VudGVyWzBdLCBjZW50ZXJbMV0pO1xyXG4gIHRoaXMuX2NlbnRlciA9IHRoaXMuX2FtYXAubG5nTGF0VG9Db250YWluZXIobG5nbGF0KTtcclxufTtcclxuXHJcbkFNYXBDb29yZFN5c1Byb3RvLnNldE1hcE9mZnNldCA9IGZ1bmN0aW9uKG1hcE9mZnNldCkge1xyXG4gIHRoaXMuX21hcE9mZnNldCA9IG1hcE9mZnNldDtcclxufTtcclxuXHJcbkFNYXBDb29yZFN5c1Byb3RvLnNldEFNYXAgPSBmdW5jdGlvbihhbWFwKSB7XHJcbiAgdGhpcy5fYW1hcCA9IGFtYXA7XHJcbn07XHJcblxyXG5BTWFwQ29vcmRTeXNQcm90by5nZXRBTWFwID0gZnVuY3Rpb24oKSB7XHJcbiAgcmV0dXJuIHRoaXMuX2FtYXA7XHJcbn07XHJcblxyXG5BTWFwQ29vcmRTeXNQcm90by5kYXRhVG9Qb2ludCA9IGZ1bmN0aW9uKGRhdGEpIHtcclxuICB2YXIgbG5nbGF0ID0gbmV3IEFNYXAuTG5nTGF0KGRhdGFbMF0sIGRhdGFbMV0pO1xyXG4gIHZhciBweCA9IHRoaXMuX2FtYXAubG5nTGF0VG9Db250YWluZXIobG5nbGF0KTtcclxuICB2YXIgbWFwT2Zmc2V0ID0gdGhpcy5fbWFwT2Zmc2V0O1xyXG4gIHJldHVybiBbcHgueCAtIG1hcE9mZnNldFswXSwgcHgueSAtIG1hcE9mZnNldFsxXV07XHJcbn07XHJcblxyXG5BTWFwQ29vcmRTeXNQcm90by5wb2ludFRvRGF0YSA9IGZ1bmN0aW9uKHB0KSB7XHJcbiAgdmFyIG1hcE9mZnNldCA9IHRoaXMuX21hcE9mZnNldDtcclxuICB2YXIgbG5nbGF0ID0gdGhpcy5fYW1hcC5jb250YWluZXJUb0xuZ0xhdChcclxuICAgIG5ldyBBTWFwLlBpeGVsKHB0WzBdICsgbWFwT2Zmc2V0WzBdLCBwdFsxXSArIG1hcE9mZnNldFsxXSlcclxuICApO1xyXG4gIHJldHVybiBbbG5nbGF0LmxuZywgbG5nbGF0LmxhdF07XHJcbn07XHJcblxyXG5BTWFwQ29vcmRTeXNQcm90by5nZXRWaWV3UmVjdCA9IGZ1bmN0aW9uKCkge1xyXG4gIHZhciBhcGkgPSB0aGlzLl9hcGk7XHJcbiAgcmV0dXJuIG5ldyBncmFwaGljLkJvdW5kaW5nUmVjdCgwLCAwLCBhcGkuZ2V0V2lkdGgoKSwgYXBpLmdldEhlaWdodCgpKTtcclxufTtcclxuXHJcbkFNYXBDb29yZFN5c1Byb3RvLmdldFJvYW1UcmFuc2Zvcm0gPSBmdW5jdGlvbigpIHtcclxuICByZXR1cm4gbWF0cml4LmNyZWF0ZSgpO1xyXG59O1xyXG5cclxuQU1hcENvb3JkU3lzUHJvdG8ucHJlcGFyZUN1c3RvbXMgPSBmdW5jdGlvbihkYXRhKSB7XHJcbiAgdmFyIHJlY3QgPSB0aGlzLmdldFZpZXdSZWN0KCk7XHJcbiAgcmV0dXJuIHtcclxuICAgIGNvb3JkU3lzOiB7XHJcbiAgICAgIC8vIFRoZSBuYW1lIGV4cG9zZWQgdG8gdXNlciBpcyBhbHdheXMgJ2NhcnRlc2lhbjJkJyBidXQgbm90ICdncmlkJy5cclxuICAgICAgdHlwZTogXCJhbWFwXCIsXHJcbiAgICAgIHg6IHJlY3QueCxcclxuICAgICAgeTogcmVjdC55LFxyXG4gICAgICB3aWR0aDogcmVjdC53aWR0aCxcclxuICAgICAgaGVpZ2h0OiByZWN0LmhlaWdodFxyXG4gICAgfSxcclxuICAgIGFwaToge1xyXG4gICAgICBjb29yZDogenJVdGlsLmJpbmQodGhpcy5kYXRhVG9Qb2ludCwgdGhpcyksXHJcbiAgICAgIHNpemU6IHpyVXRpbC5iaW5kKGRhdGFUb0Nvb3JkU2l6ZSwgdGhpcylcclxuICAgIH1cclxuICB9O1xyXG59O1xyXG5cclxuZnVuY3Rpb24gZGF0YVRvQ29vcmRTaXplKGRhdGFTaXplLCBkYXRhSXRlbSkge1xyXG4gIGRhdGFJdGVtID0gZGF0YUl0ZW0gfHwgWzAsIDBdO1xyXG4gIHJldHVybiB6clV0aWwubWFwKFxyXG4gICAgWzAsIDFdLFxyXG4gICAgZnVuY3Rpb24oZGltSWR4KSB7XHJcbiAgICAgIHZhciB2YWwgPSBkYXRhSXRlbVtkaW1JZHhdO1xyXG4gICAgICB2YXIgaGFsZlNpemUgPSBkYXRhU2l6ZVtkaW1JZHhdIC8gMjtcclxuICAgICAgdmFyIHAxID0gW107XHJcbiAgICAgIHZhciBwMiA9IFtdO1xyXG4gICAgICBwMVtkaW1JZHhdID0gdmFsIC0gaGFsZlNpemU7XHJcbiAgICAgIHAyW2RpbUlkeF0gPSB2YWwgKyBoYWxmU2l6ZTtcclxuICAgICAgcDFbMSAtIGRpbUlkeF0gPSBwMlsxIC0gZGltSWR4XSA9IGRhdGFJdGVtWzEgLSBkaW1JZHhdO1xyXG4gICAgICByZXR1cm4gTWF0aC5hYnMoXHJcbiAgICAgICAgdGhpcy5kYXRhVG9Qb2ludChwMSlbZGltSWR4XSAtIHRoaXMuZGF0YVRvUG9pbnQocDIpW2RpbUlkeF1cclxuICAgICAgKTtcclxuICAgIH0sXHJcbiAgICB0aGlzXHJcbiAgKTtcclxufVxyXG5cclxuZnVuY3Rpb24gYWRkQ3NzUnVsZShzZWxlY3RvciwgcnVsZXMsIGluZGV4KSB7XHJcbiAgLy8gMi4wXHJcbiAgdmFyIGlzMlggPSBBTWFwLnZlcnNpb24gPj0gMjtcclxuICB2YXIgc2hlZXQgPSBpczJYXHJcbiAgICA/IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKFwiQU1hcF9EeW5hbWljX3N0eWxlXCIpLnNoZWV0XHJcbiAgICA6IGRvY3VtZW50LmdldEVsZW1lbnRzQnlDbGFzc05hbWUoXCJBTWFwLnN0eWxlXCIpWzBdLnNoZWV0O1xyXG4gIGluZGV4ID0gaW5kZXggfHwgMDtcclxuICBpZiAoc2hlZXQuaW5zZXJ0UnVsZSkge1xyXG4gICAgc2hlZXQuaW5zZXJ0UnVsZShzZWxlY3RvciArIFwie1wiICsgcnVsZXMgKyBcIn1cIiwgaW5kZXgpO1xyXG4gIH0gZWxzZSBpZiAoc2hlZXQuYWRkUnVsZSkge1xyXG4gICAgc2hlZXQuYWRkUnVsZShzZWxlY3RvciwgcnVsZXMsIGluZGV4KTtcclxuICB9XHJcbn1cclxuXHJcbi8vIEZvciBkZWNpZGluZyB3aGljaCBkaW1lbnNpb25zIHRvIHVzZSB3aGVuIGNyZWF0aW5nIGxpc3QgZGF0YVxyXG5BTWFwQ29vcmRTeXMuZGltZW5zaW9ucyA9IEFNYXBDb29yZFN5c1Byb3RvLmRpbWVuc2lvbnM7XHJcblxyXG4vLyB2YXIgbmF0aXZlUm90YXRpb24gPSBBTWFwLk1hcC5wcm90b3R5cGUuc2V0Um90YXRpb247XHJcbi8vIHZhciBuYXRpdmVQaXRjaCA9IEFNYXAuTWFwLnByb3RvdHlwZS5zZXRQaXRjaDtcclxuXHJcbi8vIGZ1bmN0aW9uIHNldFJvdGF0aW9uKHJvdGF0aW9uKSB7XHJcbi8vICAgdmFyIGFtYXAgPSB0aGlzLmdldEFNYXAoKTtcclxuLy8gICAvLyBmb3IgMi54IHdoaWNoIGhhcyBhbmltYXRpb24gZm9yIHJvdGF0aW9uXHJcbi8vICAgbmF0aXZlUm90YXRpb24uYXBwbHkoYW1hcCwgW3JvdGF0aW9uLCB0cnVlXSk7XHJcblxyXG4vLyAgIHZhciByb3RhdGVFbmFibGUgPSBhbWFwLmdldFN0YXR1cygpLnJvdGF0ZUVuYWJsZTtcclxuLy8gICBpZiAocm90YXRlRW5hYmxlKSB7XHJcbi8vICAgICB2YXIgYW1hcENvb3JkU3lzID0gdGhpcy5jb29yZGluYXRlU3lzdGVtO1xyXG4vLyAgICAgdmFyIG5ld1JvdGF0aW9uID0gYW1hcC5nZXRSb3RhdGlvbigpO1xyXG4vLyAgICAgLy8gZW1pdCBhbWFwcmVuZGVyIGV2ZW50XHJcbi8vICAgICBuZXdSb3RhdGlvbiAhPT0gYW1hcENvb3JkU3lzLl9yb3RhdGlvbiAmJiBhbWFwLmVtaXQoJ2FtYXByZW5kZXInLCB7XHJcbi8vICAgICAgIHR5cGU6ICdyb3RhdGlvbicsXHJcbi8vICAgICAgIG9sZFJvdGF0aW9uOiBhbWFwQ29vcmRTeXMuX3JvdGF0aW9uLFxyXG4vLyAgICAgICBuZXdSb3RhdGlvbjogbmV3Um90YXRpb25cclxuLy8gICAgIH0pO1xyXG4vLyAgICAgYW1hcENvb3JkU3lzLl9yb3RhdGlvbiA9IG5ld1JvdGF0aW9uO1xyXG4vLyAgIH1cclxuLy8gfVxyXG5cclxuLy8gZnVuY3Rpb24gc2V0UGl0Y2gocGl0Y2gpIHtcclxuLy8gICB2YXIgYW1hcCA9IHRoaXMuZ2V0QU1hcCgpO1xyXG4vLyAgIC8vIGZvciAyLnggd2hpY2ggaGFzIGFuaW1hdGlvbiBmb3IgcGl0Y2hcclxuLy8gICBuYXRpdmVQaXRjaC5hcHBseShhbWFwLCBbcGl0Y2gsIHRydWVdKTtcclxuXHJcbi8vICAgdmFyIHBpdGNoRW5hYmxlID0gYW1hcC5nZXRTdGF0dXMoKS5waXRjaEVuYWJsZTtcclxuLy8gICBpZiAocGl0Y2hFbmFibGUpIHtcclxuLy8gICAgIHZhciBhbWFwQ29vcmRTeXMgPSB0aGlzLmNvb3JkaW5hdGVTeXN0ZW07XHJcbi8vICAgICB2YXIgbmV3UGl0Y2ggPSBhbWFwLmdldFBpdGNoKCk7XHJcbi8vICAgICAvLyBlbWl0IGFtYXByZW5kZXIgZXZlbnRcclxuLy8gICAgIG5ld1BpdGNoICE9PSBhbWFwQ29vcmRTeXMuX3BpdGNoICYmIGFtYXAuZW1pdCgnYW1hcHJlbmRlcicsIHtcclxuLy8gICAgICAgdHlwZTogJ3BpdGNoJyxcclxuLy8gICAgICAgb2xkUGl0Y2g6IGFtYXBDb29yZFN5cy5fcGl0Y2gsXHJcbi8vICAgICAgIG5ld1BpdGNoOiBuZXdQaXRjaFxyXG4vLyAgICAgfSk7XHJcbi8vICAgICBhbWFwQ29vcmRTeXMuX3BpdGNoID0gbmV3UGl0Y2g7XHJcbi8vICAgfVxyXG4vLyB9XHJcblxyXG5BTWFwQ29vcmRTeXMuY3JlYXRlID0gZnVuY3Rpb24oZWNNb2RlbCwgYXBpKSB7XHJcbiAgdmFyIGFtYXBDb29yZFN5cztcclxuICB2YXIgcm9vdCA9IGFwaS5nZXREb20oKTtcclxuXHJcbiAgLy8gRklYTUU6IGEgaGFjayBmb3IgQU1hcCAyLjBcclxuICBpZiAoQU1hcC52ZXJzaW9uID49IDIpIHtcclxuICAgIGlmKHJvb3Quc3R5bGUub3ZlcmZsb3cgIT09IFwiYXV0b1wiKSB7XHJcbiAgICAgIHJvb3Quc3R5bGUub3ZlcmZsb3cgPSBcImF1dG9cIjtcclxuICAgICAgY29uc29sZS53YXJuKFwiW2hhY2sgaGludF0gQ3VycmVudGx5IGluIEFNYXAgQVBJIDIuMCwgdGhlIG92ZXJmbG93IG9mIGVjaGFydHMgY29udGFpbmVyIG11c3QgYmUgYGF1dG9gLlwiKTtcclxuICAgIH1cclxuICB9XHJcblxyXG4gIGVjTW9kZWwuZWFjaENvbXBvbmVudChcImFtYXBcIiwgZnVuY3Rpb24oYW1hcE1vZGVsKSB7XHJcbiAgICB2YXIgcGFpbnRlciA9IGFwaS5nZXRacigpLnBhaW50ZXI7XHJcbiAgICB2YXIgdmlld3BvcnRSb290ID0gcGFpbnRlci5nZXRWaWV3cG9ydFJvb3QoKTtcclxuICAgIGlmICh0eXBlb2YgQU1hcCA9PT0gXCJ1bmRlZmluZWRcIikge1xyXG4gICAgICB0aHJvdyBuZXcgRXJyb3IoXCJBTWFwIGFwaSBpcyBub3QgbG9hZGVkXCIpO1xyXG4gICAgfVxyXG4gICAgaWYgKGFtYXBDb29yZFN5cykge1xyXG4gICAgICB0aHJvdyBuZXcgRXJyb3IoXCJPbmx5IG9uZSBhbWFwIGNvbXBvbmVudCBjYW4gZXhpc3RcIik7XHJcbiAgICB9XHJcbiAgICB2YXIgYW1hcCA9IGFtYXBNb2RlbC5nZXRBTWFwKCk7XHJcbiAgICBpZiAoIWFtYXApIHtcclxuICAgICAgLy8gTm90IHN1cHBvcnQgSUU4XHJcbiAgICAgIHZhciBhbWFwUm9vdCA9IHJvb3QucXVlcnlTZWxlY3RvcihcIi5lYy1leHRlbnNpb24tYW1hcFwiKTtcclxuICAgICAgaWYgKGFtYXBSb290KSB7XHJcbiAgICAgICAgLy8gUmVzZXQgdmlld3BvcnQgbGVmdCBhbmQgdG9wLCB3aGljaCB3aWxsIGJlIGNoYW5nZWRcclxuICAgICAgICAvLyBpbiBtb3ZpbmcgaGFuZGxlciBpbiBBTWFwVmlld1xyXG4gICAgICAgIHZpZXdwb3J0Um9vdC5zdHlsZS5sZWZ0ID0gXCIwcHhcIjtcclxuICAgICAgICB2aWV3cG9ydFJvb3Quc3R5bGUudG9wID0gXCIwcHhcIjtcclxuICAgICAgICByb290LnJlbW92ZUNoaWxkKGFtYXBSb290KTtcclxuICAgICAgfVxyXG4gICAgICBhbWFwUm9vdCA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoXCJkaXZcIik7XHJcbiAgICAgIGFtYXBSb290LnN0eWxlLmNzc1RleHQgPSBcIndpZHRoOjEwMCU7aGVpZ2h0OjEwMCVcIjtcclxuICAgICAgLy8gTm90IHN1cHBvcnQgSUU4XHJcbiAgICAgIGFtYXBSb290LmNsYXNzTGlzdC5hZGQoXCJlYy1leHRlbnNpb24tYW1hcFwiKTtcclxuICAgICAgcm9vdC5hcHBlbmRDaGlsZChhbWFwUm9vdCk7XHJcblxyXG4gICAgICB2YXIgb3B0aW9ucyA9IHpyVXRpbC5jbG9uZShhbWFwTW9kZWwuZ2V0KCkpO1xyXG4gICAgICB2YXIgZWNoYXJ0c0xheWVyWkluZGV4ID0gb3B0aW9ucy5lY2hhcnRzTGF5ZXJaSW5kZXg7XHJcbiAgICAgIC8vIGRlbGV0ZSBleGNsdWRlZCBvcHRpb25zXHJcbiAgICAgIHpyVXRpbC5lYWNoKGV4Y2x1ZGVkT3B0aW9ucywgZnVuY3Rpb24oa2V5KSB7XHJcbiAgICAgICAgZGVsZXRlIG9wdGlvbnNba2V5XTtcclxuICAgICAgfSk7XHJcblxyXG4gICAgICBhbWFwID0gbmV3IEFNYXAuTWFwKGFtYXBSb290LCBvcHRpb25zKTtcclxuICAgICAgYW1hcE1vZGVsLnNldEFNYXAoYW1hcCk7XHJcblxyXG4gICAgICB2YXIgZWNoYXJ0c0xheWVyID0gbmV3IEFNYXAuQ3VzdG9tTGF5ZXIodmlld3BvcnRSb290LCB7XHJcbiAgICAgICAgekluZGV4OiBlY2hhcnRzTGF5ZXJaSW5kZXhcclxuICAgICAgfSk7XHJcbiAgICAgIGFtYXBNb2RlbC5zZXRFQ2hhcnRzTGF5ZXIoZWNoYXJ0c0xheWVyKTtcclxuICAgICAgYW1hcC5hZGQoZWNoYXJ0c0xheWVyKTtcclxuXHJcbiAgICAgIGFkZENzc1J1bGUoXCIuZWMtYW1hcC1ub3Qtem9vbVwiLCBcImxlZnQ6MCFpbXBvcnRhbnQ7dG9wOjAhaW1wb3J0YW50XCIsIEluZmluaXR5KTtcclxuXHJcbiAgICAgIC8vIE92ZXJyaWRlXHJcbiAgICAgIHBhaW50ZXIuZ2V0Vmlld3BvcnRSb290T2Zmc2V0ID0gZnVuY3Rpb24oKSB7XHJcbiAgICAgICAgcmV0dXJuIHsgb2Zmc2V0TGVmdDogMCwgb2Zmc2V0VG9wOiAwIH07XHJcbiAgICAgIH07XHJcbiAgICB9XHJcblxyXG4gICAgLy8gdHJhY2sgcGl0Y2ggYW5kIHJvdGF0aW9uXHJcbiAgICAvL3ZhciB0cmFja1BpdGNoQW5kUm90YXRpb24gPSBhbWFwTW9kZWwuZ2V0KCd0cmFja1BpdGNoQW5kUm90YXRpb24nKTtcclxuICAgIC8vQU1hcC5NYXAucHJvdG90eXBlLnNldFJvdGF0aW9uID0gdHJhY2tQaXRjaEFuZFJvdGF0aW9uID8gc2V0Um90YXRpb24uYmluZChhbWFwTW9kZWwpIDogbmF0aXZlUm90YXRpb247XHJcbiAgICAvL0FNYXAuTWFwLnByb3RvdHlwZS5zZXRQaXRjaCA9IHRyYWNrUGl0Y2hBbmRSb3RhdGlvbiA/IHNldFBpdGNoLmJpbmQoYW1hcE1vZGVsKSA6IG5hdGl2ZVBpdGNoO1xyXG5cclxuICAgIHZhciBjZW50ZXIgPSBhbWFwTW9kZWwuZ2V0KFwiY2VudGVyXCIpO1xyXG4gICAgdmFyIHpvb20gPSBhbWFwTW9kZWwuZ2V0KFwiem9vbVwiKTtcclxuICAgIGlmIChjZW50ZXIgJiYgem9vbSkge1xyXG4gICAgICB2YXIgYW1hcENlbnRlciA9IGFtYXAuZ2V0Q2VudGVyKCk7XHJcbiAgICAgIHZhciBhbWFwWm9vbSA9IGFtYXAuZ2V0Wm9vbSgpO1xyXG4gICAgICB2YXIgY2VudGVyT3Jab29tQ2hhbmdlZCA9IGFtYXBNb2RlbC5jZW50ZXJPclpvb21DaGFuZ2VkKFthbWFwQ2VudGVyLmxuZywgYW1hcENlbnRlci5sYXRdLCBhbWFwWm9vbSk7XHJcbiAgICAgIGlmIChjZW50ZXJPclpvb21DaGFuZ2VkKSB7XHJcbiAgICAgICAgdmFyIHB0ID0gbmV3IEFNYXAuTG5nTGF0KGNlbnRlclswXSwgY2VudGVyWzFdKTtcclxuICAgICAgICBhbWFwLnNldFpvb21BbmRDZW50ZXIoem9vbSwgcHQpO1xyXG4gICAgICB9XHJcbiAgICB9XHJcblxyXG4gICAgYW1hcENvb3JkU3lzID0gbmV3IEFNYXBDb29yZFN5cyhhbWFwLCBhcGkpO1xyXG4gICAgYW1hcENvb3JkU3lzLnNldE1hcE9mZnNldChhbWFwTW9kZWwuX19tYXBPZmZzZXQgfHwgWzAsIDBdKTtcclxuICAgIGFtYXBDb29yZFN5cy5zZXRab29tKHpvb20pO1xyXG4gICAgYW1hcENvb3JkU3lzLnNldENlbnRlcihjZW50ZXIpO1xyXG5cclxuICAgIGFtYXBNb2RlbC5jb29yZGluYXRlU3lzdGVtID0gYW1hcENvb3JkU3lzO1xyXG4gIH0pO1xyXG5cclxuICBlY01vZGVsLmVhY2hTZXJpZXMoZnVuY3Rpb24oc2VyaWVzTW9kZWwpIHtcclxuICAgIGlmIChzZXJpZXNNb2RlbC5nZXQoXCJjb29yZGluYXRlU3lzdGVtXCIpID09PSBcImFtYXBcIikge1xyXG4gICAgICBzZXJpZXNNb2RlbC5jb29yZGluYXRlU3lzdGVtID0gYW1hcENvb3JkU3lzO1xyXG4gICAgfVxyXG4gIH0pO1xyXG59O1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgQU1hcENvb3JkU3lzO1xyXG4iXSwibWFwcGluZ3MiOiJBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7Iiwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///./src/AMapCoordSys.js\n");
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! echarts */ "echarts");
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_0__);
+/* global AMap */
+
+
+
+function AMapCoordSys(amap, api) {
+  this._amap = amap;
+  this.dimensions = ['lng', 'lat'];
+  this._mapOffset = [0, 0];
+  this._api = api;
+}
+
+var AMapCoordSysProto = AMapCoordSys.prototype;
+
+// exclude private and unsupported options
+var excludedOptions = [
+  'echartsLayerZIndex',
+  'renderOnMoving',
+  'layers'
+  //'hideOnZooming'
+  //'trackPitchAndRotation'
+];
+
+AMapCoordSysProto.dimensions = ['lng', 'lat'];
+
+AMapCoordSysProto.setZoom = function(zoom) {
+  this._zoom = zoom;
+};
+
+AMapCoordSysProto.setCenter = function(center) {
+  var lnglat = new AMap.LngLat(center[0], center[1]);
+  this._center = this._amap.lngLatToContainer(lnglat);
+};
+
+AMapCoordSysProto.setMapOffset = function(mapOffset) {
+  this._mapOffset = mapOffset;
+};
+
+AMapCoordSysProto.setAMap = function(amap) {
+  this._amap = amap;
+};
+
+AMapCoordSysProto.getAMap = function() {
+  return this._amap;
+};
+
+AMapCoordSysProto.dataToPoint = function(data) {
+  var lnglat = new AMap.LngLat(data[0], data[1]);
+  var px = this._amap.lngLatToContainer(lnglat);
+  var mapOffset = this._mapOffset;
+  return [px.x - mapOffset[0], px.y - mapOffset[1]];
+};
+
+AMapCoordSysProto.pointToData = function(pt) {
+  var mapOffset = this._mapOffset;
+  var lnglat = this._amap.containerToLngLat(
+    new AMap.Pixel(pt[0] + mapOffset[0], pt[1] + mapOffset[1])
+  );
+  return [lnglat.lng, lnglat.lat];
+};
+
+AMapCoordSysProto.getViewRect = function() {
+  var api = this._api;
+  return new echarts__WEBPACK_IMPORTED_MODULE_0__["graphic"].BoundingRect(0, 0, api.getWidth(), api.getHeight());
+};
+
+AMapCoordSysProto.getRoamTransform = function() {
+  return echarts__WEBPACK_IMPORTED_MODULE_0__["matrix"].create();
+};
+
+AMapCoordSysProto.prepareCustoms = function(data) {
+  var rect = this.getViewRect();
+  return {
+    coordSys: {
+      // The name exposed to user is always 'cartesian2d' but not 'grid'.
+      type: 'amap',
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height
+    },
+    api: {
+      coord: echarts__WEBPACK_IMPORTED_MODULE_0__["util"].bind(this.dataToPoint, this),
+      size: echarts__WEBPACK_IMPORTED_MODULE_0__["util"].bind(dataToCoordSize, this)
+    }
+  };
+};
+
+function dataToCoordSize(dataSize, dataItem) {
+  dataItem = dataItem || [0, 0];
+  return echarts__WEBPACK_IMPORTED_MODULE_0__["util"].map(
+    [0, 1],
+    function(dimIdx) {
+      var val = dataItem[dimIdx];
+      var halfSize = dataSize[dimIdx] / 2;
+      var p1 = [];
+      var p2 = [];
+      p1[dimIdx] = val - halfSize;
+      p2[dimIdx] = val + halfSize;
+      p1[1 - dimIdx] = p2[1 - dimIdx] = dataItem[1 - dimIdx];
+      return Math.abs(
+        this.dataToPoint(p1)[dimIdx] - this.dataToPoint(p2)[dimIdx]
+      );
+    },
+    this
+  );
+}
+
+function addCssRule(selector, rules, index) {
+  // 2.0
+  var is2X = AMap.version >= 2;
+  var sheet = is2X
+    ? document.getElementById('AMap_Dynamic_style').sheet
+    : document.getElementsByClassName('AMap.style')[0].sheet;
+  index = index || 0;
+  if (sheet.insertRule) {
+    sheet.insertRule(selector + '{' + rules + '}', index);
+  } else if (sheet.addRule) {
+    sheet.addRule(selector, rules, index);
+  }
+}
+
+// For deciding which dimensions to use when creating list data
+AMapCoordSys.dimensions = AMapCoordSysProto.dimensions;
+
+// var nativeRotation = AMap.Map.prototype.setRotation;
+// var nativePitch = AMap.Map.prototype.setPitch;
+
+// function setRotation(rotation) {
+//   var amap = this.getAMap();
+//   // for 2.x which has animation for rotation
+//   nativeRotation.apply(amap, [rotation, true]);
+
+//   var rotateEnable = amap.getStatus().rotateEnable;
+//   if (rotateEnable) {
+//     var amapCoordSys = this.coordinateSystem;
+//     var newRotation = amap.getRotation();
+//     // emit amaprender event
+//     newRotation !== amapCoordSys._rotation && amap.emit('amaprender', {
+//       type: 'rotation',
+//       oldRotation: amapCoordSys._rotation,
+//       newRotation: newRotation
+//     });
+//     amapCoordSys._rotation = newRotation;
+//   }
+// }
+
+// function setPitch(pitch) {
+//   var amap = this.getAMap();
+//   // for 2.x which has animation for pitch
+//   nativePitch.apply(amap, [pitch, true]);
+
+//   var pitchEnable = amap.getStatus().pitchEnable;
+//   if (pitchEnable) {
+//     var amapCoordSys = this.coordinateSystem;
+//     var newPitch = amap.getPitch();
+//     // emit amaprender event
+//     newPitch !== amapCoordSys._pitch && amap.emit('amaprender', {
+//       type: 'pitch',
+//       oldPitch: amapCoordSys._pitch,
+//       newPitch: newPitch
+//     });
+//     amapCoordSys._pitch = newPitch;
+//   }
+// }
+
+AMapCoordSys.create = function(ecModel, api) {
+  var amapCoordSys;
+  var root = api.getDom();
+
+  // FIXME: a hack for AMap 2.0
+  if (AMap.version >= 2) {
+    if(root.style.overflow !== 'auto') {
+      root.style.overflow = 'auto';
+      console.warn('[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.');
+    }
+  }
+
+  ecModel.eachComponent('amap', function(amapModel) {
+    var painter = api.getZr().painter;
+    var viewportRoot = painter.getViewportRoot();
+    if (typeof AMap === 'undefined') {
+      throw new Error('AMap api is not loaded');
+    }
+    if (amapCoordSys) {
+      throw new Error('Only one amap component can exist');
+    }
+    var amap = amapModel.getAMap();
+    if (!amap) {
+      // Not support IE8
+      var amapRoot = root.querySelector('.ec-extension-amap');
+      if (amapRoot) {
+        // Reset viewport left and top, which will be changed
+        // in moving handler in AMapView
+        viewportRoot.style.left = '0px';
+        viewportRoot.style.top = '0px';
+        root.removeChild(amapRoot);
+      }
+      amapRoot = document.createElement('div');
+      amapRoot.style.cssText = 'width:100%;height:100%';
+      // Not support IE8
+      amapRoot.classList.add('ec-extension-amap');
+      root.appendChild(amapRoot);
+
+      var options = echarts__WEBPACK_IMPORTED_MODULE_0__["util"].clone(amapModel.get());
+      var echartsLayerZIndex = options.echartsLayerZIndex;
+      // delete excluded options
+      echarts__WEBPACK_IMPORTED_MODULE_0__["util"].each(excludedOptions, function(key) {
+        delete options[key];
+      });
+
+      amap = new AMap.Map(amapRoot, options);
+      amapModel.setAMap(amap);
+
+      var echartsLayer = new AMap.CustomLayer(viewportRoot, {
+        zIndex: echartsLayerZIndex
+      });
+      amapModel.setEChartsLayer(echartsLayer);
+      amap.add(echartsLayer);
+
+      addCssRule('.ec-amap-not-zoom', 'left:0!important;top:0!important', Infinity);
+
+      // Override
+      painter.getViewportRootOffset = function() {
+        return { offsetLeft: 0, offsetTop: 0 };
+      };
+    }
+
+    // track pitch and rotation
+    //var trackPitchAndRotation = amapModel.get('trackPitchAndRotation');
+    //AMap.Map.prototype.setRotation = trackPitchAndRotation ? setRotation.bind(amapModel) : nativeRotation;
+    //AMap.Map.prototype.setPitch = trackPitchAndRotation ? setPitch.bind(amapModel) : nativePitch;
+
+    var center = amapModel.get('center');
+    var zoom = amapModel.get('zoom');
+    if (center && zoom) {
+      var amapCenter = amap.getCenter();
+      var amapZoom = amap.getZoom();
+      var centerOrZoomChanged = amapModel.centerOrZoomChanged([amapCenter.lng, amapCenter.lat], amapZoom);
+      if (centerOrZoomChanged) {
+        var pt = new AMap.LngLat(center[0], center[1]);
+        amap.setZoomAndCenter(zoom, pt);
+      }
+    }
+
+    amapCoordSys = new AMapCoordSys(amap, api);
+    amapCoordSys.setMapOffset(amapModel.__mapOffset || [0, 0]);
+    amapCoordSys.setZoom(zoom);
+    amapCoordSys.setCenter(center);
+
+    amapModel.coordinateSystem = amapCoordSys;
+  });
+
+  ecModel.eachSeries(function(seriesModel) {
+    if (seriesModel.get('coordinateSystem') === 'amap') {
+      seriesModel.coordinateSystem = amapCoordSys;
+    }
+  });
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (AMapCoordSys);
+
 
 /***/ }),
 
@@ -149,7 +810,58 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var echa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! echarts */ \"echarts\");\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_0__);\n\n\nfunction v2Equal(a, b) {\n  return a && b && a[0] === b[0] && a[1] === b[1];\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (echarts__WEBPACK_IMPORTED_MODULE_0__[\"extendComponentModel\"]({\n  type: \"amap\",\n\n  setAMap: function(amap) {\n    this.__amap = amap;\n  },\n\n  getAMap: function() {\n    return this.__amap;\n  },\n\n  setEChartsLayer: function(layer) {\n    this.__echartsLayer = layer;\n  },\n\n  getEChartsLayer: function() {\n    return this.__echartsLayer;\n  },\n\n  setCenterAndZoom: function(center, zoom) {\n    this.option.center = center;\n    this.option.zoom = zoom;\n  },\n\n  centerOrZoomChanged: function(center, zoom) {\n    var option = this.option;\n    return !(v2Equal(center, option.center) && zoom === option.zoom);\n  },\n\n  defaultOption: {\n    center: [116.397428, 39.90923],\n    zoom: 5,\n    isHotspot: false,\n    resizeEnable: true,\n\n    // extension options\n    echartsLayerZIndex: 2000,\n    renderOnMoving: true\n    //hideOnZooming: true,\n    //trackPitchAndRotation: false\n  }\n}));\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvQU1hcE1vZGVsLmpzLmpzIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vW25hbWVdLy4vc3JjL0FNYXBNb2RlbC5qcz8zYWVmIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCAqIGFzIGVjaGFydHMgZnJvbSBcImVjaGFydHNcIjtcblxuZnVuY3Rpb24gdjJFcXVhbChhLCBiKSB7XG4gIHJldHVybiBhICYmIGIgJiYgYVswXSA9PT0gYlswXSAmJiBhWzFdID09PSBiWzFdO1xufVxuXG5leHBvcnQgZGVmYXVsdCBlY2hhcnRzLmV4dGVuZENvbXBvbmVudE1vZGVsKHtcbiAgdHlwZTogXCJhbWFwXCIsXG5cbiAgc2V0QU1hcDogZnVuY3Rpb24oYW1hcCkge1xuICAgIHRoaXMuX19hbWFwID0gYW1hcDtcbiAgfSxcblxuICBnZXRBTWFwOiBmdW5jdGlvbigpIHtcbiAgICByZXR1cm4gdGhpcy5fX2FtYXA7XG4gIH0sXG5cbiAgc2V0RUNoYXJ0c0xheWVyOiBmdW5jdGlvbihsYXllcikge1xuICAgIHRoaXMuX19lY2hhcnRzTGF5ZXIgPSBsYXllcjtcbiAgfSxcblxuICBnZXRFQ2hhcnRzTGF5ZXI6IGZ1bmN0aW9uKCkge1xuICAgIHJldHVybiB0aGlzLl9fZWNoYXJ0c0xheWVyO1xuICB9LFxuXG4gIHNldENlbnRlckFuZFpvb206IGZ1bmN0aW9uKGNlbnRlciwgem9vbSkge1xuICAgIHRoaXMub3B0aW9uLmNlbnRlciA9IGNlbnRlcjtcbiAgICB0aGlzLm9wdGlvbi56b29tID0gem9vbTtcbiAgfSxcblxuICBjZW50ZXJPclpvb21DaGFuZ2VkOiBmdW5jdGlvbihjZW50ZXIsIHpvb20pIHtcbiAgICB2YXIgb3B0aW9uID0gdGhpcy5vcHRpb247XG4gICAgcmV0dXJuICEodjJFcXVhbChjZW50ZXIsIG9wdGlvbi5jZW50ZXIpICYmIHpvb20gPT09IG9wdGlvbi56b29tKTtcbiAgfSxcblxuICBkZWZhdWx0T3B0aW9uOiB7XG4gICAgY2VudGVyOiBbMTE2LjM5NzQyOCwgMzkuOTA5MjNdLFxuICAgIHpvb206IDUsXG4gICAgaXNIb3RzcG90OiBmYWxzZSxcbiAgICByZXNpemVFbmFibGU6IHRydWUsXG5cbiAgICAvLyBleHRlbnNpb24gb3B0aW9uc1xuICAgIGVjaGFydHNMYXllclpJbmRleDogMjAwMCxcbiAgICByZW5kZXJPbk1vdmluZzogdHJ1ZVxuICAgIC8vaGlkZU9uWm9vbWluZzogdHJ1ZSxcbiAgICAvL3RyYWNrUGl0Y2hBbmRSb3RhdGlvbjogZmFsc2VcbiAgfVxufSk7XG4iXSwibWFwcGluZ3MiOiJBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTsiLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./src/AMapModel.js\n");
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! echarts */ "echarts");
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_0__);
+
+
+function v2Equal(a, b) {
+  return a && b && a[0] === b[0] && a[1] === b[1];
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (echarts__WEBPACK_IMPORTED_MODULE_0__["extendComponentModel"]({
+  type: 'amap',
+
+  setAMap: function(amap) {
+    this.__amap = amap;
+  },
+
+  getAMap: function() {
+    return this.__amap;
+  },
+
+  setEChartsLayer: function(layer) {
+    this.__echartsLayer = layer;
+  },
+
+  getEChartsLayer: function() {
+    return this.__echartsLayer;
+  },
+
+  setCenterAndZoom: function(center, zoom) {
+    this.option.center = center;
+    this.option.zoom = zoom;
+  },
+
+  centerOrZoomChanged: function(center, zoom) {
+    var option = this.option;
+    return !(v2Equal(center, option.center) && zoom === option.zoom);
+  },
+
+  defaultOption: {
+    center: [116.397428, 39.90923],
+    zoom: 5,
+    isHotspot: false,
+    resizeEnable: true,
+
+    // extension options
+    echartsLayerZIndex: 2000,
+    renderOnMoving: true
+    //hideOnZooming: true,
+    //trackPitchAndRotation: false
+  }
+}));
+
 
 /***/ }),
 
@@ -161,7 +873,163 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var echa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! echarts */ \"echarts\");\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var lodash_debounce__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash.debounce */ \"./node_modules/lodash.debounce/index.js\");\n/* harmony import */ var lodash_debounce__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_debounce__WEBPACK_IMPORTED_MODULE_1__);\n/* global AMap */\n\n\n\n\n/* harmony default export */ __webpack_exports__[\"default\"] = (echarts__WEBPACK_IMPORTED_MODULE_0__[\"extendComponentView\"]({\n  type: \"amap\",\n\n  render: function(amapModel, ecModel, api) {\n    var rendering = true;\n\n    var amap = amapModel.getAMap();\n    var viewportRoot = api.getZr().painter.getViewportRoot();\n    var offsetEl = amap.getContainer();\n    var amape = offsetEl.querySelector(\".amap-e\");\n    var coordSys = amapModel.coordinateSystem;\n    var echartsLayer = amapModel.getEChartsLayer();\n\n    var renderOnMoving = amapModel.get(\"renderOnMoving\");\n    //var hideOnZooming = amapModel.get(\"hideOnZooming\");\n    var resizeEnable = amapModel.get(\"resizeEnable\");\n\n    var is2X = AMap.version >= 2;\n    var is3DMode = amap.getViewMode_() === \"3D\";\n    var not2X3D = !is2X && !is3DMode;\n\n    amape && amape.classList.add(\"ec-amap-not-zoom\");\n\n    var moveHandler = function(e) {\n      if (rendering) {\n        return;\n      }\n\n      var mapOffset = [\n        -parseInt(offsetEl.style.left, 10) || 0,\n        -parseInt(offsetEl.style.top, 10) || 0\n      ];\n      viewportRoot.style.left = mapOffset[0] + \"px\";\n      viewportRoot.style.top = mapOffset[1] + \"px\";\n\n      coordSys.setMapOffset(mapOffset);\n      amapModel.__mapOffset = mapOffset;\n\n      api.dispatchAction({\n        type: \"amapRoam\",\n        animation: {\n          // compatible with ECharts 5.x\n          // no delay for rendering but remain animation of elements\n          duration: 0\n        }\n      });\n    };\n\n    var zoomStartHandler = function(e) {\n      if (rendering) {\n        return;\n      }\n\n      // fix flicker in 3D mode for 1.x when zoom is over min or max value\n      if (!is2X && is3DMode) {\n        return;\n      }\n\n      /*hideOnZooming && */echartsLayer.setOpacity(not2X3D ? 0 : 0.01);\n    };\n\n    var zoomEndHandler = function(e) {\n      if (rendering) {\n        return;\n      }\n\n      not2X3D || echartsLayer.setOpacity(1);\n\n      api.dispatchAction({\n        type: \"amapRoam\",\n        animation: {\n          duration: 0\n        }\n      });\n\n      if (not2X3D) {\n        clearTimeout(this._layerOpacityTimeout);\n\n        this._layerOpacityTimeout = setTimeout(function() {\n          echartsLayer.setOpacity(1);\n        }, 0);\n      }\n    };\n\n    var resizeHandler;\n\n    //amap.off(\"mapmove\", this._oldMoveHandler);\n    // 1.x amap.getCameraState();\n    // 2.x amap.getView().getStatus();\n    amap.off(\"mapmove\", this._oldMoveHandler);\n    amap.off(\"moveend\", this._oldMoveHandler);\n    amap.off(\"viewchange\", this._oldMoveHandler);\n    amap.off(\"camerachange\", this._oldMoveHandler);\n    //amap.off(\"amaprender\", this._oldMoveHandler);\n    amap.off(\"zoomstart\", this._oldZoomStartHandler);\n    amap.off(\"zoomend\", this._oldZoomEndHandler);\n    amap.off(\"resize\", this._oldResizeHandler);\n\n    amap.on(renderOnMoving\n      ? (is2X ? \"viewchange\" : is3DMode ? \"camerachange\" : \"mapmove\")\n      : \"moveend\",\n      // FIXME: event `camerachange` won't be triggered\n      // if 3D mode is not enabled for AMap 1.x.\n      // if animation is disabled,\n      // there will be a bad experience in zooming and dragging operations.\n      not2X3D\n        ? (moveHandler = lodash_debounce__WEBPACK_IMPORTED_MODULE_1___default()(moveHandler, 0))\n        : moveHandler);\n    //amap.on(\"amaprender\", moveHandler);\n    amap.on(\"zoomstart\", zoomStartHandler);\n    amap.on(\"zoomend\", zoomEndHandler = echarts__WEBPACK_IMPORTED_MODULE_0__[\"util\"].bind(zoomEndHandler, this));\n\n    if (resizeEnable) {\n      resizeHandler = function(e) {\n        clearTimeout(this._resizeDelay);\n\n        this._resizeDelay = setTimeout(function() {\n          echarts__WEBPACK_IMPORTED_MODULE_0__[\"getInstanceByDom\"](api.getDom()).resize();\n        }, 100);\n      };\n\n      resizeHandler = echarts__WEBPACK_IMPORTED_MODULE_0__[\"util\"].bind(resizeHandler, this);\n      amap.on(\"resize\", resizeHandler);\n    }\n\n    this._oldMoveHandler = moveHandler;\n    this._oldZoomStartHandler = zoomStartHandler;\n    this._oldZoomEndHandler = zoomEndHandler;\n\n    resizeEnable && (this._oldResizeHandler = resizeHandler);\n\n    rendering = false;\n  },\n\n  dispose: function(ecModel, api) {\n    clearTimeout(this._layerOpacityTimeout);\n    clearTimeout(this._resizeDelay);\n\n    var component = ecModel.getComponent(\"amap\");\n    component.getAMap().destroy();\n    component.setAMap(null);\n    component.setEChartsLayer(null);\n    component.coordinateSystem.setAMap(null);\n    component.coordinateSystem = null;\n  }\n}));\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvQU1hcFZpZXcuanMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9bbmFtZV0vLi9zcmMvQU1hcFZpZXcuanM/NDdlMSJdLCJzb3VyY2VzQ29udGVudCI6WyIvKiBnbG9iYWwgQU1hcCAqL1xuXG5pbXBvcnQgKiBhcyBlY2hhcnRzIGZyb20gXCJlY2hhcnRzXCI7XG5pbXBvcnQgZGVib3VuY2UgZnJvbSBcImxvZGFzaC5kZWJvdW5jZVwiO1xuXG5leHBvcnQgZGVmYXVsdCBlY2hhcnRzLmV4dGVuZENvbXBvbmVudFZpZXcoe1xuICB0eXBlOiBcImFtYXBcIixcblxuICByZW5kZXI6IGZ1bmN0aW9uKGFtYXBNb2RlbCwgZWNNb2RlbCwgYXBpKSB7XG4gICAgdmFyIHJlbmRlcmluZyA9IHRydWU7XG5cbiAgICB2YXIgYW1hcCA9IGFtYXBNb2RlbC5nZXRBTWFwKCk7XG4gICAgdmFyIHZpZXdwb3J0Um9vdCA9IGFwaS5nZXRacigpLnBhaW50ZXIuZ2V0Vmlld3BvcnRSb290KCk7XG4gICAgdmFyIG9mZnNldEVsID0gYW1hcC5nZXRDb250YWluZXIoKTtcbiAgICB2YXIgYW1hcGUgPSBvZmZzZXRFbC5xdWVyeVNlbGVjdG9yKFwiLmFtYXAtZVwiKTtcbiAgICB2YXIgY29vcmRTeXMgPSBhbWFwTW9kZWwuY29vcmRpbmF0ZVN5c3RlbTtcbiAgICB2YXIgZWNoYXJ0c0xheWVyID0gYW1hcE1vZGVsLmdldEVDaGFydHNMYXllcigpO1xuXG4gICAgdmFyIHJlbmRlck9uTW92aW5nID0gYW1hcE1vZGVsLmdldChcInJlbmRlck9uTW92aW5nXCIpO1xuICAgIC8vdmFyIGhpZGVPblpvb21pbmcgPSBhbWFwTW9kZWwuZ2V0KFwiaGlkZU9uWm9vbWluZ1wiKTtcbiAgICB2YXIgcmVzaXplRW5hYmxlID0gYW1hcE1vZGVsLmdldChcInJlc2l6ZUVuYWJsZVwiKTtcblxuICAgIHZhciBpczJYID0gQU1hcC52ZXJzaW9uID49IDI7XG4gICAgdmFyIGlzM0RNb2RlID0gYW1hcC5nZXRWaWV3TW9kZV8oKSA9PT0gXCIzRFwiO1xuICAgIHZhciBub3QyWDNEID0gIWlzMlggJiYgIWlzM0RNb2RlO1xuXG4gICAgYW1hcGUgJiYgYW1hcGUuY2xhc3NMaXN0LmFkZChcImVjLWFtYXAtbm90LXpvb21cIik7XG5cbiAgICB2YXIgbW92ZUhhbmRsZXIgPSBmdW5jdGlvbihlKSB7XG4gICAgICBpZiAocmVuZGVyaW5nKSB7XG4gICAgICAgIHJldHVybjtcbiAgICAgIH1cblxuICAgICAgdmFyIG1hcE9mZnNldCA9IFtcbiAgICAgICAgLXBhcnNlSW50KG9mZnNldEVsLnN0eWxlLmxlZnQsIDEwKSB8fCAwLFxuICAgICAgICAtcGFyc2VJbnQob2Zmc2V0RWwuc3R5bGUudG9wLCAxMCkgfHwgMFxuICAgICAgXTtcbiAgICAgIHZpZXdwb3J0Um9vdC5zdHlsZS5sZWZ0ID0gbWFwT2Zmc2V0WzBdICsgXCJweFwiO1xuICAgICAgdmlld3BvcnRSb290LnN0eWxlLnRvcCA9IG1hcE9mZnNldFsxXSArIFwicHhcIjtcblxuICAgICAgY29vcmRTeXMuc2V0TWFwT2Zmc2V0KG1hcE9mZnNldCk7XG4gICAgICBhbWFwTW9kZWwuX19tYXBPZmZzZXQgPSBtYXBPZmZzZXQ7XG5cbiAgICAgIGFwaS5kaXNwYXRjaEFjdGlvbih7XG4gICAgICAgIHR5cGU6IFwiYW1hcFJvYW1cIixcbiAgICAgICAgYW5pbWF0aW9uOiB7XG4gICAgICAgICAgLy8gY29tcGF0aWJsZSB3aXRoIEVDaGFydHMgNS54XG4gICAgICAgICAgLy8gbm8gZGVsYXkgZm9yIHJlbmRlcmluZyBidXQgcmVtYWluIGFuaW1hdGlvbiBvZiBlbGVtZW50c1xuICAgICAgICAgIGR1cmF0aW9uOiAwXG4gICAgICAgIH1cbiAgICAgIH0pO1xuICAgIH07XG5cbiAgICB2YXIgem9vbVN0YXJ0SGFuZGxlciA9IGZ1bmN0aW9uKGUpIHtcbiAgICAgIGlmIChyZW5kZXJpbmcpIHtcbiAgICAgICAgcmV0dXJuO1xuICAgICAgfVxuXG4gICAgICAvLyBmaXggZmxpY2tlciBpbiAzRCBtb2RlIGZvciAxLnggd2hlbiB6b29tIGlzIG92ZXIgbWluIG9yIG1heCB2YWx1ZVxuICAgICAgaWYgKCFpczJYICYmIGlzM0RNb2RlKSB7XG4gICAgICAgIHJldHVybjtcbiAgICAgIH1cblxuICAgICAgLypoaWRlT25ab29taW5nICYmICovZWNoYXJ0c0xheWVyLnNldE9wYWNpdHkobm90MlgzRCA/IDAgOiAwLjAxKTtcbiAgICB9O1xuXG4gICAgdmFyIHpvb21FbmRIYW5kbGVyID0gZnVuY3Rpb24oZSkge1xuICAgICAgaWYgKHJlbmRlcmluZykge1xuICAgICAgICByZXR1cm47XG4gICAgICB9XG5cbiAgICAgIG5vdDJYM0QgfHwgZWNoYXJ0c0xheWVyLnNldE9wYWNpdHkoMSk7XG5cbiAgICAgIGFwaS5kaXNwYXRjaEFjdGlvbih7XG4gICAgICAgIHR5cGU6IFwiYW1hcFJvYW1cIixcbiAgICAgICAgYW5pbWF0aW9uOiB7XG4gICAgICAgICAgZHVyYXRpb246IDBcbiAgICAgICAgfVxuICAgICAgfSk7XG5cbiAgICAgIGlmIChub3QyWDNEKSB7XG4gICAgICAgIGNsZWFyVGltZW91dCh0aGlzLl9sYXllck9wYWNpdHlUaW1lb3V0KTtcblxuICAgICAgICB0aGlzLl9sYXllck9wYWNpdHlUaW1lb3V0ID0gc2V0VGltZW91dChmdW5jdGlvbigpIHtcbiAgICAgICAgICBlY2hhcnRzTGF5ZXIuc2V0T3BhY2l0eSgxKTtcbiAgICAgICAgfSwgMCk7XG4gICAgICB9XG4gICAgfTtcblxuICAgIHZhciByZXNpemVIYW5kbGVyO1xuXG4gICAgLy9hbWFwLm9mZihcIm1hcG1vdmVcIiwgdGhpcy5fb2xkTW92ZUhhbmRsZXIpO1xuICAgIC8vIDEueCBhbWFwLmdldENhbWVyYVN0YXRlKCk7XG4gICAgLy8gMi54IGFtYXAuZ2V0VmlldygpLmdldFN0YXR1cygpO1xuICAgIGFtYXAub2ZmKFwibWFwbW92ZVwiLCB0aGlzLl9vbGRNb3ZlSGFuZGxlcik7XG4gICAgYW1hcC5vZmYoXCJtb3ZlZW5kXCIsIHRoaXMuX29sZE1vdmVIYW5kbGVyKTtcbiAgICBhbWFwLm9mZihcInZpZXdjaGFuZ2VcIiwgdGhpcy5fb2xkTW92ZUhhbmRsZXIpO1xuICAgIGFtYXAub2ZmKFwiY2FtZXJhY2hhbmdlXCIsIHRoaXMuX29sZE1vdmVIYW5kbGVyKTtcbiAgICAvL2FtYXAub2ZmKFwiYW1hcHJlbmRlclwiLCB0aGlzLl9vbGRNb3ZlSGFuZGxlcik7XG4gICAgYW1hcC5vZmYoXCJ6b29tc3RhcnRcIiwgdGhpcy5fb2xkWm9vbVN0YXJ0SGFuZGxlcik7XG4gICAgYW1hcC5vZmYoXCJ6b29tZW5kXCIsIHRoaXMuX29sZFpvb21FbmRIYW5kbGVyKTtcbiAgICBhbWFwLm9mZihcInJlc2l6ZVwiLCB0aGlzLl9vbGRSZXNpemVIYW5kbGVyKTtcblxuICAgIGFtYXAub24ocmVuZGVyT25Nb3ZpbmdcbiAgICAgID8gKGlzMlggPyBcInZpZXdjaGFuZ2VcIiA6IGlzM0RNb2RlID8gXCJjYW1lcmFjaGFuZ2VcIiA6IFwibWFwbW92ZVwiKVxuICAgICAgOiBcIm1vdmVlbmRcIixcbiAgICAgIC8vIEZJWE1FOiBldmVudCBgY2FtZXJhY2hhbmdlYCB3b24ndCBiZSB0cmlnZ2VyZWRcbiAgICAgIC8vIGlmIDNEIG1vZGUgaXMgbm90IGVuYWJsZWQgZm9yIEFNYXAgMS54LlxuICAgICAgLy8gaWYgYW5pbWF0aW9uIGlzIGRpc2FibGVkLFxuICAgICAgLy8gdGhlcmUgd2lsbCBiZSBhIGJhZCBleHBlcmllbmNlIGluIHpvb21pbmcgYW5kIGRyYWdnaW5nIG9wZXJhdGlvbnMuXG4gICAgICBub3QyWDNEXG4gICAgICAgID8gKG1vdmVIYW5kbGVyID0gZGVib3VuY2UobW92ZUhhbmRsZXIsIDApKVxuICAgICAgICA6IG1vdmVIYW5kbGVyKTtcbiAgICAvL2FtYXAub24oXCJhbWFwcmVuZGVyXCIsIG1vdmVIYW5kbGVyKTtcbiAgICBhbWFwLm9uKFwiem9vbXN0YXJ0XCIsIHpvb21TdGFydEhhbmRsZXIpO1xuICAgIGFtYXAub24oXCJ6b29tZW5kXCIsIHpvb21FbmRIYW5kbGVyID0gZWNoYXJ0cy51dGlsLmJpbmQoem9vbUVuZEhhbmRsZXIsIHRoaXMpKTtcblxuICAgIGlmIChyZXNpemVFbmFibGUpIHtcbiAgICAgIHJlc2l6ZUhhbmRsZXIgPSBmdW5jdGlvbihlKSB7XG4gICAgICAgIGNsZWFyVGltZW91dCh0aGlzLl9yZXNpemVEZWxheSk7XG5cbiAgICAgICAgdGhpcy5fcmVzaXplRGVsYXkgPSBzZXRUaW1lb3V0KGZ1bmN0aW9uKCkge1xuICAgICAgICAgIGVjaGFydHMuZ2V0SW5zdGFuY2VCeURvbShhcGkuZ2V0RG9tKCkpLnJlc2l6ZSgpO1xuICAgICAgICB9LCAxMDApO1xuICAgICAgfTtcblxuICAgICAgcmVzaXplSGFuZGxlciA9IGVjaGFydHMudXRpbC5iaW5kKHJlc2l6ZUhhbmRsZXIsIHRoaXMpO1xuICAgICAgYW1hcC5vbihcInJlc2l6ZVwiLCByZXNpemVIYW5kbGVyKTtcbiAgICB9XG5cbiAgICB0aGlzLl9vbGRNb3ZlSGFuZGxlciA9IG1vdmVIYW5kbGVyO1xuICAgIHRoaXMuX29sZFpvb21TdGFydEhhbmRsZXIgPSB6b29tU3RhcnRIYW5kbGVyO1xuICAgIHRoaXMuX29sZFpvb21FbmRIYW5kbGVyID0gem9vbUVuZEhhbmRsZXI7XG5cbiAgICByZXNpemVFbmFibGUgJiYgKHRoaXMuX29sZFJlc2l6ZUhhbmRsZXIgPSByZXNpemVIYW5kbGVyKTtcblxuICAgIHJlbmRlcmluZyA9IGZhbHNlO1xuICB9LFxuXG4gIGRpc3Bvc2U6IGZ1bmN0aW9uKGVjTW9kZWwsIGFwaSkge1xuICAgIGNsZWFyVGltZW91dCh0aGlzLl9sYXllck9wYWNpdHlUaW1lb3V0KTtcbiAgICBjbGVhclRpbWVvdXQodGhpcy5fcmVzaXplRGVsYXkpO1xuXG4gICAgdmFyIGNvbXBvbmVudCA9IGVjTW9kZWwuZ2V0Q29tcG9uZW50KFwiYW1hcFwiKTtcbiAgICBjb21wb25lbnQuZ2V0QU1hcCgpLmRlc3Ryb3koKTtcbiAgICBjb21wb25lbnQuc2V0QU1hcChudWxsKTtcbiAgICBjb21wb25lbnQuc2V0RUNoYXJ0c0xheWVyKG51bGwpO1xuICAgIGNvbXBvbmVudC5jb29yZGluYXRlU3lzdGVtLnNldEFNYXAobnVsbCk7XG4gICAgY29tcG9uZW50LmNvb3JkaW5hdGVTeXN0ZW0gPSBudWxsO1xuICB9XG59KTtcbiJdLCJtYXBwaW5ncyI6IkFBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOyIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///./src/AMapView.js\n");
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! echarts */ "echarts");
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var lodash_debounce__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash.debounce */ "./node_modules/lodash.debounce/index.js");
+/* harmony import */ var lodash_debounce__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_debounce__WEBPACK_IMPORTED_MODULE_1__);
+/* global AMap */
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = (echarts__WEBPACK_IMPORTED_MODULE_0__["extendComponentView"]({
+  type: 'amap',
+
+  render: function(amapModel, ecModel, api) {
+    var rendering = true;
+
+    var amap = amapModel.getAMap();
+    var viewportRoot = api.getZr().painter.getViewportRoot();
+    var offsetEl = amap.getContainer();
+    var amape = offsetEl.querySelector('.amap-e');
+    var coordSys = amapModel.coordinateSystem;
+    var echartsLayer = amapModel.getEChartsLayer();
+
+    var renderOnMoving = amapModel.get('renderOnMoving');
+    //var hideOnZooming = amapModel.get('hideOnZooming');
+    var resizeEnable = amapModel.get('resizeEnable');
+
+    var is2X = AMap.version >= 2;
+    var is3DMode = amap.getViewMode_() === '3D';
+    var not2X3D = !is2X && !is3DMode;
+
+    amape && amape.classList.add('ec-amap-not-zoom');
+
+    var moveHandler = function(e) {
+      if (rendering) {
+        return;
+      }
+
+      var mapOffset = [
+        -parseInt(offsetEl.style.left, 10) || 0,
+        -parseInt(offsetEl.style.top, 10) || 0
+      ];
+      viewportRoot.style.left = mapOffset[0] + 'px';
+      viewportRoot.style.top = mapOffset[1] + 'px';
+
+      coordSys.setMapOffset(mapOffset);
+      amapModel.__mapOffset = mapOffset;
+
+      api.dispatchAction({
+        type: 'amapRoam',
+        animation: {
+          // compatible with ECharts 5.x
+          // no delay for rendering but remain animation of elements
+          duration: 0
+        }
+      });
+    };
+
+    var zoomStartHandler = function(e) {
+      if (rendering) {
+        return;
+      }
+
+      // fix flicker in 3D mode for 1.x when zoom is over min or max value
+      if (!is2X && is3DMode) {
+        return;
+      }
+
+      /*hideOnZooming && */echartsLayer.setOpacity(not2X3D ? 0 : 0.01);
+    };
+
+    var zoomEndHandler = function(e) {
+      if (rendering) {
+        return;
+      }
+
+      not2X3D || echartsLayer.setOpacity(1);
+
+      api.dispatchAction({
+        type: 'amapRoam',
+        animation: {
+          duration: 0
+        }
+      });
+
+      if (not2X3D) {
+        clearTimeout(this._layerOpacityTimeout);
+
+        this._layerOpacityTimeout = setTimeout(function() {
+          echartsLayer.setOpacity(1);
+        }, 0);
+      }
+    };
+
+    var resizeHandler;
+
+    //amap.off('mapmove', this._oldMoveHandler);
+    // 1.x amap.getCameraState();
+    // 2.x amap.getView().getStatus();
+    amap.off('mapmove', this._oldMoveHandler);
+    amap.off('moveend', this._oldMoveHandler);
+    amap.off('viewchange', this._oldMoveHandler);
+    amap.off('camerachange', this._oldMoveHandler);
+    //amap.off('amaprender', this._oldMoveHandler);
+    amap.off('zoomstart', this._oldZoomStartHandler);
+    amap.off('zoomend', this._oldZoomEndHandler);
+    amap.off('resize', this._oldResizeHandler);
+
+    amap.on(renderOnMoving
+      ? (is2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove')
+      : 'moveend',
+      // FIXME: event `camerachange` won't be triggered
+      // if 3D mode is not enabled for AMap 1.x.
+      // if animation is disabled,
+      // there will be a bad experience in zooming and dragging operations.
+      not2X3D
+        ? (moveHandler = lodash_debounce__WEBPACK_IMPORTED_MODULE_1___default()(moveHandler, 0))
+        : moveHandler);
+    //amap.on('amaprender', moveHandler);
+    amap.on('zoomstart', zoomStartHandler);
+    amap.on('zoomend', zoomEndHandler = echarts__WEBPACK_IMPORTED_MODULE_0__["util"].bind(zoomEndHandler, this));
+
+    if (resizeEnable) {
+      resizeHandler = function(e) {
+        clearTimeout(this._resizeDelay);
+
+        this._resizeDelay = setTimeout(function() {
+          echarts__WEBPACK_IMPORTED_MODULE_0__["getInstanceByDom"](api.getDom()).resize();
+        }, 100);
+      };
+
+      resizeHandler = echarts__WEBPACK_IMPORTED_MODULE_0__["util"].bind(resizeHandler, this);
+      amap.on('resize', resizeHandler);
+    }
+
+    this._oldMoveHandler = moveHandler;
+    this._oldZoomStartHandler = zoomStartHandler;
+    this._oldZoomEndHandler = zoomEndHandler;
+
+    resizeEnable && (this._oldResizeHandler = resizeHandler);
+
+    rendering = false;
+  },
+
+  dispose: function(ecModel, api) {
+    clearTimeout(this._layerOpacityTimeout);
+    clearTimeout(this._resizeDelay);
+
+    var component = ecModel.getComponent('amap');
+    component.getAMap().destroy();
+    component.setAMap(null);
+    component.setEChartsLayer(null);
+    component.coordinateSystem.setAMap(null);
+    component.coordinateSystem = null;
+  }
+}));
+
 
 /***/ }),
 
@@ -173,7 +1041,50 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var echa
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../package.json */ \"./package.json\");\nvar _package_json__WEBPACK_IMPORTED_MODULE_0___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../package.json */ \"./package.json\", 1);\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"version\", function() { return _package_json__WEBPACK_IMPORTED_MODULE_0__[\"version\"]; });\n\n/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, \"name\", function() { return _package_json__WEBPACK_IMPORTED_MODULE_0__[\"name\"]; });\n\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! echarts */ \"echarts\");\n/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _AMapCoordSys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AMapCoordSys */ \"./src/AMapCoordSys.js\");\n/* harmony import */ var _AMapModel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AMapModel */ \"./src/AMapModel.js\");\n/* harmony import */ var _AMapView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AMapView */ \"./src/AMapView.js\");\n/**\n * AMap component extension\n */\n\n\n\n\n\n\n\n\n\necharts__WEBPACK_IMPORTED_MODULE_1__[\"registerCoordinateSystem\"](\"amap\", _AMapCoordSys__WEBPACK_IMPORTED_MODULE_2__[\"default\"]);\n\n// Action\necharts__WEBPACK_IMPORTED_MODULE_1__[\"registerAction\"](\n  {\n    type: \"amapRoam\",\n    event: \"amapRoam\",\n    update: \"updateLayout\"\n  },\n  function(payload, ecModel) {\n    ecModel.eachComponent(\"amap\", function(amapModel) {\n      var amap = amapModel.getAMap();\n      var center = amap.getCenter();\n      amapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom());\n    });\n  }\n);\n\n\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvaW5kZXguanMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9bbmFtZV0vLi9zcmMvaW5kZXguanM/YjYzNSJdLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEFNYXAgY29tcG9uZW50IGV4dGVuc2lvblxuICovXG5cbmltcG9ydCB7IHZlcnNpb24sIG5hbWUgfSBmcm9tIFwiLi4vcGFja2FnZS5qc29uXCI7XG5cbmltcG9ydCAqIGFzIGVjaGFydHMgZnJvbSBcImVjaGFydHNcIjtcbmltcG9ydCBBTWFwQ29vcmRTeXMgZnJvbSBcIi4vQU1hcENvb3JkU3lzXCI7XG5cbmltcG9ydCBcIi4vQU1hcE1vZGVsXCI7XG5pbXBvcnQgXCIuL0FNYXBWaWV3XCI7XG5cbmVjaGFydHMucmVnaXN0ZXJDb29yZGluYXRlU3lzdGVtKFwiYW1hcFwiLCBBTWFwQ29vcmRTeXMpO1xuXG4vLyBBY3Rpb25cbmVjaGFydHMucmVnaXN0ZXJBY3Rpb24oXG4gIHtcbiAgICB0eXBlOiBcImFtYXBSb2FtXCIsXG4gICAgZXZlbnQ6IFwiYW1hcFJvYW1cIixcbiAgICB1cGRhdGU6IFwidXBkYXRlTGF5b3V0XCJcbiAgfSxcbiAgZnVuY3Rpb24ocGF5bG9hZCwgZWNNb2RlbCkge1xuICAgIGVjTW9kZWwuZWFjaENvbXBvbmVudChcImFtYXBcIiwgZnVuY3Rpb24oYW1hcE1vZGVsKSB7XG4gICAgICB2YXIgYW1hcCA9IGFtYXBNb2RlbC5nZXRBTWFwKCk7XG4gICAgICB2YXIgY2VudGVyID0gYW1hcC5nZXRDZW50ZXIoKTtcbiAgICAgIGFtYXBNb2RlbC5zZXRDZW50ZXJBbmRab29tKFtjZW50ZXIubG5nLCBjZW50ZXIubGF0XSwgYW1hcC5nZXRab29tKCkpO1xuICAgIH0pO1xuICB9XG4pO1xuXG5leHBvcnQgeyB2ZXJzaW9uLCBuYW1lIH07XG4iXSwibWFwcGluZ3MiOiJBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBOyIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///./src/index.js\n");
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../package.json */ "./package.json");
+var _package_json__WEBPACK_IMPORTED_MODULE_0___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../package.json */ "./package.json", 1);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "version", function() { return _package_json__WEBPACK_IMPORTED_MODULE_0__["version"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "name", function() { return _package_json__WEBPACK_IMPORTED_MODULE_0__["name"]; });
+
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! echarts */ "echarts");
+/* harmony import */ var echarts__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(echarts__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _AMapCoordSys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AMapCoordSys */ "./src/AMapCoordSys.js");
+/* harmony import */ var _AMapModel__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./AMapModel */ "./src/AMapModel.js");
+/* harmony import */ var _AMapView__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./AMapView */ "./src/AMapView.js");
+/**
+ * AMap component extension
+ */
+
+
+
+
+
+
+
+
+
+echarts__WEBPACK_IMPORTED_MODULE_1__["registerCoordinateSystem"]('amap', _AMapCoordSys__WEBPACK_IMPORTED_MODULE_2__["default"]);
+
+// Action
+echarts__WEBPACK_IMPORTED_MODULE_1__["registerAction"](
+  {
+    type: 'amapRoam',
+    event: 'amapRoam',
+    update: 'updateLayout'
+  },
+  function(payload, ecModel) {
+    ecModel.eachComponent('amap', function(amapModel) {
+      var amap = amapModel.getAMap();
+      var center = amap.getCenter();
+      amapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom());
+    });
+  }
+);
+
+
+
 
 /***/ }),
 
@@ -184,9 +1095,10 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _pac
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("module.exports = __WEBPACK_EXTERNAL_MODULE_echarts__;//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZWNoYXJ0cy5qcyIsInNvdXJjZXMiOlsid2VicGFjazovL1tuYW1lXS9leHRlcm5hbCBcImVjaGFydHNcIj84YzY3Il0sInNvdXJjZXNDb250ZW50IjpbIm1vZHVsZS5leHBvcnRzID0gX19XRUJQQUNLX0VYVEVSTkFMX01PRFVMRV9lY2hhcnRzX187Il0sIm1hcHBpbmdzIjoiQUFBQSIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///echarts\n");
+module.exports = __WEBPACK_EXTERNAL_MODULE_echarts__;
 
 /***/ })
 
 /******/ });
 });
+//# sourceMappingURL=echarts-extension-amap.js.map
