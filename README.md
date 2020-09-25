@@ -49,7 +49,7 @@ require("echarts-extension-amap");
 Or use a CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@latest/dist/echarts-extension-amap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
 ```
 
 This extension will register itself as a component of `echarts` after it is imported.
