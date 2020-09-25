@@ -1,11 +1,11 @@
-import * as echarts from "echarts";
+import * as echarts from 'echarts';
 
 function v2Equal(a, b) {
   return a && b && a[0] === b[0] && a[1] === b[1];
 }
 
 export default echarts.extendComponentModel({
-  type: "amap",
+  type: 'amap',
 
   setAMap: function(amap) {
     this.__amap = amap;

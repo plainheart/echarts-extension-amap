@@ -1,10 +1,10 @@
 /* global AMap */
 
-import { util as zrUtil, graphic, matrix } from "echarts";
+import { util as zrUtil, graphic, matrix } from 'echarts';
 
 function AMapCoordSys(amap, api) {
   this._amap = amap;
-  this.dimensions = ["lng", "lat"];
+  this.dimensions = ['lng', 'lat'];
   this._mapOffset = [0, 0];
   this._api = api;
 }
@@ -13,14 +13,14 @@ var AMapCoordSysProto = AMapCoordSys.prototype;
 
 // exclude private and unsupported options
 var excludedOptions = [
-  "echartsLayerZIndex",
-  "renderOnMoving",
-  "layers"
-  //"hideOnZooming"
-  //"trackPitchAndRotation"
+  'echartsLayerZIndex',
+  'renderOnMoving',
+  'layers'
+  //'hideOnZooming'
+  //'trackPitchAndRotation'
 ];
 
-AMapCoordSysProto.dimensions = ["lng", "lat"];
+AMapCoordSysProto.dimensions = ['lng', 'lat'];
 
 AMapCoordSysProto.setZoom = function(zoom) {
   this._zoom = zoom;
@@ -72,7 +72,7 @@ AMapCoordSysProto.prepareCustoms = function(data) {
   return {
     coordSys: {
       // The name exposed to user is always 'cartesian2d' but not 'grid'.
-      type: "amap",
+      type: 'amap',
       x: rect.x,
       y: rect.y,
       width: rect.width,
@@ -109,11 +109,11 @@ function addCssRule(selector, rules, index) {
   // 2.0
   var is2X = AMap.version >= 2;
   var sheet = is2X
-    ? document.getElementById("AMap_Dynamic_style").sheet
-    : document.getElementsByClassName("AMap.style")[0].sheet;
+    ? document.getElementById('AMap_Dynamic_style').sheet
+    : document.getElementsByClassName('AMap.style')[0].sheet;
   index = index || 0;
   if (sheet.insertRule) {
-    sheet.insertRule(selector + "{" + rules + "}", index);
+    sheet.insertRule(selector + '{' + rules + '}', index);
   } else if (sheet.addRule) {
     sheet.addRule(selector, rules, index);
   }
@@ -169,36 +169,36 @@ AMapCoordSys.create = function(ecModel, api) {
 
   // FIXME: a hack for AMap 2.0
   if (AMap.version >= 2) {
-    if(root.style.overflow !== "auto") {
-      root.style.overflow = "auto";
-      console.warn("[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.");
+    if(root.style.overflow !== 'auto') {
+      root.style.overflow = 'auto';
+      console.warn('[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.');
     }
   }
 
-  ecModel.eachComponent("amap", function(amapModel) {
+  ecModel.eachComponent('amap', function(amapModel) {
     var painter = api.getZr().painter;
     var viewportRoot = painter.getViewportRoot();
-    if (typeof AMap === "undefined") {
-      throw new Error("AMap api is not loaded");
+    if (typeof AMap === 'undefined') {
+      throw new Error('AMap api is not loaded');
     }
     if (amapCoordSys) {
-      throw new Error("Only one amap component can exist");
+      throw new Error('Only one amap component can exist');
     }
     var amap = amapModel.getAMap();
     if (!amap) {
       // Not support IE8
-      var amapRoot = root.querySelector(".ec-extension-amap");
+      var amapRoot = root.querySelector('.ec-extension-amap');
       if (amapRoot) {
         // Reset viewport left and top, which will be changed
         // in moving handler in AMapView
-        viewportRoot.style.left = "0px";
-        viewportRoot.style.top = "0px";
+        viewportRoot.style.left = '0px';
+        viewportRoot.style.top = '0px';
         root.removeChild(amapRoot);
       }
-      amapRoot = document.createElement("div");
-      amapRoot.style.cssText = "width:100%;height:100%";
+      amapRoot = document.createElement('div');
+      amapRoot.style.cssText = 'width:100%;height:100%';
       // Not support IE8
-      amapRoot.classList.add("ec-extension-amap");
+      amapRoot.classList.add('ec-extension-amap');
       root.appendChild(amapRoot);
 
       var options = zrUtil.clone(amapModel.get());
@@ -217,7 +217,7 @@ AMapCoordSys.create = function(ecModel, api) {
       amapModel.setEChartsLayer(echartsLayer);
       amap.add(echartsLayer);
 
-      addCssRule(".ec-amap-not-zoom", "left:0!important;top:0!important", Infinity);
+      addCssRule('.ec-amap-not-zoom', 'left:0!important;top:0!important', Infinity);
 
       // Override
       painter.getViewportRootOffset = function() {
@@ -230,8 +230,8 @@ AMapCoordSys.create = function(ecModel, api) {
     //AMap.Map.prototype.setRotation = trackPitchAndRotation ? setRotation.bind(amapModel) : nativeRotation;
     //AMap.Map.prototype.setPitch = trackPitchAndRotation ? setPitch.bind(amapModel) : nativePitch;
 
-    var center = amapModel.get("center");
-    var zoom = amapModel.get("zoom");
+    var center = amapModel.get('center');
+    var zoom = amapModel.get('zoom');
     if (center && zoom) {
       var amapCenter = amap.getCenter();
       var amapZoom = amap.getZoom();
@@ -251,7 +251,7 @@ AMapCoordSys.create = function(ecModel, api) {
   });
 
   ecModel.eachSeries(function(seriesModel) {
-    if (seriesModel.get("coordinateSystem") === "amap") {
+    if (seriesModel.get('coordinateSystem') === 'amap') {
       seriesModel.coordinateSystem = amapCoordSys;
     }
   });
