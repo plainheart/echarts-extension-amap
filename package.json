@@ -4,9 +4,9 @@
   "description": "An AMap(https://lbs.amap.com) extension for Apache ECharts (incubating) (https://github.com/apache/incubator-echarts)",
   "main": "dist/echarts-extension-amap.min.js",
   "scripts": {
-    "build": "webpack -p",
-    "dev": "webpack -d",
-    "watch": "webpack -d --watch",
+    "build": "webpack --env=production --optimize-minimize --progress --colors",
+    "dev": "webpack --env=development",
+    "watch": "webpack --env=development --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -37,7 +37,6 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
-    "echarts": "^4.7.0",
     "lodash.debounce": "^4.0.8"
   }
 }
