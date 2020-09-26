@@ -29,7 +29,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('echarts')) :
   typeof define === 'function' && define.amd ? define(['exports', 'echarts'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.echarts = global.echarts || {}, global.echarts.gmap = {}), global.echarts));
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.echarts = global.echarts || {}, global.echarts.amap = {}), global.echarts));
 }(this, (function (exports, echarts) { 'use strict';
 
   var name = "echarts-extension-amap";

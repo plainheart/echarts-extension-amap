@@ -35,7 +35,7 @@ module.exports = function (opt/*{ min, addBundleVersion }*/) {
     // legacy: true,
     external: ['echarts'],
     output: {
-      name: 'echarts.gmap',
+      name: 'echarts.amap',
       format: 'umd',
       sourcemap: !opt.min,
       banner: getLicense(),
