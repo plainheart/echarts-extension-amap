@@ -84,8 +84,8 @@ function run() {
 }
 
 function generateExamples() {
-  [['en', ''], ['zh_CN']].forEach(function (lang) {
-    const fileName = `index${lang[1] != null ? '' : '_' + lang[0]}.html`;
+  [['en', false], ['zh_CN']].forEach(function (lang) {
+    const fileName = `index${lang[1] === false ? '' : '_' + lang[0]}.html`;
     const dest = path.resolve(__dirname, '../examples/' + fileName);
     console.log(
       color('fgCyan', 'dim')('\nGenerating example'),
