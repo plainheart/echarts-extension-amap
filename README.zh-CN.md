@@ -48,8 +48,16 @@ require("echarts-extension-amap");
 
 使用 CDN
 
+[jsdelivr](https://www.jsdelivr.com/)
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
+```
+
+[unpkg](https://unpkg.com/)
+
+```html
+<script src="https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
 ```
 
 插件会自动注册相应的组件。

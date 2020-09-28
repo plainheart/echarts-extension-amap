@@ -48,8 +48,16 @@ require("echarts-extension-amap");
 
 Or use a CDN
 
+[jsdelivr](https://www.jsdelivr.com/)
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
+```
+
+[unpkg](https://unpkg.com/)
+
+```html
+<script src="https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
 ```
 
 This extension will register itself as a component of `echarts` after it is imported.
