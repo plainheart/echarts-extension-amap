@@ -12,7 +12,8 @@ export default echarts.extendComponentView({
     var amap = amapModel.getAMap();
     var viewportRoot = api.getZr().painter.getViewportRoot();
     var offsetEl = amap.getContainer();
-    var amape = offsetEl.querySelector('.amap-e');
+    //var amape = offsetEl.querySelector('.amap-e');
+    var amape = viewportRoot.parentNode;
     var coordSys = amapModel.coordinateSystem;
     var echartsLayer = amapModel.getEChartsLayer();
 
@@ -35,8 +36,16 @@ export default echarts.extendComponentView({
         -parseInt(offsetEl.style.left, 10) || 0,
         -parseInt(offsetEl.style.top, 10) || 0
       ];
-      viewportRoot.style.left = mapOffset[0] + 'px';
-      viewportRoot.style.top = mapOffset[1] + 'px';
+      // only update style when map offset changed
+      const viewportRootStyle = viewportRoot.style;
+      const offsetLeft = mapOffset[0] + 'px';
+      const offsetTop = mapOffset[1] + 'px';
+      if (viewportRootStyle.left !== offsetLeft) {
+        viewportRootStyle.left = offsetLeft;
+      }
+      if (viewportRootStyle.top !== offsetTop) {
+        viewportRootStyle.top = offsetTop;
+      }
 
       coordSys.setMapOffset(mapOffset);
       amapModel.__mapOffset = mapOffset;
@@ -110,7 +119,8 @@ export default echarts.extendComponentView({
       // there will be a bad experience in zooming and dragging operations.
       not2X3D
         ? (moveHandler = debounce(moveHandler, 0))
-        : moveHandler);
+        : moveHandler
+    );
     //amap.on('amaprender', moveHandler);
     amap.on('zoomstart', zoomStartHandler);
     amap.on('zoomend', zoomEndHandler = echarts.util.bind(zoomEndHandler, this));

@@ -114,7 +114,8 @@ function addCssRule(selector, rules, index) {
   index = index || 0;
   if (sheet.insertRule) {
     sheet.insertRule(selector + '{' + rules + '}', index);
-  } else if (sheet.addRule) {
+  }
+  else if (sheet.addRule) {
     sheet.addRule(selector, rules, index);
   }
 }
@@ -168,12 +169,12 @@ AMapCoordSys.create = function(ecModel, api) {
   var root = api.getDom();
 
   // FIXME: a hack for AMap 2.0
-  if (AMap.version >= 2) {
-    if(root.style.overflow !== 'auto') {
-      root.style.overflow = 'auto';
-      console.warn('[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.');
-    }
-  }
+  // if (AMap.version >= 2) {
+  //   if(root.style.overflow !== 'auto') {
+  //     root.style.overflow = 'auto';
+  //     console.warn('[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.');
+  //   }
+  // }
 
   ecModel.eachComponent('amap', function(amapModel) {
     var painter = api.getZr().painter;
@@ -196,9 +197,8 @@ AMapCoordSys.create = function(ecModel, api) {
         root.removeChild(amapRoot);
       }
       amapRoot = document.createElement('div');
-      amapRoot.style.cssText = 'width:100%;height:100%';
-      // Not support IE8
-      amapRoot.classList.add('ec-extension-amap');
+      amapRoot.className = 'ec-extension-amap';
+      amapRoot.style.cssText = 'position:absolute;width:100%;height:100%';
       root.appendChild(amapRoot);
 
       var options = zrUtil.clone(amapModel.get());
