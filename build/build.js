@@ -84,9 +84,24 @@ function run() {
 }
 
 function generateExamples() {
+  const exampleDir = path.resolve(__dirname, '../examples');
+  const libVersionMap = {};
+  [['', version], ['amap', '1.4.15'], ['echarts', 'latest']].forEach(function (lib) {
+    const libName = lib[0];
+    const libVersion = lib[1];
+    const formattedLibName = ((libName ? libName + '_' : '') + 'version').toUpperCase();
+    libVersionMap[formattedLibName] = (
+      libName
+        ? fs.readFileSync(
+            exampleDir + '/' + libName + '.version',
+            { encoding: 'utf-8' }
+          ) || lib[1]
+        : libVersion
+    ).trim();
+  });
   [['en', false], ['zh_CN']].forEach(function (lang) {
     const fileName = `index${lang[1] === false ? '' : '_' + lang[0]}.html`;
-    const dest = path.resolve(__dirname, '../examples/' + fileName);
+    const dest = path.resolve(exampleDir, './', fileName);
     console.log(
       color('fgCyan', 'dim')('\nGenerating example'),
       color('fgCyan')(fileName),
@@ -98,7 +113,13 @@ function generateExamples() {
       dest + '.tpl',
       { encoding: 'utf-8' }
     );
-    const example = tpl.replace(/{VERSION}/g, version);
+    let example = tpl;
+    Object.keys(libVersionMap).forEach(function (libVer) {
+      example = example.replace(
+        new RegExp(`{${libVer}}`, 'g'),
+        libVersionMap[libVer].trim()
+      )
+    });
     fs.writeFileSync(
       dest,
       example,

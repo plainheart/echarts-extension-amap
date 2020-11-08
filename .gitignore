@@ -80,3 +80,4 @@ test/
 
 # tpl
 examples/*.tpl
+examples/*.version
