@@ -152,10 +152,14 @@ export default echarts.extendComponentView({
     clearTimeout(this._resizeDelay);
 
     var component = ecModel.getComponent('amap');
-    component.getAMap().destroy();
-    component.setAMap(null);
-    component.setEChartsLayer(null);
-    component.coordinateSystem.setAMap(null);
-    component.coordinateSystem = null;
+    if (component) {
+      component.getAMap().destroy();
+      component.setAMap(null);
+      component.setEChartsLayer(null);
+      if (component.coordinateSystem) {
+        component.coordinateSystem.setAMap(null);
+        component.coordinateSystem = null;
+      }
+    }
   }
 });
