@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.6.2
+ * @version 1.7.0
  * @author plainheart
  * 
  * MIT License
@@ -33,7 +33,7 @@
 }(this, (function (exports, echarts) { 'use strict';
 
   var name = "echarts-extension-amap";
-  var version = "1.6.2";
+  var version = "1.7.0";
 
   /* global AMap */
 
@@ -275,6 +275,14 @@
           var pt = new AMap.LngLat(center[0], center[1]);
           amap.setZoomAndCenter(zoom, pt);
         }
+      }
+
+      // update map style(#13)
+      var originalMapStyle = amapModel.__mapStyle;
+      var newMapStyle = amapModel.get('mapStyle');
+      if (originalMapStyle !== newMapStyle) {
+        amap.setMapStyle(newMapStyle);
+        amapModel.__mapStyle = newMapStyle;
       }
 
       amapCoordSys = new AMapCoordSys(amap, api);
