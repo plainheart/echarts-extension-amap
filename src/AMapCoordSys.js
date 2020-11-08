@@ -242,6 +242,14 @@ AMapCoordSys.create = function(ecModel, api) {
       }
     }
 
+    // update map style(#13)
+    var originalMapStyle = amapModel.__mapStyle;
+    var newMapStyle = amapModel.get('mapStyle');
+    if (originalMapStyle !== newMapStyle) {
+      amap.setMapStyle(newMapStyle);
+      amapModel.__mapStyle = newMapStyle;
+    }
+
     amapCoordSys = new AMapCoordSys(amap, api);
     amapCoordSys.setMapOffset(amapModel.__mapOffset || [0, 0]);
     amapCoordSys.setZoom(zoom);
