@@ -32,7 +32,7 @@ npm install echarts-extension-amap --save
 
 ```html
 <!--引入高德地图的Javascript API，这里需要使用你在高德地图开发者平台申请的 ak-->
-<script src="https://webapi.amap.com/maps?v=2.0&key=ak&plugin=AMap.Scale,AMap.ToolBar"></script>
+<script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar,AMap.CustomLayer"></script>
 <!-- 引入 ECharts -->
 <script src="/path/to/echarts.min.js"></script>
 <!-- 引入高德地图扩展 -->

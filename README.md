@@ -28,11 +28,11 @@ npm install echarts-extension-amap --save
 
 ### Import
 
-Import packaged distribution file `echarts-extension-amap.min.js` and add AMap API script and echarts script.
+Import packaged distribution file `echarts-extension-amap.min.js` and add AMap API script and ECharts script.
 
 ```html
 <!-- import JavaScript API of AMap, please replace the ak with your own key and specify the version and plugins you need -->
-<script src="https://webapi.amap.com/maps?v=2.0&key=ak&plugin=AMap.Scale,AMap.ToolBar"></script>
+<script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar,AMap.CustomLayer"></script>
 <!-- import ECharts -->
 <script src="/path/to/echarts.min.js"></script>
 <!-- import echarts-extension-amap -->
