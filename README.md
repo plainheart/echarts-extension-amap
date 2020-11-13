@@ -10,7 +10,7 @@
 
 [Online example on CodePen](https://codepen.io/plainheart/pen/qBbdNYx)
 
-This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Line](https://echarts.apache.org/en/option.html#series-line), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap).
+This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Lines](https://echarts.apache.org/en/option.html#series-lines), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap).
 
 ### Examples
 
