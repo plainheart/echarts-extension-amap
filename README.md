@@ -22,7 +22,7 @@ Refer to [examples/index.html](https://github.com/plainheart/echarts-extension-a
 
 ### Installation
 
-```js
+```shell
 npm install echarts-extension-amap --save
 ```
 
@@ -39,11 +39,11 @@ Import packaged distribution file `echarts-extension-amap.min.js` and add AMap A
 <script src="dist/echarts-extension-amap.min.js"></script>
 ```
 
-You can also import this extension by `require` if you are using `webpack`.
+You can also import this extension by `require` or `import` if you are using `webpack`.
 
 ```js
-require("echarts");
-require("echarts-extension-amap");
+require('echarts');
+require('echarts-extension-amap');
 ```
 
 Or use a CDN
@@ -82,7 +82,7 @@ option = {
     // whether the map and echarts automatically handles browser window resize to update itself.
     resizeEnable: true,
     // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
-    mapStyle: "amap://styles/dark",
+    mapStyle: 'amap://styles/dark',
     // whether echarts layer should be rendered when the map is moving. Default is true.
     // if false, it will only be re-rendered after the map `moveend`.
     // It's better to set this option to false if data is large.
@@ -97,9 +97,9 @@ option = {
   },
   series: [
     {
-      type: "scatter",
+      type: 'scatter',
       // use `amap` as the coordinate system
-      coordinateSystem: "amap",
+      coordinateSystem: 'amap',
       // data items [[lng, lat, value], [lng, lat, value], ...]
       data: [[120, 30, 8], [120.1, 30.2, 20]],
       encode: {
@@ -113,7 +113,7 @@ option = {
 // Get the instance of AMap
 var amap = chart
   .getModel()
-  .getComponent("amap")
+  .getComponent('amap')
   .getAMap();
 // Add some controls provided by AMap.
 amap.addControl(new AMap.Scale());

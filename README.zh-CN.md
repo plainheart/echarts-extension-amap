@@ -22,7 +22,7 @@
 
 ### 安装
 
-```js
+```shell
 npm install echarts-extension-amap --save
 ```
 
@@ -39,11 +39,11 @@ npm install echarts-extension-amap --save
 <script src="dist/echarts-extension-amap.min.js"></script>
 ```
 
-如果是 webpack 打包，也可以 require 引入
+如果是 `webpack` 打包，也可以通过 `require` 或者 `import` 引入
 
 ```js
-require("echarts");
-require("echarts-extension-amap");
+require('echarts');
+require('echarts-extension-amap');
 ```
 
 使用 CDN
@@ -80,7 +80,7 @@ option = {
     // 是否开启resize
     resizeEnable: true,
     // 自定义地图样式主题
-    mapStyle: "amap://styles/dark",
+    mapStyle: 'amap://styles/dark',
     // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
     renderOnMoving: true,
     // 高德地图自定义EchartsLayer的zIndex，默认2000
@@ -91,9 +91,9 @@ option = {
   },
   series: [
     {
-      type: "scatter",
+      type: 'scatter',
       // 使用高德地图坐标系
-      coordinateSystem: "amap",
+      coordinateSystem: 'amap',
       // 数据格式跟在 geo 坐标系上一样，每一项都是 [经度，纬度，数值大小，其它维度...]
       data: [[120, 30, 8], [120.1, 30.2, 20]],
       encode: {
@@ -106,7 +106,7 @@ option = {
 // 获取高德地图实例，使用高德地图自带的控件(需要在高德地图js API script标签手动引入)
 var amap = chart
   .getModel()
-  .getComponent("amap")
+  .getComponent('amap')
   .getAMap();
 // 添加控件
 amap.addControl(new AMap.Scale());
