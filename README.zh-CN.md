@@ -10,7 +10,7 @@
 
 [在线示例](https://codepen.io/plainheart/pen/qBbdNYx)
 
-[ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-line)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap) 等可视化。
+[ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-lines)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap) 等可视化。
 
 ### 示例
 
