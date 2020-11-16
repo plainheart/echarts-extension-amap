@@ -26,7 +26,7 @@
   <!-- please replace {ak} with your ak & customize your plugins -->
   <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar,AMap.CustomLayer"></script>
   <!-- ECharts CDN -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.0.0-beta.2/dist/echarts.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5.0.0-rc.1/dist/echarts.min.js"></script>
   <!-- echarts amap extension -->
   <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.7.0/dist/echarts-extension-amap.min.js"></script>
@@ -461,7 +461,7 @@
         // whether the map and echarts automatically handles browser window resize to update itself.
         resizeEnable: true,
         // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
-        mapStyle: "amap://styles/dark",
+        mapStyle: 'amap://styles/dark',
         // whether echarts layer should be rendered when the map is moving. Default is true.
         // if false, it will only be re-rendered after the map `moveend`.
         // It's better to set this option to false if data is large.
@@ -477,13 +477,13 @@
       tooltip : {
         trigger: 'item'
       },
-      animation: true,
+      animation: echarts.version[0] < 5,
       series: [
         {
           name: 'PM2.5',
-          type: "scatter",
+          type: 'scatter',
           // use `amap` as the coordinate system
-          coordinateSystem: "amap",
+          coordinateSystem: 'amap',
           // data items [[lng, lat, value], [lng, lat, value], ...]
           data: convertData(data),
           symbolSize: function (val) {
@@ -541,10 +541,10 @@
       ]
     };
     // initialize echart
-    var chart = echarts.init(document.getElementById("echarts-amap"));
+    var chart = echarts.init(document.getElementById('echarts-amap'));
     chart.setOption(option);
     // get amap instance
-    var amap = chart.getModel().getComponent("amap").getAMap();
+    var amap = chart.getModel().getComponent('amap').getAMap();
     // operations below are the same as amap
     amap.addControl(new AMap.Scale());
     amap.addControl(new AMap.ToolBar());
