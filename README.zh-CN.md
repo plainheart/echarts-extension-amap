@@ -24,7 +24,7 @@ Heatmap 热力图: [examples/heatmap.html](https://github.com/plainheart/echarts
 
 Lines 线图: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines_zh_CN.html)
 
-![Preview-Lines](https://img.yasuotu.com/uploads/2020/12/07/5fcdc1f1c8a2b_5fcdc1f398c17.gif)
+![Preview-Lines](https://user-images.githubusercontent.com/26999792/101313379-fca43c80-3890-11eb-9dea-46230dc432d5.gif)
 
 ### 安装
 
