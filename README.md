@@ -14,7 +14,7 @@ This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html
 
 ### Examples
 
-Scatter: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.html)
+Scatter: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/scatter.html)
 
 ![Preview-Scatter](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 

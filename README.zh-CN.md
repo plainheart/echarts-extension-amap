@@ -14,7 +14,7 @@
 
 ### 示例
 
-Scatter 散点图: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index_zh_CN.html)
+Scatter 散点图: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/scatter_zh_CN.html)
 
 ![Preview-Scatter](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
