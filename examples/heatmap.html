@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="cleartype" content="on">
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <link rel="dns-prefetch" href="https://webapi.amap.com">
+  <link rel="dns-prefetch" href="https://restapi.amap.com">
+  <link rel="dns-prefetch" href="https://vdata.amap.com">
+  <link rel="dns-prefetch" href="https://vdata01.amap.com">
+  <link rel="dns-prefetch" href="https://vdata02.amap.com">
+  <link rel="dns-prefetch" href="https://vdata03.amap.com">
+  <link rel="dns-prefetch" href="https://vdata04.amap.com">
+  <link rel="dns-prefetch" href="https://sdf.amap.com">
+  <link rel="dns-prefetch" href="https://wprd01.is.autonavi.com">
+  <link rel="dns-prefetch" href="https://wprd02.is.autonavi.com">
+  <link rel="dns-prefetch" href="https://wprd03.is.autonavi.com">
+  <link rel="dns-prefetch" href="https://wprd04.is.autonavi.com">
+  <link rel="dns-prefetch" href="https://webst01.is.autonavi.com">
+  <link rel="dns-prefetch" href="https://webst02.is.autonavi.com">
+  <link rel="dns-prefetch" href="https://webst03.is.autonavi.com">
+  <link rel="dns-prefetch" href="https://webst04.is.autonavi.com">
+  <title>an example for echarts-extension-amap</title>
+  <!-- please replace {ak} with your ak & customize your plugins -->
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar,AMap.CustomLayer"></script>
+  <!-- ECharts CDN -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <!-- echarts amap extension -->
+  <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.7.0/dist/echarts-extension-amap.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    html, body, #echarts-amap {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="echarts-amap"></div>
+  <!-- data comes from Baidu Map, just for example -->
+  <script type="text/javascript">
+    var heatmapDataURI = 'https://cdn.jsdelivr.net/gh/apache/incubator-echarts-examples/public/data/asset/data/hangzhou-tracks.json'
+
+    var option = {
+      // amap component option
+      amap: {
+        // enable 3D mode
+        // Note that it's suggested to enable 3D mode to improve echarts rendering.
+        viewMode: '3D',
+        // initial options of AMap
+        // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
+        // initial map center [lng, lat]
+        center: [108.39, 39.9],
+        // initial map zoom
+        zoom: 4,
+        // whether the map and echarts automatically handles browser window resize to update itself.
+        resizeEnable: true,
+        // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
+        mapStyle: 'amap://styles/dark',
+        // whether echarts layer should be rendered when the map is moving. Default is true.
+        // if false, it will only be re-rendered after the map `moveend`.
+        // It's better to set this option to false if data is large.
+        renderOnMoving: true,
+        // the zIndex of echarts layer for AMap, default value is 2000.
+        echartsLayerZIndex: 2019
+        // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
+        // There are some bugs about it, we can use `amap.add` instead.
+        // Refer to the codes at the bottom.
+
+        // More initial options...
+      },
+      tooltip : {
+        trigger: 'item'
+      },
+      animation: true,
+      visualMap: {
+        show: false,
+        top: 'top',
+        min: 0,
+        max: 5,
+        seriesIndex: 0,
+        calculable: true,
+        inRange: {
+          color: ['blue', 'blue', 'green', 'yellow', 'red']
+        }
+      },
+      series: [
+        {
+          type: 'heatmap',
+          // use `amap` as the coordinate system
+          coordinateSystem: 'amap',
+          data: [],
+          pointSize: 5,
+          blurSize: 6
+        }
+      ]
+    };
+    // initialize echart
+    var chart = echarts.init(document.getElementById('echarts-amap'));
+    // fetch the heatmap data
+    $.get(heatmapDataURI, function (data) {
+      // convert
+      var points = [].concat.apply([], data.map(function (track) {
+        return track.map(function (seg) {
+          return seg.coord.concat([1]);
+        });
+      }));
+      // set the data for heatmap
+      option.series[0].data = points;
+      chart.setOption(option);
+      // get amap instance
+      var amap = chart.getModel().getComponent('amap').getAMap();
+      // operations below are the same as amap
+      amap.addControl(new AMap.Scale());
+      amap.addControl(new AMap.ToolBar());
+      // add layers
+      // var satelliteLayer = new AMap.TileLayer.Satellite();
+      // var roadNetLayer = new AMap.TileLayer.RoadNet();
+      // amap.add([satelliteLayer, roadNetLayer]);
+    });
+  </script>
+</body>
+</html>

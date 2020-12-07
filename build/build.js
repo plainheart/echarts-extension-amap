@@ -99,37 +99,41 @@ function generateExamples() {
         : libVersion
     ).trim();
   });
+  const exampleTypes = ['index', 'heatmap', 'lines'];
   [['en', false], ['zh_CN']].forEach(function (lang) {
-    const fileName = `index${lang[1] === false ? '' : '_' + lang[0]}.html`;
-    const dest = path.resolve(exampleDir, './', fileName);
-    console.log(
-      color('fgCyan', 'dim')('\nGenerating example'),
-      color('fgCyan')(fileName),
-      color('fgCyan', 'dim')('=>'),
-      color('fgCyan')(dest),
-      color('fgCyan', 'dim')(' ...')
-    );
-    const tpl = fs.readFileSync(
-      dest + '.tpl',
-      { encoding: 'utf-8' }
-    );
-    let example = tpl;
-    Object.keys(libVersionMap).forEach(function (libVer) {
-      example = example.replace(
-        new RegExp(`{${libVer}}`, 'g'),
-        libVersionMap[libVer].trim()
-      )
-    });
-    fs.writeFileSync(
-      dest,
-      example,
-      { encoding: 'utf-8' }
-    );
-    console.log(
-      color('fgGreen', 'dim')('\nGenerated '),
-      color('fgGreen')(dest),
-      color('fgGreen', 'dim')(' successfully.')
-    );
+    lang = `${lang[1] === false ? '' : '_' + lang[0]}`;
+    exampleTypes.forEach(function (type) {
+      const fileName = `${type}${lang}.html`;
+      const dest = path.resolve(exampleDir, './', fileName);
+      console.log(
+        color('fgCyan', 'dim')('\nGenerating example'),
+        color('fgCyan')(fileName),
+        color('fgCyan', 'dim')('=>'),
+        color('fgCyan')(dest),
+        color('fgCyan', 'dim')(' ...')
+      );
+      const tpl = fs.readFileSync(
+        dest + '.tpl',
+        { encoding: 'utf-8' }
+      );
+      let example = tpl;
+      Object.keys(libVersionMap).forEach(function (libVer) {
+        example = example.replace(
+          new RegExp(`{${libVer}}`, 'g'),
+          libVersionMap[libVer].trim()
+        )
+      });
+      fs.writeFileSync(
+        dest,
+        example,
+        { encoding: 'utf-8' }
+      );
+      console.log(
+        color('fgGreen', 'dim')('\nGenerated '),
+        color('fgGreen')(dest),
+        color('fgGreen', 'dim')(' successfully.')
+      );
+    })
   });
 }
 
