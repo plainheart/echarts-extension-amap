@@ -20,7 +20,7 @@ Scatter: [examples/scatter.html](https://github.com/plainheart/echarts-extension
 
 Heatmap: [examples/heatmap.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/heatmap.html)
 
-![Preview-Heatmap](https://user-images.githubusercontent.com/26999792/101313069-53f5dd00-3890-11eb-895d-c292f3031e0d.png)
+![Preview-Heatmap](https://user-images.githubusercontent.com/26999792/101314208-fadb7880-3892-11eb-902a-8f6f41ffe0fc.png)
 
 Lines: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines.html)
 
