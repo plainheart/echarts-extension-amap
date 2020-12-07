@@ -48,72 +48,93 @@
   <div id="echarts-amap"></div>
   <!-- data comes from Baidu Map, just for example -->
   <script type="text/javascript">
-    var heatmapDataURI = 'https://cdn.jsdelivr.net/gh/apache/incubator-echarts-examples/public/data/asset/data/hangzhou-tracks.json';
+    var linesDataURI = 'https://cdn.jsdelivr.net/gh/apache/incubator-echarts-examples/public/data/asset/data/lines-bus.json';
 
-    var option = {
-      // amap component option
-      amap: {
-        // enable 3D mode
-        // Note that it's suggested to enable 3D mode to improve echarts rendering.
-        viewMode: '3D',
-        // initial options of AMap
-        // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
-        // initial map center [lng, lat]
-        center: [120.098776, 30.226665],
-        // initial map zoom
-        zoom: 13,
-        // whether the map and echarts automatically handles browser window resize to update itself.
-        resizeEnable: true,
-        // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
-        mapStyle: 'amap://styles/dark',
-        // whether echarts layer should be rendered when the map is moving. Default is true.
-        // if false, it will only be re-rendered after the map `moveend`.
-        // It's better to set this option to false if data is large.
-        renderOnMoving: true,
-        // the zIndex of echarts layer for AMap, default value is 2000.
-        echartsLayerZIndex: 2019
-        // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
-        // There are some bugs about it, we can use `amap.add` instead.
-        // Refer to the codes at the bottom.
-
-        // More initial options...
-      },
-      visualMap: {
-        show: true,
-        right: 20,
-        min: 0,
-        max: 5,
-        seriesIndex: 0,
-        calculable: true,
-        inRange: {
-          color: ['blue', 'blue', 'green', 'yellow', 'red']
-        }
-      },
-      animation: false,
-      series: [
-        {
-          type: 'heatmap',
-          // use `amap` as the coordinate system
-          coordinateSystem: 'amap',
-          data: [],
-          pointSize: 5,
-          blurSize: 6
-        }
-      ]
-    };
     // initialize echart
     var chart = echarts.init(document.getElementById('echarts-amap'));
-    // fetch the heatmap data
-    $.get(heatmapDataURI, function (data) {
+    // fetch the lines data
+    $.get(linesDataURI, function (data) {
       // convert
-      var points = [].concat.apply([], data.map(function (track) {
-        return track.map(function (seg) {
-          return seg.coord.concat([1]);
-        });
+      var hStep = 300 / (data.length - 1);
+      var busLines = [].concat.apply([], data.map(function (busLine, idx) {
+        var prevPt;
+        var points = [];
+        for (var i = 0; i < busLine.length; i += 2) {
+          var pt = [busLine[i], busLine[i + 1]];
+          if (i > 0) {
+            pt = [
+              prevPt[0] + pt[0],
+              prevPt[1] + pt[1]
+            ];
+          }
+          prevPt = pt;
+
+          points.push([pt[0] / 1e4, pt[1] / 1e4]);
+        }
+        return {
+          coords: points,
+          lineStyle: {
+            color: echarts.color.modifyHSL('#5A94DF', Math.round(hStep * idx))
+          }
+        };
       }));
-      // set the data for heatmap
-      option.series[0].data = points;
-      chart.setOption(option);
+      chart.setOption({
+        // amap component option
+        amap: {
+          // enable 3D mode
+          // Note that it's suggested to enable 3D mode to improve echarts rendering.
+          viewMode: '3D',
+          // initial options of AMap
+          // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
+          // initial map center [lng, lat]
+          center: [116.46, 39.92],
+          // initial map zoom
+          zoom: 10,
+          // whether the map and echarts automatically handles browser window resize to update itself.
+          resizeEnable: true,
+          // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
+          mapStyle: 'amap://styles/dark',
+          // whether echarts layer should be rendered when the map is moving. Default is true.
+          // if false, it will only be re-rendered after the map `moveend`.
+          // It's better to set this option to false if data is large.
+          renderOnMoving: false,
+          // the zIndex of echarts layer for AMap, default value is 2000.
+          echartsLayerZIndex: 2019
+          // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
+          // There are some bugs about it, we can use `amap.add` instead.
+          // Refer to the codes at the bottom.
+
+          // More initial options...
+        },
+        series: [{
+          type: 'lines',
+          coordinateSystem: 'amap',
+          polyline: true,
+          data: busLines,
+          silent: true,
+          lineStyle: {
+            opacity: 0.2,
+            width: 1
+          },
+          progressiveThreshold: 500,
+          progressive: 200
+        }, {
+          type: 'lines',
+          coordinateSystem: 'amap',
+          polyline: true,
+          data: busLines,
+          lineStyle: {
+            width: 0
+          },
+          effect: {
+            constantSpeed: 20,
+            show: true,
+            trailLength: 0.1,
+            symbolSize: 1.5
+          },
+          zlevel: 1
+        }]
+      });
       // get amap instance
       var amap = chart.getModel().getComponent('amap').getAMap();
       // operations below are the same as amap
