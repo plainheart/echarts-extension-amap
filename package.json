@@ -6,7 +6,7 @@
   "files": [
     "dist",
     "src",
-    "examples"
+    "examples/*.html"
   ],
   "scripts": {
     "dev": "node build/build.js",
