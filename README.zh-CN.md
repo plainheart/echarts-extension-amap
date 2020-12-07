@@ -14,11 +14,17 @@
 
 ### 示例
 
-参见 [examples/index_zh_CN.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index_zh_CN.html)
+Scatter 散点图: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index_zh_CN.html)
 
-![空气质量](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
+![Preview-Scatter](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
-![天气预报](https://user-images.githubusercontent.com/26999792/85219748-03b9ba00-b3d9-11ea-9cd0-0e8a09bd06ca.png)
+Heatmap 热力图: [examples/heatmap.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/heatmap_zh_CN.html)
+
+![Preview-Heatmap](https://user-images.githubusercontent.com/26999792/101313069-53f5dd00-3890-11eb-895d-c292f3031e0d.png)
+
+Lines 线图: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines_zh_CN.html)
+
+![Preview-Lines](https://user-images.githubusercontent.com/26999792/101313379-fca43c80-3890-11eb-9dea-46230dc432d5.gif)
 
 ### 安装
 

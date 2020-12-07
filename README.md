@@ -14,11 +14,17 @@ This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html
 
 ### Examples
 
-Refer to [examples/index.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.html)
+Scatter: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/index.html)
 
-![Preview-PM2.5](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
+![Preview-Scatter](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
-![Preview-Weather](https://user-images.githubusercontent.com/26999792/85219748-03b9ba00-b3d9-11ea-9cd0-0e8a09bd06ca.png)
+Heatmap: [examples/heatmap.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/heatmap.html)
+
+![Preview-Heatmap](https://user-images.githubusercontent.com/26999792/101313069-53f5dd00-3890-11eb-895d-c292f3031e0d.png)
+
+Lines: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines.html)
+
+![Preview-Lines](https://user-images.githubusercontent.com/26999792/101313379-fca43c80-3890-11eb-9dea-46230dc432d5.gif)
 
 ### Installation
 
