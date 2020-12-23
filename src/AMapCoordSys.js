@@ -250,6 +250,17 @@ AMapCoordSys.create = function(ecModel, api) {
       amapModel.__mapStyle = newMapStyle;
     }
 
+    // update map lang
+    // PENDING: AMap 2.x does not support `setLang` yet
+    if (amap.setLang) {
+      var originalMapLang = amapModel.__mapLang;
+      var newMapLang = amapModel.get('lang');
+      if (originalMapLang !== newMapLang) {
+        amap.setLang(newMapLang);
+        amapModel.__mapLang = newMapLang;
+      }
+    }
+
     amapCoordSys = new AMapCoordSys(amap, api);
     amapCoordSys.setMapOffset(amapModel.__mapOffset || [0, 0]);
     amapCoordSys.setZoom(zoom);
