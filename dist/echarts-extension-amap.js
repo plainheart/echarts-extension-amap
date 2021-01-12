@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.7.0
+ * @version 1.8.0
  * @author plainheart
  * 
  * MIT License
@@ -33,7 +33,7 @@
 }(this, (function (exports, echarts) { 'use strict';
 
   var name = "echarts-extension-amap";
-  var version = "1.7.0";
+  var version = "1.8.0";
 
   /* global AMap */
 
@@ -283,6 +283,17 @@
       if (originalMapStyle !== newMapStyle) {
         amap.setMapStyle(newMapStyle);
         amapModel.__mapStyle = newMapStyle;
+      }
+
+      // update map lang
+      // PENDING: AMap 2.x does not support `setLang` yet
+      if (amap.setLang) {
+        var originalMapLang = amapModel.__mapLang;
+        var newMapLang = amapModel.get('lang');
+        if (originalMapLang !== newMapLang) {
+          amap.setLang(newMapLang);
+          amapModel.__mapLang = newMapLang;
+        }
       }
 
       amapCoordSys = new AMapCoordSys(amap, api);
