@@ -25,12 +25,13 @@
   <link rel="dns-prefetch" href="https://webst04.is.autonavi.com">
   <title>an example for echarts-extension-amap</title>
   <!-- please replace {ak} with your ak & customize your plugins -->
-  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar,AMap.CustomLayer"></script>
+  <!-- Plugin `AMap.CustomLayer` is required if you are using a version of library less than v1.9.0 -->
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
   <!-- ECharts CDN -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
   <!-- echarts amap extension -->
   <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.8.0/dist/echarts-extension-amap.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.9.0/dist/echarts-extension-amap.min.js"></script>
   <style type="text/css">
     * {
       margin: 0;
@@ -468,7 +469,14 @@
         // It's better to set this option to false if data is large.
         renderOnMoving: true,
         // the zIndex of echarts layer for AMap, default value is 2000.
-        echartsLayerZIndex: 2019
+        // deprecated since v1.9.0, use `echartsLayerInteractive` instead.
+        echartsLayerZIndex: 2000,
+        // whether echarts layer is interactive. Default value is true
+        // supported since v1.9.0
+        echartsLayerInteractive: true,
+        // whether to enable large mode. Default value is false
+        // supported since v1.9.0
+        largeMode: false
         // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
         // There are some bugs about it, we can use `amap.add` instead.
         // Refer to the codes at the bottom.
@@ -544,8 +552,10 @@
     // initialize echart
     var chart = echarts.init(document.getElementById('echarts-amap'));
     chart.setOption(option);
-    // get amap instance
-    var amap = chart.getModel().getComponent('amap').getAMap();
+    // get AMap extension component
+    var amapComponent = chart.getModel().getComponent('amap');
+    // get the instance of AMap
+    var amap = amapComponent.getAMap();
     // operations below are the same as amap
     amap.addControl(new AMap.Scale());
     amap.addControl(new AMap.ToolBar());
@@ -553,6 +563,12 @@
     // var satelliteLayer = new AMap.TileLayer.Satellite();
     // var roadNetLayer = new AMap.TileLayer.RoadNet();
     // amap.add([satelliteLayer, roadNetLayer]);
+    // Add a marker to map
+    // amap.add(new AMap.Marker({
+    //   position: [115, 35]
+    // }));
+    // Make the overlay layer of AMap interactive
+    // amapComponent.setEChartsLayerInteractive(false);
   </script>
 </body>
 </html>

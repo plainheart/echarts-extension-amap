@@ -1,9 +1,5 @@
 import { ComponentModel } from 'echarts/lib/echarts'
-import { isV5 } from './helper'
-
-function v2Equal(a, b) {
-  return a && b && a[0] === b[0] && a[1] === b[1]
-}
+import { isV5, v2Equal } from './helper'
 
 const AMapModel = {
   type: 'amap',

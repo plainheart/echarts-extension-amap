@@ -1,11 +1,11 @@
 /*!
  * echarts-extension-amap 
- * @version 1.8.0
+ * @version 1.9.0
  * @author plainheart
  * 
  * MIT License
  * 
- * Copyright (c) 2019-2020 Zhongxiang.Wang
+ * Copyright (c) 2019-2021 Zhongxiang.Wang
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,82 +27,87 @@
  * 
  */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('echarts')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'echarts'], factory) :
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('echarts/lib/echarts')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'echarts/lib/echarts'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.echarts = global.echarts || {}, global.echarts.amap = {}), global.echarts));
-}(this, (function (exports, echarts) { 'use strict';
-
-  var name = "echarts-extension-amap";
-  var version = "1.8.0";
+}(this, (function (exports, echarts$1) { 'use strict';
 
   /* global AMap */
 
+  function dataToCoordSize(dataSize, dataItem) {
+    dataItem = dataItem || [0, 0];
+    return echarts$1.util.map([0, 1], function (dimIdx) {
+      var val = dataItem[dimIdx];
+      var halfSize = dataSize[dimIdx] / 2;
+      var p1 = [];
+      var p2 = [];
+      p1[dimIdx] = val - halfSize;
+      p2[dimIdx] = val + halfSize;
+      p1[1 - dimIdx] = p2[1 - dimIdx] = dataItem[1 - dimIdx];
+      return Math.abs(this.dataToPoint(p1)[dimIdx] - this.dataToPoint(p2)[dimIdx]);
+    }, this);
+  } // exclude private and unsupported options
+
+
+  var excludedOptions = ['echartsLayerZIndex', // DEPRECATED since v1.9.0
+  'echartsLayerInteractive', 'renderOnMoving', 'largeMode', 'layers'];
+
   function AMapCoordSys(amap, api) {
     this._amap = amap;
-    this.dimensions = ['lng', 'lat'];
-    this._mapOffset = [0, 0];
     this._api = api;
+    this._mapOffset = [0, 0]; // this.dimensions = ['lng', 'lat']
   }
 
   var AMapCoordSysProto = AMapCoordSys.prototype;
 
-  // exclude private and unsupported options
-  var excludedOptions = [
-    'echartsLayerZIndex',
-    'renderOnMoving',
-    'layers'
-    //'hideOnZooming'
-    //'trackPitchAndRotation'
-  ];
-
-  AMapCoordSysProto.dimensions = ['lng', 'lat'];
-
-  AMapCoordSysProto.setZoom = function(zoom) {
+  AMapCoordSysProto.setZoom = function (zoom) {
     this._zoom = zoom;
   };
 
-  AMapCoordSysProto.setCenter = function(center) {
+  AMapCoordSysProto.setCenter = function (center) {
     var lnglat = new AMap.LngLat(center[0], center[1]);
     this._center = this._amap.lngLatToContainer(lnglat);
   };
 
-  AMapCoordSysProto.setMapOffset = function(mapOffset) {
+  AMapCoordSysProto.setMapOffset = function (mapOffset) {
     this._mapOffset = mapOffset;
   };
 
-  AMapCoordSysProto.setAMap = function(amap) {
+  AMapCoordSysProto.setAMap = function (amap) {
     this._amap = amap;
   };
 
-  AMapCoordSysProto.getAMap = function() {
+  AMapCoordSysProto.getAMap = function () {
     return this._amap;
   };
 
-  AMapCoordSysProto.dataToPoint = function(data) {
+  AMapCoordSysProto.dataToPoint = function (data) {
     var lnglat = new AMap.LngLat(data[0], data[1]);
+
     var px = this._amap.lngLatToContainer(lnglat);
+
     var mapOffset = this._mapOffset;
     return [px.x - mapOffset[0], px.y - mapOffset[1]];
   };
 
-  AMapCoordSysProto.pointToData = function(pt) {
+  AMapCoordSysProto.pointToData = function (pt) {
     var mapOffset = this._mapOffset;
-    var lnglat = this._amap.containerToLngLat(
-      new AMap.Pixel(pt[0] + mapOffset[0], pt[1] + mapOffset[1])
-    );
+
+    var lnglat = this._amap.containerToLngLat(new AMap.Pixel(pt[0] + mapOffset[0], pt[1] + mapOffset[1]));
+
     return [lnglat.lng, lnglat.lat];
   };
 
-  AMapCoordSysProto.getViewRect = function() {
+  AMapCoordSysProto.getViewRect = function () {
     var api = this._api;
-    return new echarts.graphic.BoundingRect(0, 0, api.getWidth(), api.getHeight());
+    return new echarts$1.graphic.BoundingRect(0, 0, api.getWidth(), api.getHeight());
   };
 
-  AMapCoordSysProto.getRoamTransform = function() {
-    return echarts.matrix.create();
+  AMapCoordSysProto.getRoamTransform = function () {
+    return echarts$1.matrix.create();
   };
 
-  AMapCoordSysProto.prepareCustoms = function(data) {
+  AMapCoordSysProto.prepareCustoms = function () {
     var rect = this.getViewRect();
     return {
       coordSys: {
@@ -114,116 +119,34 @@
         height: rect.height
       },
       api: {
-        coord: echarts.util.bind(this.dataToPoint, this),
-        size: echarts.util.bind(dataToCoordSize, this)
+        coord: echarts$1.util.bind(this.dataToPoint, this),
+        size: echarts$1.util.bind(dataToCoordSize, this)
       }
     };
   };
 
-  function dataToCoordSize(dataSize, dataItem) {
-    dataItem = dataItem || [0, 0];
-    return echarts.util.map(
-      [0, 1],
-      function(dimIdx) {
-        var val = dataItem[dimIdx];
-        var halfSize = dataSize[dimIdx] / 2;
-        var p1 = [];
-        var p2 = [];
-        p1[dimIdx] = val - halfSize;
-        p2[dimIdx] = val + halfSize;
-        p1[1 - dimIdx] = p2[1 - dimIdx] = dataItem[1 - dimIdx];
-        return Math.abs(
-          this.dataToPoint(p1)[dimIdx] - this.dataToPoint(p2)[dimIdx]
-        );
-      },
-      this
-    );
-  }
-
-  function addCssRule(selector, rules, index) {
-    // 2.0
-    var is2X = AMap.version >= 2;
-    var sheet = is2X
-      ? document.getElementById('AMap_Dynamic_style').sheet
-      : document.getElementsByClassName('AMap.style')[0].sheet;
-    index = index || 0;
-    if (sheet.insertRule) {
-      sheet.insertRule(selector + '{' + rules + '}', index);
-    }
-    else if (sheet.addRule) {
-      sheet.addRule(selector, rules, index);
-    }
-  }
-
-  // For deciding which dimensions to use when creating list data
-  AMapCoordSys.dimensions = AMapCoordSysProto.dimensions;
-
-  // var nativeRotation = AMap.Map.prototype.setRotation;
-  // var nativePitch = AMap.Map.prototype.setPitch;
-
-  // function setRotation(rotation) {
-  //   var amap = this.getAMap();
-  //   // for 2.x which has animation for rotation
-  //   nativeRotation.apply(amap, [rotation, true]);
-
-  //   var rotateEnable = amap.getStatus().rotateEnable;
-  //   if (rotateEnable) {
-  //     var amapCoordSys = this.coordinateSystem;
-  //     var newRotation = amap.getRotation();
-  //     // emit amaprender event
-  //     newRotation !== amapCoordSys._rotation && amap.emit('amaprender', {
-  //       type: 'rotation',
-  //       oldRotation: amapCoordSys._rotation,
-  //       newRotation: newRotation
-  //     });
-  //     amapCoordSys._rotation = newRotation;
-  //   }
-  // }
-
-  // function setPitch(pitch) {
-  //   var amap = this.getAMap();
-  //   // for 2.x which has animation for pitch
-  //   nativePitch.apply(amap, [pitch, true]);
-
-  //   var pitchEnable = amap.getStatus().pitchEnable;
-  //   if (pitchEnable) {
-  //     var amapCoordSys = this.coordinateSystem;
-  //     var newPitch = amap.getPitch();
-  //     // emit amaprender event
-  //     newPitch !== amapCoordSys._pitch && amap.emit('amaprender', {
-  //       type: 'pitch',
-  //       oldPitch: amapCoordSys._pitch,
-  //       newPitch: newPitch
-  //     });
-  //     amapCoordSys._pitch = newPitch;
-  //   }
-  // }
-
-  AMapCoordSys.create = function(ecModel, api) {
+  AMapCoordSys.create = function (ecModel, api) {
     var amapCoordSys;
     var root = api.getDom();
-
-    // FIXME: a hack for AMap 2.0
-    // if (AMap.version >= 2) {
-    //   if(root.style.overflow !== 'auto') {
-    //     root.style.overflow = 'auto';
-    //     console.warn('[hack hint] Currently in AMap API 2.0, the overflow of echarts container must be `auto`.');
-    //   }
-    // }
-
-    ecModel.eachComponent('amap', function(amapModel) {
+    ecModel.eachComponent('amap', function (amapModel) {
       var painter = api.getZr().painter;
       var viewportRoot = painter.getViewportRoot();
+
       if (typeof AMap === 'undefined') {
         throw new Error('AMap api is not loaded');
       }
+
       if (amapCoordSys) {
         throw new Error('Only one amap component can exist');
       }
+
       var amap = amapModel.getAMap();
+      var echartsLayerInteractive = amapModel.get('echartsLayerInteractive');
+
       if (!amap) {
         // Not support IE8
         var amapRoot = root.querySelector('.ec-extension-amap');
+
         if (amapRoot) {
           // Reset viewport left and top, which will be changed
           // in moving handler in AMapView
@@ -231,65 +154,63 @@
           viewportRoot.style.top = '0px';
           root.removeChild(amapRoot);
         }
+
         amapRoot = document.createElement('div');
         amapRoot.className = 'ec-extension-amap';
-        amapRoot.style.cssText = 'position:absolute;width:100%;height:100%';
+        amapRoot.style.cssText = 'position:absolute;top:0;left:0;bottom:0;right:0;';
         root.appendChild(amapRoot);
+        var options = echarts$1.util.clone(amapModel.get());
 
-        var options = echarts.util.clone(amapModel.get());
-        var echartsLayerZIndex = options.echartsLayerZIndex;
-        // delete excluded options
-        echarts.util.each(excludedOptions, function(key) {
+        if ('echartsLayerZIndex' in options) {
+          console.warn('[ECharts][Extension][AMap] DEPRECATED: the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerInteractive` instead.');
+        } // delete excluded options
+
+
+        echarts$1.util.each(excludedOptions, function (key) {
           delete options[key];
         });
-
         amap = new AMap.Map(amapRoot, options);
         amapModel.setAMap(amap);
+        amapRoot.querySelector('.amap-maps').appendChild(viewportRoot);
+        amapModel.setEChartsLayer(viewportRoot); // Override
 
-        var echartsLayer = new AMap.CustomLayer(viewportRoot, {
-          zIndex: echartsLayerZIndex
-        });
-        amapModel.setEChartsLayer(echartsLayer);
-        amap.add(echartsLayer);
-
-        addCssRule('.ec-amap-not-zoom', 'left:0!important;top:0!important', Infinity);
-
-        // Override
-        painter.getViewportRootOffset = function() {
-          return { offsetLeft: 0, offsetTop: 0 };
+        painter.getViewportRootOffset = function () {
+          return {
+            offsetLeft: 0,
+            offsetTop: 0
+          };
         };
       }
 
-      // track pitch and rotation
-      //var trackPitchAndRotation = amapModel.get('trackPitchAndRotation');
-      //AMap.Map.prototype.setRotation = trackPitchAndRotation ? setRotation.bind(amapModel) : nativeRotation;
-      //AMap.Map.prototype.setPitch = trackPitchAndRotation ? setPitch.bind(amapModel) : nativePitch;
-
+      amapModel.setEChartsLayerInteractive(echartsLayerInteractive);
       var center = amapModel.get('center');
       var zoom = amapModel.get('zoom');
+
       if (center && zoom) {
         var amapCenter = amap.getCenter();
         var amapZoom = amap.getZoom();
         var centerOrZoomChanged = amapModel.centerOrZoomChanged([amapCenter.lng, amapCenter.lat], amapZoom);
-        if (centerOrZoomChanged) {
-          var pt = new AMap.LngLat(center[0], center[1]);
-          amap.setZoomAndCenter(zoom, pt);
-        }
-      }
 
-      // update map style(#13)
+        if (centerOrZoomChanged) {
+          amap.setZoomAndCenter(zoom, new AMap.LngLat(center[0], center[1]));
+        }
+      } // update map style(#13)
+
+
       var originalMapStyle = amapModel.__mapStyle;
       var newMapStyle = amapModel.get('mapStyle');
+
       if (originalMapStyle !== newMapStyle) {
         amap.setMapStyle(newMapStyle);
         amapModel.__mapStyle = newMapStyle;
-      }
-
-      // update map lang
+      } // update map lang
       // PENDING: AMap 2.x does not support `setLang` yet
+
+
       if (amap.setLang) {
         var originalMapLang = amapModel.__mapLang;
         var newMapLang = amapModel.get('lang');
+
         if (originalMapLang !== newMapLang) {
           amap.setLang(newMapLang);
           amapModel.__mapLang = newMapLang;
@@ -300,63 +221,64 @@
       amapCoordSys.setMapOffset(amapModel.__mapOffset || [0, 0]);
       amapCoordSys.setZoom(zoom);
       amapCoordSys.setCenter(center);
-
       amapModel.coordinateSystem = amapCoordSys;
     });
-
-    ecModel.eachSeries(function(seriesModel) {
+    ecModel.eachSeries(function (seriesModel) {
       if (seriesModel.get('coordinateSystem') === 'amap') {
         seriesModel.coordinateSystem = amapCoordSys;
       }
     });
   };
 
+  AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat'];
+
+  var isV5 = echarts$1.version.split('.')[0] > 4;
   function v2Equal(a, b) {
     return a && b && a[0] === b[0] && a[1] === b[1];
   }
 
-  echarts.extendComponentModel({
+  var AMapModel = {
     type: 'amap',
-
-    setAMap: function(amap) {
+    setAMap: function setAMap(amap) {
       this.__amap = amap;
     },
-
-    getAMap: function() {
+    getAMap: function getAMap() {
       return this.__amap;
     },
-
-    setEChartsLayer: function(layer) {
+    setEChartsLayer: function setEChartsLayer(layer) {
       this.__echartsLayer = layer;
     },
-
-    getEChartsLayer: function() {
+    getEChartsLayer: function getEChartsLayer() {
       return this.__echartsLayer;
     },
-
-    setCenterAndZoom: function(center, zoom) {
+    setEChartsLayerVisiblity: function setEChartsLayerVisiblity(visible) {
+      this.__echartsLayer.style.display = visible ? 'block' : 'none';
+    },
+    // FIXME: NOT SUPPORT <= IE 10
+    setEChartsLayerInteractive: function setEChartsLayerInteractive(interactive) {
+      this.__echartsLayer.style.pointerEvents = interactive ? 'auto' : 'none';
+    },
+    setCenterAndZoom: function setCenterAndZoom(center, zoom) {
       this.option.center = center;
       this.option.zoom = zoom;
     },
-
-    centerOrZoomChanged: function(center, zoom) {
+    centerOrZoomChanged: function centerOrZoomChanged(center, zoom) {
       var option = this.option;
       return !(v2Equal(center, option.center) && zoom === option.zoom);
     },
-
     defaultOption: {
       center: [116.397428, 39.90923],
       zoom: 5,
       isHotspot: false,
       resizeEnable: true,
-
-      // extension options
-      echartsLayerZIndex: 2000,
-      renderOnMoving: true
-      //hideOnZooming: true,
-      //trackPitchAndRotation: false
+      // extension specific options
+      // echartsLayerZIndex: 2000, // DEPRECATED since v1.9.0
+      echartsLayerInteractive: true,
+      renderOnMoving: true,
+      largeMode: false
     }
-  });
+  };
+  var AMapModel$1 = isV5 ? echarts$1.ComponentModel.extend(AMapModel) : AMapModel;
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -370,52 +292,52 @@
    */
 
   /** Used as the `TypeError` message for "Functions" methods. */
+
   var FUNC_ERROR_TEXT = 'Expected a function';
-
   /** Used as references for various `Number` constants. */
+
   var NAN = 0 / 0;
-
   /** `Object#toString` result references. */
+
   var symbolTag = '[object Symbol]';
-
   /** Used to match leading and trailing whitespace. */
+
   var reTrim = /^\s+|\s+$/g;
-
   /** Used to detect bad signed hexadecimal string values. */
+
   var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
   /** Used to detect binary string values. */
+
   var reIsBinary = /^0b[01]+$/i;
-
   /** Used to detect octal string values. */
+
   var reIsOctal = /^0o[0-7]+$/i;
-
   /** Built-in method references without a dependency on `root`. */
+
   var freeParseInt = parseInt;
-
   /** Detect free variable `global` from Node.js. */
+
   var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
-
   /** Detect free variable `self`. */
+
   var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
   /** Used as a reference to the global object. */
+
   var root = freeGlobal || freeSelf || Function('return this')();
-
   /** Used for built-in method references. */
-  var objectProto = Object.prototype;
 
+  var objectProto = Object.prototype;
   /**
    * Used to resolve the
    * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
    * of values.
    */
-  var objectToString = objectProto.toString;
 
+  var objectToString = objectProto.toString;
   /* Built-in method references for those with the same name as other `lodash` methods. */
+
   var nativeMax = Math.max,
       nativeMin = Math.min;
-
   /**
    * Gets the timestamp of the number of milliseconds that have elapsed since
    * the Unix epoch (1 January 1970 00:00:00 UTC).
@@ -432,10 +354,10 @@
    * }, _.now());
    * // => Logs the number of milliseconds it took for the deferred invocation.
    */
-  var now = function() {
+
+  var now = function () {
     return root.Date.now();
   };
-
   /**
    * Creates a debounced function that delays invoking `func` until after `wait`
    * milliseconds have elapsed since the last time the debounced function was
@@ -490,6 +412,8 @@
    * // Cancel the trailing debounced invocation.
    * jQuery(window).on('popstate', debounced.cancel);
    */
+
+
   function debounce(func, wait, options) {
     var lastArgs,
         lastThis,
@@ -505,7 +429,9 @@
     if (typeof func != 'function') {
       throw new TypeError(FUNC_ERROR_TEXT);
     }
+
     wait = toNumber(wait) || 0;
+
     if (isObject(options)) {
       leading = !!options.leading;
       maxing = 'maxWait' in options;
@@ -516,7 +442,6 @@
     function invokeFunc(time) {
       var args = lastArgs,
           thisArg = lastThis;
-
       lastArgs = lastThis = undefined;
       lastInvokeTime = time;
       result = func.apply(thisArg, args);
@@ -525,10 +450,10 @@
 
     function leadingEdge(time) {
       // Reset any `maxWait` timer.
-      lastInvokeTime = time;
-      // Start the timer for the trailing edge.
-      timerId = setTimeout(timerExpired, wait);
-      // Invoke the leading edge.
+      lastInvokeTime = time; // Start the timer for the trailing edge.
+
+      timerId = setTimeout(timerExpired, wait); // Invoke the leading edge.
+
       return leading ? invokeFunc(time) : result;
     }
 
@@ -536,38 +461,37 @@
       var timeSinceLastCall = time - lastCallTime,
           timeSinceLastInvoke = time - lastInvokeTime,
           result = wait - timeSinceLastCall;
-
       return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
     }
 
     function shouldInvoke(time) {
       var timeSinceLastCall = time - lastCallTime,
-          timeSinceLastInvoke = time - lastInvokeTime;
-
-      // Either this is the first call, activity has stopped and we're at the
+          timeSinceLastInvoke = time - lastInvokeTime; // Either this is the first call, activity has stopped and we're at the
       // trailing edge, the system time has gone backwards and we're treating
       // it as the trailing edge, or we've hit the `maxWait` limit.
-      return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
-        (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+
+      return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
     }
 
     function timerExpired() {
       var time = now();
+
       if (shouldInvoke(time)) {
         return trailingEdge(time);
-      }
-      // Restart the timer.
+      } // Restart the timer.
+
+
       timerId = setTimeout(timerExpired, remainingWait(time));
     }
 
     function trailingEdge(time) {
-      timerId = undefined;
-
-      // Only invoke if we have `lastArgs` which means `func` has been
+      timerId = undefined; // Only invoke if we have `lastArgs` which means `func` has been
       // debounced at least once.
+
       if (trailing && lastArgs) {
         return invokeFunc(time);
       }
+
       lastArgs = lastThis = undefined;
       return result;
     }
@@ -576,6 +500,7 @@
       if (timerId !== undefined) {
         clearTimeout(timerId);
       }
+
       lastInvokeTime = 0;
       lastArgs = lastCallTime = lastThis = timerId = undefined;
     }
@@ -587,7 +512,6 @@
     function debounced() {
       var time = now(),
           isInvoking = shouldInvoke(time);
-
       lastArgs = arguments;
       lastThis = this;
       lastCallTime = time;
@@ -596,22 +520,25 @@
         if (timerId === undefined) {
           return leadingEdge(lastCallTime);
         }
+
         if (maxing) {
           // Handle invocations in a tight loop.
           timerId = setTimeout(timerExpired, wait);
           return invokeFunc(lastCallTime);
         }
       }
+
       if (timerId === undefined) {
         timerId = setTimeout(timerExpired, wait);
       }
+
       return result;
     }
+
     debounced.cancel = cancel;
     debounced.flush = flush;
     return debounced;
   }
-
   /**
    * Checks if `value` is the
    * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
@@ -637,11 +564,12 @@
    * _.isObject(null);
    * // => false
    */
+
+
   function isObject(value) {
     var type = typeof value;
     return !!value && (type == 'object' || type == 'function');
   }
-
   /**
    * Checks if `value` is object-like. A value is object-like if it's not `null`
    * and has a `typeof` result of "object".
@@ -666,10 +594,11 @@
    * _.isObjectLike(null);
    * // => false
    */
+
+
   function isObjectLike(value) {
     return !!value && typeof value == 'object';
   }
-
   /**
    * Checks if `value` is classified as a `Symbol` primitive or object.
    *
@@ -687,11 +616,11 @@
    * _.isSymbol('abc');
    * // => false
    */
-  function isSymbol(value) {
-    return typeof value == 'symbol' ||
-      (isObjectLike(value) && objectToString.call(value) == symbolTag);
-  }
 
+
+  function isSymbol(value) {
+    return typeof value == 'symbol' || isObjectLike(value) && objectToString.call(value) == symbolTag;
+  }
   /**
    * Converts `value` to a number.
    *
@@ -715,78 +644,75 @@
    * _.toNumber('3.2');
    * // => 3.2
    */
+
+
   function toNumber(value) {
     if (typeof value == 'number') {
       return value;
     }
+
     if (isSymbol(value)) {
       return NAN;
     }
+
     if (isObject(value)) {
       var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-      value = isObject(other) ? (other + '') : other;
+      value = isObject(other) ? other + '' : other;
     }
+
     if (typeof value != 'string') {
       return value === 0 ? value : +value;
     }
+
     value = value.replace(reTrim, '');
     var isBinary = reIsBinary.test(value);
-    return (isBinary || reIsOctal.test(value))
-      ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-      : (reIsBadHex.test(value) ? NAN : +value);
+    return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
   }
 
   var lodash_debounce = debounce;
 
   /* global AMap */
 
-  echarts.extendComponentView({
+  var AMapView = {
     type: 'amap',
-
-    render: function(amapModel, ecModel, api) {
+    init: function init() {
+      this._isFirstRender = true;
+    },
+    render: function render(amapModel, ecModel, api) {
       var rendering = true;
-
       var amap = amapModel.getAMap();
       var viewportRoot = api.getZr().painter.getViewportRoot();
       var offsetEl = amap.getContainer();
-      //var amape = offsetEl.querySelector('.amap-e');
-      var amape = viewportRoot.parentNode;
       var coordSys = amapModel.coordinateSystem;
-      var echartsLayer = amapModel.getEChartsLayer();
-
       var renderOnMoving = amapModel.get('renderOnMoving');
-      //var hideOnZooming = amapModel.get('hideOnZooming');
       var resizeEnable = amapModel.get('resizeEnable');
+      var largeMode = amapModel.get('largeMode'); // `AMap.version` only exists in AMap 2.x
+      // For AMap 1.x, it's `AMap.v`
 
       var is2X = AMap.version >= 2;
       var is3DMode = amap.getViewMode_() === '3D';
-      var not2X3D = !is2X && !is3DMode;
 
-      amape && amape.classList.add('ec-amap-not-zoom');
-
-      var moveHandler = function(e) {
+      var moveHandler = function moveHandler() {
         if (rendering) {
           return;
         }
 
-        var mapOffset = [
-          -parseInt(offsetEl.style.left, 10) || 0,
-          -parseInt(offsetEl.style.top, 10) || 0
-        ];
-        // only update style when map offset changed
-        const viewportRootStyle = viewportRoot.style;
-        const offsetLeft = mapOffset[0] + 'px';
-        const offsetTop = mapOffset[1] + 'px';
+        var offsetElStyle = offsetEl.style;
+        var mapOffset = [-parseInt(offsetElStyle.left, 10) || 0, -parseInt(offsetElStyle.top, 10) || 0]; // only update style when map offset changed
+
+        var viewportRootStyle = viewportRoot.style;
+        var offsetLeft = mapOffset[0] + 'px';
+        var offsetTop = mapOffset[1] + 'px';
+
         if (viewportRootStyle.left !== offsetLeft) {
           viewportRootStyle.left = offsetLeft;
         }
+
         if (viewportRootStyle.top !== offsetTop) {
           viewportRootStyle.top = offsetTop;
         }
 
-        coordSys.setMapOffset(mapOffset);
-        amapModel.__mapOffset = mapOffset;
-
+        coordSys.setMapOffset(amapModel.__mapOffset = mapOffset);
         api.dispatchAction({
           type: 'amapRoam',
           animation: {
@@ -797,131 +723,134 @@
         });
       };
 
-      var zoomStartHandler = function(e) {
-        if (rendering) {
-          return;
-        }
+      amap.off('mapmove', this._moveHandler);
+      amap.off('moveend', this._moveHandler);
+      amap.off('viewchange', this._moveHandler);
+      amap.off('camerachange', this._moveHandler);
+      amap.off('zoom', this._moveHandler);
 
-        // fix flicker in 3D mode for 1.x when zoom is over min or max value
-        if (!is2X && is3DMode) {
-          return;
-        }
-
-        /*hideOnZooming && */echartsLayer.setOpacity(not2X3D ? 0 : 0.01);
-      };
-
-      var zoomEndHandler = function(e) {
-        if (rendering) {
-          return;
-        }
-
-        not2X3D || echartsLayer.setOpacity(1);
-
-        api.dispatchAction({
-          type: 'amapRoam',
-          animation: {
-            duration: 0
-          }
-        });
-
-        if (not2X3D) {
-          clearTimeout(this._layerOpacityTimeout);
-
-          this._layerOpacityTimeout = setTimeout(function() {
-            echartsLayer.setOpacity(1);
-          }, 0);
-        }
-      };
-
-      var resizeHandler;
-
-      //amap.off('mapmove', this._oldMoveHandler);
-      // 1.x amap.getCameraState();
-      // 2.x amap.getView().getStatus();
-      amap.off('mapmove', this._oldMoveHandler);
-      amap.off('moveend', this._oldMoveHandler);
-      amap.off('viewchange', this._oldMoveHandler);
-      amap.off('camerachange', this._oldMoveHandler);
-      //amap.off('amaprender', this._oldMoveHandler);
-      amap.off('zoomstart', this._oldZoomStartHandler);
-      amap.off('zoomend', this._oldZoomEndHandler);
-      amap.off('resize', this._oldResizeHandler);
-
-      amap.on(renderOnMoving
-        ? (is2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove')
-        : 'moveend',
-        // FIXME: event `camerachange` won't be triggered
-        // if 3D mode is not enabled for AMap 1.x.
-        // if animation is disabled,
-        // there will be a bad experience in zooming and dragging operations.
-        not2X3D
-          ? (moveHandler = lodash_debounce(moveHandler, 0))
-          : moveHandler
-      );
-      //amap.on('amaprender', moveHandler);
-      amap.on('zoomstart', zoomStartHandler);
-      amap.on('zoomend', zoomEndHandler = echarts.util.bind(zoomEndHandler, this));
-
-      if (resizeEnable) {
-        resizeHandler = function(e) {
-          clearTimeout(this._resizeDelay);
-
-          this._resizeDelay = setTimeout(function() {
-            echarts.getInstanceByDom(api.getDom()).resize();
-          }, 100);
-        };
-
-        resizeHandler = echarts.util.bind(resizeHandler, this);
-        amap.on('resize', resizeHandler);
+      if (this._resizeHandler) {
+        amap.off('resize', this._resizeHandler);
       }
 
-      this._oldMoveHandler = moveHandler;
-      this._oldZoomStartHandler = zoomStartHandler;
-      this._oldZoomEndHandler = zoomEndHandler;
+      if (this._moveStartHandler) {
+        amap.off('movestart', this._moveStartHandler);
+      }
 
-      resizeEnable && (this._oldResizeHandler = resizeHandler);
+      if (this._moveEndHandler) {
+        amap.off('moveend', this._moveEndHandler);
+        amap.off('zoomend', this._moveEndHandler);
+      }
 
-      rendering = false;
+      amap.on(renderOnMoving ? is2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove' : 'moveend', // FIXME: bad performance in 1.x in the cases with large data, use debounce?
+      // moveHandler
+      !is2X && largeMode ? moveHandler = lodash_debounce(moveHandler, 20) : moveHandler);
+      this._moveHandler = moveHandler;
+
+      if (renderOnMoving && !(is2X && is3DMode)) {
+        // need to listen to zoom if 1.x & 2D mode
+        // FIXME: unnecessary `mapmove` event triggered when zooming
+        amap.on('zoom', moveHandler);
+      }
+
+      if (!renderOnMoving) {
+        amap.on('movestart', this._moveStartHandler = function (e) {
+          setTimeout(function () {
+            amapModel.setEChartsLayerVisiblity(false);
+          }, 0);
+        });
+
+        var moveEndHandler = this._moveEndHandler = function (e) {
+          (!e || e.type !== 'moveend') && moveHandler();
+          setTimeout(function () {
+            amapModel.setEChartsLayerVisiblity(true);
+          }, is2X || !largeMode ? 0 : 20);
+        };
+
+        amap.on('moveend', moveEndHandler);
+        amap.on('zoomend', moveEndHandler);
+
+        if (this._isFirstRender && is3DMode) {
+          // FIXME: not rewrite AMap instance method
+          var nativeSetPicth = amap.setPitch;
+          var nativeSetRotation = amap.setRotation;
+
+          amap.setPitch = function () {
+            nativeSetPicth.apply(this, arguments);
+            moveEndHandler();
+          };
+
+          amap.setRotation = function () {
+            nativeSetRotation.apply(this, arguments);
+            moveEndHandler();
+          };
+        }
+      }
+
+      if (resizeEnable) {
+        var resizeHandler = function resizeHandler() {
+          echarts.getInstanceByDom(api.getDom()).resize();
+        };
+
+        if (!is2X && largeMode) {
+          resizeHandler = lodash_debounce(resizeHandler, 20);
+        }
+
+        amap.on('resize', this._resizeHandler = resizeHandler);
+      }
+
+      this._isFirstRender = rendering = false;
     },
-
-    dispose: function(ecModel, api) {
-      clearTimeout(this._layerOpacityTimeout);
-      clearTimeout(this._resizeDelay);
-
+    dispose: function dispose(ecModel) {
       var component = ecModel.getComponent('amap');
+
       if (component) {
         component.getAMap().destroy();
         component.setAMap(null);
         component.setEChartsLayer(null);
+
         if (component.coordinateSystem) {
           component.coordinateSystem.setAMap(null);
           component.coordinateSystem = null;
         }
+
+        delete this._moveHandler;
+        delete this._resizeHandler;
+        delete this._moveStartHandler;
+        delete this._moveEndHandler;
       }
     }
-  });
+  };
+  var AMapView$1 = isV5 ? echarts$1.ComponentView.extend(AMapView) : AMapView;
+
+  var name = "echarts-extension-amap";
+  var version = "1.9.0";
 
   /**
    * AMap component extension
    */
+  function install(registers) {
+    // Model
+    isV5 ? registers.registerComponentModel(AMapModel$1) : registers.extendComponentModel(AMapModel$1); // View
 
-  echarts.registerCoordinateSystem('amap', AMapCoordSys);
+    isV5 ? registers.registerComponentView(AMapView$1) : registers.extendComponentView(AMapView$1); // Coordinate System
 
-  // Action
-  echarts.registerAction(
-    {
+    registers.registerCoordinateSystem('amap', AMapCoordSys); // Action
+
+    registers.registerAction({
       type: 'amapRoam',
       event: 'amapRoam',
       update: 'updateLayout'
-    },
-    function(payload, ecModel) {
-      ecModel.eachComponent('amap', function(amapModel) {
+    }, function (payload, ecModel) {
+      ecModel.eachComponent('amap', function (amapModel) {
         var amap = amapModel.getAMap();
         var center = amap.getCenter();
         amapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom());
       });
-    }
-  );
+    });
+  }
+
+  isV5 ? echarts$1.use(install) : install(echarts$1);
 
   exports.name = name;
   exports.version = version;
