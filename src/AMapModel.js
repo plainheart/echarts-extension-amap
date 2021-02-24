@@ -28,8 +28,8 @@ export default ComponentModel.extend({
   },
 
   // FIXME: NOT SUPPORT <= IE 10
-  setEChartsLayerClickable(clickable) {
-    this.__echartsLayer.style.pointerEvents = clickable ? 'auto' : 'none'
+  setEChartsLayerInteractive(interactive) {
+    this.__echartsLayer.style.pointerEvents = interactive ? 'auto' : 'none'
   },
 
   setCenterAndZoom(center, zoom) {
@@ -50,7 +50,7 @@ export default ComponentModel.extend({
 
     // extension specific options
     // echartsLayerZIndex: 2000, // DEPRECATED since v1.9.0
-    echartsLayerClickable: true,
+    echartsLayerInteractive: true,
     renderOnMoving: true,
     largeMode: false
   }

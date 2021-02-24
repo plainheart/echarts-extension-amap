@@ -91,11 +91,11 @@ option = {
     // It's better to set this option to false if data is large.
     renderOnMoving: true,
     // the zIndex of echarts layer for AMap, default value is 2000.
-    // deprecated since v1.9.0, use `echartsLayerClickable` instead.
+    // deprecated since v1.9.0, use `echartsLayerInteractive` instead.
     echartsLayerZIndex: 2019
-    // whether echarts layer is clickable. Default value is true
+    // whether echarts layer is interactive. Default value is true
     // supported since v1.9.0
-    echartsLayerClickable: true,
+    echartsLayerInteractive: true,
     // whether to enable large mode. Default value is false
     largeMode: false,
     // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
@@ -134,6 +134,6 @@ amap.add([satelliteLayer, roadNetLayer]);
 amap.add(new AMap.Marker({
   position: [115, 35]
 }));
-// Make the overlay layer of AMap clickable
-amapComponent.setEChartsLayerClickable(false);
+// Make the overlay layer of AMap interactive
+amapComponent.setEChartsLayerInteractive(false);
 ```

@@ -34,10 +34,10 @@ npm install echarts-extension-amap --save
 
 ### 引入
 
-可以直接引入打包好的扩展文件和高德地图的 Javascript API
+可以直接引入打包好的扩展文件和高德地图的 JavaScript API
 
 ```html
-<!-- 引入高德地图的Javascript API，这里需要使用你在高德地图开发者平台申请的 ak -->
+<!-- 引入高德地图的JavaScript API，这里需要使用你在高德地图开发者平台申请的 ak -->
 <!-- 如果你在使用的是 v1.9.0 之前的旧版本，还需要引入 `AMap.CustomLayer` 插件 -->
 <script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
 <!-- 引入 ECharts -->
@@ -87,12 +87,12 @@ option = {
     // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
     renderOnMoving: true,
     // ECharts 图层的 zIndex 默认 2000
-    // 从 v1.9.0 起 此配置项已被弃用 请使用 `echartsLayerClickable` 代替
+    // 从 v1.9.0 起 此配置项已被弃用 请使用 `echartsLayerInteractive` 代替
     echartsLayerZIndex: 2019,
-    // 设置 ECharts 图层是否可点击 默认为 true
-    // 设置为 false 可实现点击高德地图本身覆盖的效果
+    // 设置 ECharts 图层是否可交互 默认为 true
+    // 设置为 false 可实现高德地图自身图层交互
     // 此配置项从 v1.9.0 起开始支持
-    echartsLayerClickable: true,
+    echartsLayerInteractive: true,
     // 是否启用大数据模式 默认为 false
     // 此配置项从 v1.9.0 起开始支持
     largeMode: false
@@ -129,6 +129,6 @@ amap.add([satelliteLayer, roadNetLayer]);
 amap.add(new AMap.Marker({
   position: [115, 35]
 }));
-// 禁用 ECharts 图层可点，从而使高德地图图层可以点击
-amapComponent.setEChartsLayerClickable(false);
+// 禁用 ECharts 图层交互，从而使高德地图图层可以点击交互
+amapComponent.setEChartsLayerInteractive(false);
 ```

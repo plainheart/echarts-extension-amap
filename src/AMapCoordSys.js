@@ -25,7 +25,7 @@ function dataToCoordSize(dataSize, dataItem) {
 // exclude private and unsupported options
 const excludedOptions = [
   'echartsLayerZIndex', // DEPRECATED since v1.9.0
-  'echartsLayerClickable',
+  'echartsLayerInteractive',
   'renderOnMoving',
   'largeMode',
   'layers'
@@ -120,7 +120,7 @@ AMapCoordSys.create = function(ecModel, api) {
       throw new Error('Only one amap component can exist')
     }
     let amap = amapModel.getAMap()
-    const echartsLayerClickable = amapModel.get('echartsLayerClickable')
+    const echartsLayerInteractive = amapModel.get('echartsLayerInteractive')
     if (!amap) {
       // Not support IE8
       let amapRoot = root.querySelector('.ec-extension-amap')
@@ -138,7 +138,7 @@ AMapCoordSys.create = function(ecModel, api) {
 
       const options = zrUtil.clone(amapModel.get())
       if ('echartsLayerZIndex' in options) {
-        console.warn('[ECharts][Extension][AMap] DEPRECATED: the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerClickable` instead.')
+        console.warn('[ECharts][Extension][AMap] DEPRECATED: the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerInteractive` instead.')
       }
       // delete excluded options
       zrUtil.each(excludedOptions, function(key) {
@@ -158,7 +158,7 @@ AMapCoordSys.create = function(ecModel, api) {
       }
     }
 
-    amapModel.setEChartsLayerClickable(echartsLayerClickable)
+    amapModel.setEChartsLayerInteractive(echartsLayerInteractive)
 
     const center = amapModel.get('center')
     const zoom = amapModel.get('zoom')
