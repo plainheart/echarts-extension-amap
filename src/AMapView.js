@@ -1,15 +1,11 @@
 
-import * as echarts from 'echarts/lib/echarts'
-import { isV5, objFn } from './helper'
+import { ComponentView } from 'echarts/lib/echarts'
+import { isV5 } from './helper'
 import debounce from 'lodash.debounce'
-
-const extendView = isV5
-  ? echarts.ComponentView.extend
-  : objFn
 
 /* global AMap */
 
-export default extendView({
+const AMapView = {
   type: 'amap',
 
   init() {
@@ -162,4 +158,8 @@ export default extendView({
       delete this._moveEndHandler
     }
   }
-})
+}
+
+export default isV5
+  ? ComponentView.extend(AMapView)
+  : AMapView
