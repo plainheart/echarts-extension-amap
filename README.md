@@ -10,7 +10,7 @@
 
 [Online example on CodePen](https://codepen.io/plainheart/pen/qBbdNYx)
 
-This is an AMap extension for [ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Lines](https://echarts.apache.org/en/option.html#series-lines), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap).
+This is an AMap extension for [Apache ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Lines](https://echarts.apache.org/en/option.html#series-lines), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap).
 
 ### Examples
 
@@ -55,11 +55,11 @@ require('echarts-extension-amap');
 
 Or use a CDN
 
-[jsDelivr](https://www.jsdelivr.com/)
+[**jsDelivr**](https://www.jsdelivr.com/)
 
 [https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
-[unpkg](https://unpkg.com/)
+[**unpkg**](https://unpkg.com/)
 
 [https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 

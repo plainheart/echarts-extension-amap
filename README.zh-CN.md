@@ -10,7 +10,7 @@
 
 [在线示例](https://codepen.io/plainheart/pen/qBbdNYx)
 
-[ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-lines)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap) 等可视化。
+[Apache ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-lines)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap) 等可视化。
 
 ### 示例
 
@@ -55,11 +55,11 @@ require('echarts-extension-amap');
 
 使用 CDN
 
-[jsDelivr](https://www.jsdelivr.com/)
+[**jsDelivr**](https://www.jsdelivr.com/)
 
 [https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
-[unpkg](https://unpkg.com/)
+[**unpkg**](https://unpkg.com/)
 
 [https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
