@@ -2,30 +2,32 @@
  * AMap component extension
  */
 
-import { version, name } from '../package.json';
+import AMapCoordSys from './AMapCoordSys'
+import AMapModel from './AMapModel'
+import AMapView from './AMapView'
 
-import * as echarts from 'echarts';
-import AMapCoordSys from './AMapCoordSys';
+export { version, name } from '../package.json'
 
-import './AMapModel';
-import './AMapView';
-
-echarts.registerCoordinateSystem('amap', AMapCoordSys);
-
-// Action
-echarts.registerAction(
-  {
-    type: 'amapRoam',
-    event: 'amapRoam',
-    update: 'updateLayout'
-  },
-  function(payload, ecModel) {
-    ecModel.eachComponent('amap', function(amapModel) {
-      var amap = amapModel.getAMap();
-      var center = amap.getCenter();
-      amapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom());
-    });
-  }
-);
-
-export { version, name };
+export function install(registers) {
+  // Model
+  registers.registerComponentModel(AMapModel)
+  // View
+  registers.registerComponentView(AMapView)
+  // Coordinate System
+  registers.registerCoordinateSystem('amap', AMapCoordSys)
+  // Action
+  registers.registerAction(
+    {
+      type: 'amapRoam',
+      event: 'amapRoam',
+      update: 'updateLayout'
+    },
+    function(payload, ecModel) {
+      ecModel.eachComponent('amap', function(amapModel) {
+        const amap = amapModel.getAMap()
+        const center = amap.getCenter()
+        amapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom())
+      })
+    }
+  )
+}

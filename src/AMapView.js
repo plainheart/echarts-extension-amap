@@ -1,54 +1,54 @@
 /* global AMap */
 
-import * as echarts from 'echarts';
-import debounce from 'lodash.debounce';
+import { getInstanceByDom, ComponentView } from 'echarts/lib/echarts'
+import debounce from 'lodash.debounce'
 
-export default echarts.extendComponentView({
+export default ComponentView.extend({
   type: 'amap',
 
-  render: function(amapModel, ecModel, api) {
-    var rendering = true;
+  init() {
+    this._isFirstRender = true
+  },
 
-    var amap = amapModel.getAMap();
-    var viewportRoot = api.getZr().painter.getViewportRoot();
-    var offsetEl = amap.getContainer();
-    //var amape = offsetEl.querySelector('.amap-e');
-    var amape = viewportRoot.parentNode;
-    var coordSys = amapModel.coordinateSystem;
-    var echartsLayer = amapModel.getEChartsLayer();
+  render(amapModel, ecModel, api) {
+    let rendering = true
 
-    var renderOnMoving = amapModel.get('renderOnMoving');
-    //var hideOnZooming = amapModel.get('hideOnZooming');
-    var resizeEnable = amapModel.get('resizeEnable');
+    const amap = amapModel.getAMap()
+    const viewportRoot = api.getZr().painter.getViewportRoot()
+    const offsetEl = amap.getContainer()
+    const coordSys = amapModel.coordinateSystem
 
-    var is2X = AMap.version >= 2;
-    var is3DMode = amap.getViewMode_() === '3D';
-    var not2X3D = !is2X && !is3DMode;
+    const renderOnMoving = amapModel.get('renderOnMoving')
+    const resizeEnable = amapModel.get('resizeEnable')
+    const largeMode = amapModel.get('largeMode')
 
-    amape && amape.classList.add('ec-amap-not-zoom');
+    // `AMap.version` only exists in AMap 2.x
+    // For AMap 1.x, it's `AMap.v`
+    const is2X = AMap.version >= 2
+    const is3DMode = amap.getViewMode_() === '3D'
 
-    var moveHandler = function(e) {
+    let moveHandler = function() {
       if (rendering) {
-        return;
+        return
       }
 
-      var mapOffset = [
-        -parseInt(offsetEl.style.left, 10) || 0,
-        -parseInt(offsetEl.style.top, 10) || 0
-      ];
+      const offsetElStyle = offsetEl.style
+      const mapOffset = [
+        -parseInt(offsetElStyle.left, 10) || 0,
+        -parseInt(offsetElStyle.top, 10) || 0
+      ]
       // only update style when map offset changed
-      const viewportRootStyle = viewportRoot.style;
-      const offsetLeft = mapOffset[0] + 'px';
-      const offsetTop = mapOffset[1] + 'px';
+      const viewportRootStyle = viewportRoot.style
+      const offsetLeft = mapOffset[0] + 'px'
+      const offsetTop = mapOffset[1] + 'px'
       if (viewportRootStyle.left !== offsetLeft) {
-        viewportRootStyle.left = offsetLeft;
+        viewportRootStyle.left = offsetLeft
       }
       if (viewportRootStyle.top !== offsetTop) {
-        viewportRootStyle.top = offsetTop;
+        viewportRootStyle.top = offsetTop
       }
 
-      coordSys.setMapOffset(mapOffset);
-      amapModel.__mapOffset = mapOffset;
+      coordSys.setMapOffset(amapModel.__mapOffset = mapOffset)
 
       api.dispatchAction({
         type: 'amapRoam',
@@ -57,109 +57,103 @@ export default echarts.extendComponentView({
           // no delay for rendering but remain animation of elements
           duration: 0
         }
-      });
-    };
+      })
+    }
 
-    var zoomStartHandler = function(e) {
-      if (rendering) {
-        return;
+    amap.off('mapmove', this._moveHandler)
+    amap.off('moveend', this._moveHandler)
+    amap.off('viewchange', this._moveHandler)
+    amap.off('camerachange', this._moveHandler)
+    amap.off('zoom', this._moveHandler)
+
+    if (this._resizeHandler) {
+      amap.off('resize', this._resizeHandler)
+    }
+    if (this._moveStartHandler) {
+      amap.off('movestart', this._moveStartHandler)
+    }
+    if (this._moveEndHandler) {
+      amap.off('moveend', this._moveEndHandler)
+      amap.off('zoomend', this._moveEndHandler)
+    }
+
+    amap.on(
+      renderOnMoving
+        ? (is2X
+          ? 'viewchange'
+          : is3DMode
+            ? 'camerachange'
+            : 'mapmove')
+        : 'moveend',
+      // FIXME: bad performance in 1.x in the cases with large data, use debounce?
+      // moveHandler
+      (!is2X && largeMode) ? (moveHandler = debounce(moveHandler, 20)) : moveHandler
+    )
+
+    this._moveHandler = moveHandler
+
+    if (renderOnMoving && !(is2X && is3DMode)) {
+      // need to listen to zoom if 1.x & 2D mode
+      // FIXME: unnecessary `mapmove` event triggered when zooming
+      amap.on('zoom', moveHandler)
+    }
+
+    if (!renderOnMoving) {
+      amap.on('movestart', this._moveStartHandler = function(e) {
+        setTimeout(function() {
+          amapModel.setEChartsLayerVisiblity(false)
+        }, 0)
+      })
+      const moveEndHandler = this._moveEndHandler = function(e) {
+        ;(!e || e.type !== 'moveend') && moveHandler()
+        setTimeout(function() {
+          amapModel.setEChartsLayerVisiblity(true)
+        }, is2X || !largeMode ? 0 : 20)
       }
-
-      // fix flicker in 3D mode for 1.x when zoom is over min or max value
-      if (!is2X && is3DMode) {
-        return;
-      }
-
-      /*hideOnZooming && */echartsLayer.setOpacity(not2X3D ? 0 : 0.01);
-    };
-
-    var zoomEndHandler = function(e) {
-      if (rendering) {
-        return;
-      }
-
-      not2X3D || echartsLayer.setOpacity(1);
-
-      api.dispatchAction({
-        type: 'amapRoam',
-        animation: {
-          duration: 0
+      amap.on('moveend', moveEndHandler)
+      amap.on('zoomend', moveEndHandler)
+      if (this._isFirstRender && is3DMode) {
+        // FIXME: not rewrite AMap instance method
+        const nativeSetPicth = amap.setPitch
+        const nativeSetRotation = amap.setRotation
+        amap.setPitch = function() {
+          nativeSetPicth.apply(this, arguments)
+          moveEndHandler()
         }
-      });
-
-      if (not2X3D) {
-        clearTimeout(this._layerOpacityTimeout);
-
-        this._layerOpacityTimeout = setTimeout(function() {
-          echartsLayer.setOpacity(1);
-        }, 0);
+        amap.setRotation = function() {
+          nativeSetRotation.apply(this, arguments)
+          moveEndHandler()
+        }
       }
-    };
-
-    var resizeHandler;
-
-    //amap.off('mapmove', this._oldMoveHandler);
-    // 1.x amap.getCameraState();
-    // 2.x amap.getView().getStatus();
-    amap.off('mapmove', this._oldMoveHandler);
-    amap.off('moveend', this._oldMoveHandler);
-    amap.off('viewchange', this._oldMoveHandler);
-    amap.off('camerachange', this._oldMoveHandler);
-    //amap.off('amaprender', this._oldMoveHandler);
-    amap.off('zoomstart', this._oldZoomStartHandler);
-    amap.off('zoomend', this._oldZoomEndHandler);
-    amap.off('resize', this._oldResizeHandler);
-
-    amap.on(renderOnMoving
-      ? (is2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove')
-      : 'moveend',
-      // FIXME: event `camerachange` won't be triggered
-      // if 3D mode is not enabled for AMap 1.x.
-      // if animation is disabled,
-      // there will be a bad experience in zooming and dragging operations.
-      not2X3D
-        ? (moveHandler = debounce(moveHandler, 0))
-        : moveHandler
-    );
-    //amap.on('amaprender', moveHandler);
-    amap.on('zoomstart', zoomStartHandler);
-    amap.on('zoomend', zoomEndHandler = echarts.util.bind(zoomEndHandler, this));
+    }
 
     if (resizeEnable) {
-      resizeHandler = function(e) {
-        clearTimeout(this._resizeDelay);
-
-        this._resizeDelay = setTimeout(function() {
-          echarts.getInstanceByDom(api.getDom()).resize();
-        }, 100);
-      };
-
-      resizeHandler = echarts.util.bind(resizeHandler, this);
-      amap.on('resize', resizeHandler);
+      let resizeHandler = function() {
+        getInstanceByDom(api.getDom()).resize()
+      }
+      if (!is2X && largeMode) {
+        resizeHandler = debounce(resizeHandler, 20)
+      }
+      amap.on('resize', this._resizeHandler = resizeHandler)
     }
 
-    this._oldMoveHandler = moveHandler;
-    this._oldZoomStartHandler = zoomStartHandler;
-    this._oldZoomEndHandler = zoomEndHandler;
-
-    resizeEnable && (this._oldResizeHandler = resizeHandler);
-
-    rendering = false;
+    this._isFirstRender = rendering = false
   },
 
-  dispose: function(ecModel, api) {
-    clearTimeout(this._layerOpacityTimeout);
-    clearTimeout(this._resizeDelay);
-
-    var component = ecModel.getComponent('amap');
+  dispose(ecModel) {
+    const component = ecModel.getComponent('amap')
     if (component) {
-      component.getAMap().destroy();
-      component.setAMap(null);
-      component.setEChartsLayer(null);
+      component.getAMap().destroy()
+      component.setAMap(null)
+      component.setEChartsLayer(null)
       if (component.coordinateSystem) {
-        component.coordinateSystem.setAMap(null);
-        component.coordinateSystem = null;
+        component.coordinateSystem.setAMap(null)
+        component.coordinateSystem = null
       }
+      delete this._moveHandler
+      delete this._resizeHandler
+      delete this._moveStartHandler
+      delete this._moveEndHandler
     }
   }
-});
+})

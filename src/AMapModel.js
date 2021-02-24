@@ -1,36 +1,45 @@
-import * as echarts from 'echarts';
+import { ComponentModel } from 'echarts/lib/echarts'
 
 function v2Equal(a, b) {
-  return a && b && a[0] === b[0] && a[1] === b[1];
+  return a && b && a[0] === b[0] && a[1] === b[1]
 }
 
-export default echarts.extendComponentModel({
+export default ComponentModel.extend({
   type: 'amap',
 
-  setAMap: function(amap) {
-    this.__amap = amap;
+  setAMap(amap) {
+    this.__amap = amap
   },
 
-  getAMap: function() {
-    return this.__amap;
+  getAMap() {
+    return this.__amap
   },
 
-  setEChartsLayer: function(layer) {
-    this.__echartsLayer = layer;
+  setEChartsLayer(layer) {
+    this.__echartsLayer = layer
   },
 
-  getEChartsLayer: function() {
-    return this.__echartsLayer;
+  getEChartsLayer() {
+    return this.__echartsLayer
   },
 
-  setCenterAndZoom: function(center, zoom) {
-    this.option.center = center;
-    this.option.zoom = zoom;
+  setEChartsLayerVisiblity(visible) {
+    this.__echartsLayer.style.display = visible ? 'block' : 'none';
   },
 
-  centerOrZoomChanged: function(center, zoom) {
-    var option = this.option;
-    return !(v2Equal(center, option.center) && zoom === option.zoom);
+  // FIXME: NOT SUPPORT <= IE 10
+  setEChartsLayerClickable(clickable) {
+    this.__echartsLayer.style.pointerEvents = clickable ? 'auto' : 'none'
+  },
+
+  setCenterAndZoom(center, zoom) {
+    this.option.center = center
+    this.option.zoom = zoom
+  },
+
+  centerOrZoomChanged(center, zoom) {
+    const option = this.option
+    return !(v2Equal(center, option.center) && zoom === option.zoom)
   },
 
   defaultOption: {
@@ -39,10 +48,10 @@ export default echarts.extendComponentModel({
     isHotspot: false,
     resizeEnable: true,
 
-    // extension options
-    echartsLayerZIndex: 2000,
-    renderOnMoving: true
-    //hideOnZooming: true,
-    //trackPitchAndRotation: false
+    // extension specific options
+    // echartsLayerZIndex: 2000, // DEPRECATED since v1.9.0
+    echartsLayerClickable: true,
+    renderOnMoving: true,
+    largeMode: false
   }
-});
+})

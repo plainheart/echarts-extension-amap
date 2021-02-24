@@ -38,7 +38,8 @@ npm install echarts-extension-amap --save
 
 ```html
 <!--引入高德地图的Javascript API，这里需要使用你在高德地图开发者平台申请的 ak-->
-<script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar,AMap.CustomLayer"></script>
+<!-- 如果你在使用的是 v1.9.0 之前的旧版本，还需要引入 `AMap.CustomLayer` 插件 -->
+<script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
 <!-- 引入 ECharts -->
 <script src="/path/to/echarts.min.js"></script>
 <!-- 引入高德地图扩展 -->
@@ -54,17 +55,13 @@ require('echarts-extension-amap');
 
 使用 CDN
 
-[jsdelivr](https://www.jsdelivr.com/)
+[jsDelivr](https://www.jsdelivr.com/)
 
-```html
-<script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
-```
+[https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
 [unpkg](https://unpkg.com/)
 
-```html
-<script src="https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
-```
+[https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
 插件会自动注册相应的组件。
 
@@ -89,8 +86,16 @@ option = {
     mapStyle: 'amap://styles/dark',
     // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
     renderOnMoving: true,
-    // 高德地图自定义EchartsLayer的zIndex，默认2000
-    echartsLayerZIndex: 2019
+    // ECharts 图层的 zIndex 默认 2000
+    // 从 v1.9.0 起 此配置项已被弃用 请使用 `echartsLayerClickable` 代替
+    echartsLayerZIndex: 2019,
+    // 设置 ECharts 图层是否可点击 默认为 true
+    // 设置为 false 可实现点击高德地图本身覆盖的效果
+    // 此配置项从 v1.9.0 起开始支持
+    echartsLayerClickable: true,
+    // 是否启用大数据模式 默认为 false
+    // 此配置项从 v1.9.0 起开始支持
+    largeMode: false
     // 说明：如果想要添加卫星、路网等图层
     // 暂时先不要使用layers配置，因为存在Bug
     // 建议使用amap.add的方式，使用方式参见最下方代码
@@ -109,11 +114,10 @@ option = {
   ]
 };
 
+// 获取 ECharts 高德地图组件
+var amapComponent = chart.getModel().getComponent('amap');
 // 获取高德地图实例，使用高德地图自带的控件(需要在高德地图js API script标签手动引入)
-var amap = chart
-  .getModel()
-  .getComponent('amap')
-  .getAMap();
+var amap = amapComponent.getAMap();
 // 添加控件
 amap.addControl(new AMap.Scale());
 amap.addControl(new AMap.ToolBar());
@@ -121,4 +125,10 @@ amap.addControl(new AMap.ToolBar());
 var satelliteLayer = new AMap.TileLayer.Satellite();
 var roadNetLayer = new AMap.TileLayer.RoadNet();
 amap.add([satelliteLayer, roadNetLayer]);
+//  添加一个 Marker
+amap.add(new AMap.Marker({
+  position: [115, 35]
+}));
+// 禁用 ECharts 图层可点，从而使高德地图图层可以点击
+amapComponent.setEChartsLayerClickable(false);
 ```

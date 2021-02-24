@@ -38,7 +38,8 @@ Import packaged distribution file `echarts-extension-amap.min.js` and add AMap A
 
 ```html
 <!-- import JavaScript API of AMap, please replace the ak with your own key and specify the version and plugins you need -->
-<script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar,AMap.CustomLayer"></script>
+<!-- Plugin `AMap.CustomLayer` is required if you are using a version of library less than v1.9.0 -->
+<script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
 <!-- import ECharts -->
 <script src="/path/to/echarts.min.js"></script>
 <!-- import echarts-extension-amap -->
@@ -54,17 +55,13 @@ require('echarts-extension-amap');
 
 Or use a CDN
 
-[jsdelivr](https://www.jsdelivr.com/)
+[jsDelivr](https://www.jsdelivr.com/)
 
-```html
-<script src="https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
-```
+[https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
 [unpkg](https://unpkg.com/)
 
-```html
-<script src="https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js"></script>
-```
+[https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
 This extension will register itself as a component of `echarts` after it is imported.
 
@@ -94,7 +91,13 @@ option = {
     // It's better to set this option to false if data is large.
     renderOnMoving: true,
     // the zIndex of echarts layer for AMap, default value is 2000.
+    // deprecated since v1.9.0, use `echartsLayerClickable` instead.
     echartsLayerZIndex: 2019
+    // whether echarts layer is clickable. Default value is true
+    // supported since v1.9.0
+    echartsLayerClickable: true,
+    // whether to enable large mode. Default value is false
+    largeMode: false,
     // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
     // There are some bugs about it, we can use `amap.add` instead.
     // Refer to the codes at the bottom.
@@ -116,11 +119,10 @@ option = {
   ]
 };
 
+// Get AMap extension component
+var amapComponent = chart.getModel().getComponent('amap');
 // Get the instance of AMap
-var amap = chart
-  .getModel()
-  .getComponent('amap')
-  .getAMap();
+var amap = amapComponent.getAMap();
 // Add some controls provided by AMap.
 amap.addControl(new AMap.Scale());
 amap.addControl(new AMap.ToolBar());
@@ -128,4 +130,10 @@ amap.addControl(new AMap.ToolBar());
 var satelliteLayer = new AMap.TileLayer.Satellite();
 var roadNetLayer = new AMap.TileLayer.RoadNet();
 amap.add([satelliteLayer, roadNetLayer]);
+// Add a marker to map
+amap.add(new AMap.Marker({
+  position: [115, 35]
+}));
+// Make the overlay layer of AMap clickable
+amapComponent.setEChartsLayerClickable(false);
 ```
