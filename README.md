@@ -97,6 +97,7 @@ option = {
     // supported since v1.9.0
     echartsLayerInteractive: true,
     // whether to enable large mode. Default value is false
+    // supported since v1.9.0
     largeMode: false,
     // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
     // There are some bugs about it, we can use `amap.add` instead.
