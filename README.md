@@ -92,7 +92,7 @@ option = {
     renderOnMoving: true,
     // the zIndex of echarts layer for AMap, default value is 2000.
     // deprecated since v1.9.0, use `echartsLayerInteractive` instead.
-    echartsLayerZIndex: 2019
+    echartsLayerZIndex: 2019,
     // whether echarts layer is interactive. Default value is true
     // supported since v1.9.0
     echartsLayerInteractive: true,
