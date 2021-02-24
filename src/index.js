@@ -5,14 +5,19 @@
 import AMapCoordSys from './AMapCoordSys'
 import AMapModel from './AMapModel'
 import AMapView from './AMapView'
+import { isV5 } from './helper'
 
 export { version, name } from '../package.json'
 
 export function install(registers) {
   // Model
-  registers.registerComponentModel(AMapModel)
+  isV5
+    ? registers.registerComponentModel(AMapModel)
+    : registers.extendComponentModel(AMapModel)
   // View
-  registers.registerComponentView(AMapView)
+  isV5
+    ? registers.registerComponentView(AMapView)
+    : registers.extendComponentView(AMapView)
   // Coordinate System
   registers.registerCoordinateSystem('amap', AMapCoordSys)
   // Action

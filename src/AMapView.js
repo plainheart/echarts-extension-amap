@@ -1,9 +1,15 @@
-/* global AMap */
 
-import { getInstanceByDom, ComponentView } from 'echarts/lib/echarts'
+import * as echarts from 'echarts/lib/echarts'
+import { isV5, objFn } from './helper'
 import debounce from 'lodash.debounce'
 
-export default ComponentView.extend({
+const extendView = isV5
+  ? echarts.ComponentView.extend
+  : objFn
+
+/* global AMap */
+
+export default extendView({
   type: 'amap',
 
   init() {
@@ -129,7 +135,7 @@ export default ComponentView.extend({
 
     if (resizeEnable) {
       let resizeHandler = function() {
-        getInstanceByDom(api.getDom()).resize()
+        echarts.getInstanceByDom(api.getDom()).resize()
       }
       if (!is2X && largeMode) {
         resizeHandler = debounce(resizeHandler, 20)

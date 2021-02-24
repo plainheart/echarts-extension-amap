@@ -1,10 +1,15 @@
-import { ComponentModel } from 'echarts/lib/echarts'
+import * as echarts from 'echarts/lib/echarts'
+import { isV5, objFn } from './helper'
 
 function v2Equal(a, b) {
   return a && b && a[0] === b[0] && a[1] === b[1]
 }
 
-export default ComponentModel.extend({
+const extendModel = isV5
+  ? echarts.ComponentModel.extend
+  : objFn
+
+export default extendModel({
   type: 'amap',
 
   setAMap(amap) {
