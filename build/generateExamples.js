@@ -1,6 +1,6 @@
 const chalk = require('chalk')
 const path = require('path')
-const fs = require('fs-extra')
+const fs = require('fs')
 const { version } = require('../package.json')
 
 function generateExamples() {
