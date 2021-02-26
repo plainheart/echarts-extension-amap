@@ -23,14 +23,15 @@ function generateExamples() {
   ;[['en', false], ['zh_CN']].forEach(function(lang) {
     lang = `${lang[1] === false ? '' : '_' + lang[0]}`
     exampleTypes.forEach(function(type) {
+      const ts = Date.now()
       const fileName = `${type}${lang}.html`
       const dest = path.resolve(exampleDir, './', fileName)
+      console.log()
       console.log(
-        chalk.cyan.dim('\nGenerating example'),
-        chalk.cyan(fileName),
-        chalk.cyan.dim('=>'),
-        chalk.cyan(dest),
-        chalk.cyan.dim('...')
+        chalk.cyan.bold(fileName),
+        chalk.blueBright('→'),
+        chalk.cyan.bold(dest),
+        chalk.cyan('...')
       )
       const tpl = fs.readFileSync(
         dest + '.tpl',
@@ -48,16 +49,18 @@ function generateExamples() {
         example,
         { encoding: 'utf-8' }
       )
+      const elapsed = Date.now() - ts
       console.log(
-        chalk.green.dim('\nGenerated'),
-        chalk.green(dest),
-        chalk.green.dim('successfully.')
+        chalk.green('Generated example'),
+        chalk.green.bold(fileName),
+        chalk.green('in'),
+        chalk.green.bold(elapsed + 'ms')
       )
     })
   })
 
   console.log()
-  console.log(chalk.bgCyan(' ✨ Generate Examples Done! '))
+  console.log(chalk.bgCyan('🚀 Generate Examples Done! '))
   console.log()
 }
 

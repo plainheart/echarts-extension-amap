@@ -1,3 +1,10 @@
 const chalk = require('chalk')
 
-console.log(`\n${chalk.bgCyan(' ✨ Build Done! ')}\n`)
+console.log()
+console.log(chalk.bgCyan('📝 Rewriting AMD dependency... '))
+
+require('./rewrite-amd')
+
+console.log()
+console.log(chalk.bgCyan('✨ Build Done! '))
+console.log()
