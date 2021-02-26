@@ -164,7 +164,11 @@ AMapCoordSys.create = function(ecModel, api) {
       }
     }
 
-    amapModel.setEChartsLayerInteractive(echartsLayerInteractive)
+    const oldEChartsLayerInteractive = amapModel.__echartsLayerInteractive
+    if (oldEChartsLayerInteractive !== echartsLayerInteractive) {
+      amapModel.setEChartsLayerInteractive(echartsLayerInteractive)
+      amapModel.__echartsLayerInteractive = echartsLayerInteractive
+    }
 
     const center = amapModel.get('center')
     const zoom = amapModel.get('zoom')

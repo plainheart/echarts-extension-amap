@@ -21,11 +21,12 @@ const AMapModel = {
   },
 
   setEChartsLayerVisiblity(visible) {
-    this.__echartsLayer.style.display = visible ? 'block' : 'none';
+    this.__echartsLayer.style.display = visible ? 'block' : 'none'
   },
 
   // FIXME: NOT SUPPORT <= IE 10
   setEChartsLayerInteractive(interactive) {
+    this.option.echartsLayerInteractive = !!interactive
     this.__echartsLayer.style.pointerEvents = interactive ? 'auto' : 'none'
   },
 
