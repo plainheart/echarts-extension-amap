@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.9.0
+ * @version 1.9.1
  * @author plainheart
  * 
  * MIT License
@@ -124,11 +124,7 @@ AMapCoordSysProto.prepareCustoms = function () {
 
 AMapCoordSys.create = function (ecModel, api) {
   var amapCoordSys;
-  var root = api.getDom();
   ecModel.eachComponent('amap', function (amapModel) {
-    var painter = api.getZr().painter;
-    var viewportRoot = painter.getViewportRoot();
-
     if (typeof AMap === 'undefined') {
       throw new Error('AMap api is not loaded');
     }
@@ -141,7 +137,12 @@ AMapCoordSys.create = function (ecModel, api) {
     var echartsLayerInteractive = amapModel.get('echartsLayerInteractive');
 
     if (!amap) {
-      // Not support IE8
+      var root = api.getDom();
+      var painter = api.getZr().painter;
+      var viewportRoot = painter.getViewportRoot(); // PENDING not hidden?
+
+      viewportRoot.style.visibility = 'hidden'; // Not support IE8
+
       var amapRoot = root.querySelector('.ec-extension-amap');
 
       if (amapRoot) {
@@ -167,8 +168,13 @@ AMapCoordSys.create = function (ecModel, api) {
         delete options[key];
       });
       amap = new AMap.Map(amapRoot, options);
-      amapModel.setAMap(amap);
-      amapRoot.querySelector('.amap-maps').appendChild(viewportRoot);
+      amapModel.setAMap(amap); // use `complete` callback to avoid NPE when first load amap
+
+      amap.on('complete', function () {
+        amapRoot.querySelector('.amap-maps').appendChild(viewportRoot); // PENDING
+
+        viewportRoot.style.visibility = '';
+      });
       amapModel.setEChartsLayer(viewportRoot); // Override
 
       painter.getViewportRootOffset = function () {
@@ -179,7 +185,13 @@ AMapCoordSys.create = function (ecModel, api) {
       };
     }
 
-    amapModel.setEChartsLayerInteractive(echartsLayerInteractive);
+    var oldEChartsLayerInteractive = amapModel.__echartsLayerInteractive;
+
+    if (oldEChartsLayerInteractive !== echartsLayerInteractive) {
+      amapModel.setEChartsLayerInteractive(echartsLayerInteractive);
+      amapModel.__echartsLayerInteractive = echartsLayerInteractive;
+    }
+
     var center = amapModel.get('center');
     var zoom = amapModel.get('zoom');
 
@@ -253,6 +265,7 @@ var AMapModel = {
   },
   // FIXME: NOT SUPPORT <= IE 10
   setEChartsLayerInteractive: function setEChartsLayerInteractive(interactive) {
+    this.option.echartsLayerInteractive = !!interactive;
     this.__echartsLayer.style.pointerEvents = interactive ? 'auto' : 'none';
   },
   setCenterAndZoom: function setCenterAndZoom(center, zoom) {
@@ -821,7 +834,7 @@ var AMapView = {
 var AMapView$1 = isV5 ? ComponentView.extend(AMapView) : AMapView;
 
 var name = "echarts-extension-amap";
-var version = "1.9.0";
+var version = "1.9.1";
 
 /**
  * AMap component extension
