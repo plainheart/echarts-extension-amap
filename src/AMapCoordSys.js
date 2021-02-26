@@ -108,11 +108,7 @@ AMapCoordSysProto.prepareCustoms = function() {
 
 AMapCoordSys.create = function(ecModel, api) {
   let amapCoordSys
-  const root = api.getDom()
-
   ecModel.eachComponent('amap', function(amapModel) {
-    const painter = api.getZr().painter
-    const viewportRoot = painter.getViewportRoot()
     if (typeof AMap === 'undefined') {
       throw new Error('AMap api is not loaded')
     }
@@ -122,6 +118,11 @@ AMapCoordSys.create = function(ecModel, api) {
     let amap = amapModel.getAMap()
     const echartsLayerInteractive = amapModel.get('echartsLayerInteractive')
     if (!amap) {
+      const root = api.getDom()
+      const painter = api.getZr().painter
+      const viewportRoot = painter.getViewportRoot()
+      // PENDING not hidden?
+      viewportRoot.style.visibility = 'hidden'
       // Not support IE8
       let amapRoot = root.querySelector('.ec-extension-amap')
       if (amapRoot) {
@@ -148,7 +149,12 @@ AMapCoordSys.create = function(ecModel, api) {
       amap = new AMap.Map(amapRoot, options)
       amapModel.setAMap(amap)
 
-      amapRoot.querySelector('.amap-maps').appendChild(viewportRoot)
+      // use `complete` callback to avoid NPE when first load amap
+      amap.on('complete', function() {
+        amapRoot.querySelector('.amap-maps').appendChild(viewportRoot)
+        // PENDING
+        viewportRoot.style.visibility = ''
+      })
 
       amapModel.setEChartsLayer(viewportRoot)
 
