@@ -1,5 +1,4 @@
-
-import { ComponentView } from 'echarts/lib/echarts'
+import { ComponentView, getInstanceByDom } from 'echarts/lib/echarts'
 import { isV5 } from './helper'
 import debounce from 'lodash.debounce'
 
@@ -131,7 +130,7 @@ const AMapView = {
 
     if (resizeEnable) {
       let resizeHandler = function() {
-        echarts.getInstanceByDom(api.getDom()).resize()
+        getInstanceByDom(api.getDom()).resize()
       }
       if (!is2X && largeMode) {
         resizeHandler = debounce(resizeHandler, 20)
