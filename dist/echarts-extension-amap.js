@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.9.1
+ * @version 1.9.2
  * @author plainheart
  * 
  * MIT License
@@ -30,13 +30,13 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('echarts/lib/echarts')) :
   typeof define === 'function' && define.amd ? define(['exports', 'echarts'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.echarts = global.echarts || {}, global.echarts.amap = {}), global.echarts));
-}(this, (function (exports, echarts$1) { 'use strict';
+}(this, (function (exports, echarts) { 'use strict';
 
   /* global AMap */
 
   function dataToCoordSize(dataSize, dataItem) {
     dataItem = dataItem || [0, 0];
-    return echarts$1.util.map([0, 1], function (dimIdx) {
+    return echarts.util.map([0, 1], function (dimIdx) {
       var val = dataItem[dimIdx];
       var halfSize = dataSize[dimIdx] / 2;
       var p1 = [];
@@ -100,11 +100,11 @@
 
   AMapCoordSysProto.getViewRect = function () {
     var api = this._api;
-    return new echarts$1.graphic.BoundingRect(0, 0, api.getWidth(), api.getHeight());
+    return new echarts.graphic.BoundingRect(0, 0, api.getWidth(), api.getHeight());
   };
 
   AMapCoordSysProto.getRoamTransform = function () {
-    return echarts$1.matrix.create();
+    return echarts.matrix.create();
   };
 
   AMapCoordSysProto.prepareCustoms = function () {
@@ -119,8 +119,8 @@
         height: rect.height
       },
       api: {
-        coord: echarts$1.util.bind(this.dataToPoint, this),
-        size: echarts$1.util.bind(dataToCoordSize, this)
+        coord: echarts.util.bind(this.dataToPoint, this),
+        size: echarts.util.bind(dataToCoordSize, this)
       }
     };
   };
@@ -160,14 +160,14 @@
         amapRoot.className = 'ec-extension-amap';
         amapRoot.style.cssText = 'position:absolute;top:0;left:0;bottom:0;right:0;';
         root.appendChild(amapRoot);
-        var options = echarts$1.util.clone(amapModel.get());
+        var options = echarts.util.clone(amapModel.get());
 
         if ('echartsLayerZIndex' in options) {
           console.warn('[ECharts][Extension][AMap] DEPRECATED: the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerInteractive` instead.');
         } // delete excluded options
 
 
-        echarts$1.util.each(excludedOptions, function (key) {
+        echarts.util.each(excludedOptions, function (key) {
           delete options[key];
         });
         amap = new AMap.Map(amapRoot, options);
@@ -244,7 +244,7 @@
 
   AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat'];
 
-  var isV5 = echarts$1.version.split('.')[0] > 4;
+  var isV5 = echarts.version.split('.')[0] > 4;
   function v2Equal(a, b) {
     return a && b && a[0] === b[0] && a[1] === b[1];
   }
@@ -291,7 +291,7 @@
       largeMode: false
     }
   };
-  var AMapModel$1 = isV5 ? echarts$1.ComponentModel.extend(AMapModel) : AMapModel;
+  var AMapModel$1 = isV5 ? echarts.ComponentModel.extend(AMapModel) : AMapModel;
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
@@ -834,10 +834,10 @@
       }
     }
   };
-  var AMapView$1 = isV5 ? echarts$1.ComponentView.extend(AMapView) : AMapView;
+  var AMapView$1 = isV5 ? echarts.ComponentView.extend(AMapView) : AMapView;
 
   var name = "echarts-extension-amap";
-  var version = "1.9.1";
+  var version = "1.9.2";
 
   /**
    * AMap component extension
@@ -863,7 +863,7 @@
     });
   }
 
-  isV5 ? echarts$1.use(install) : install(echarts$1);
+  isV5 ? echarts.use(install) : install(echarts);
 
   exports.name = name;
   exports.version = version;

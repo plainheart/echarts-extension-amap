@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.9.1
+ * @version 1.9.2
  * @author plainheart
  * 
  * MIT License
@@ -26,8 +26,8 @@
  * SOFTWARE.
  * 
  */
-import * as echarts$1 from 'echarts/lib/echarts';
-import { graphic, matrix, util, version as version$1, ComponentModel, ComponentView, use } from 'echarts/lib/echarts';
+import * as echarts from 'echarts/lib/echarts';
+import { graphic, matrix, util, version as version$1, ComponentModel, ComponentView, getInstanceByDom, use } from 'echarts/lib/echarts';
 
 /* global AMap */
 
@@ -799,7 +799,7 @@ var AMapView = {
 
     if (resizeEnable) {
       var resizeHandler = function resizeHandler() {
-        echarts.getInstanceByDom(api.getDom()).resize();
+        getInstanceByDom(api.getDom()).resize();
       };
 
       if (!is2X && largeMode) {
@@ -834,7 +834,7 @@ var AMapView = {
 var AMapView$1 = isV5 ? ComponentView.extend(AMapView) : AMapView;
 
 var name = "echarts-extension-amap";
-var version = "1.9.1";
+var version = "1.9.2";
 
 /**
  * AMap component extension
@@ -860,6 +860,6 @@ function install(registers) {
   });
 }
 
-isV5 ? use(install) : install(echarts$1);
+isV5 ? use(install) : install(echarts);
 
 export { name, version };
