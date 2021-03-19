@@ -8,7 +8,10 @@
     "dist",
     "src",
     "index.js",
+    "index.d.ts",
     "export.js",
+    "export.d.ts",
+    "types.d.ts",
     "examples/*.html"
   ],
   "types": "types.d.ts",
