@@ -11,7 +11,7 @@
     "export.js",
     "examples/*.html"
   ],
-  "types": "index.d.ts",
+  "types": "types.d.ts",
   "scripts": {
     "dev": "rollup -wc --environment NODE_ENV:development",
     "build": "rollup -c --environment NODE_ENV:production && node build/post-build.js",

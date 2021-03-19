@@ -20,11 +20,9 @@ type EChartsRegisters = EChartsExtensionInstallRegisters extends never
 
 /**
  * To install AMap component
- * @param registers echarts registers. If using v4, it should be echarts namespace.
+ * @param registersregisters echarts registers. If using v4, it should be echarts namespace.
  */
-export declare function install(registers: EChartsRegisters): void
+declare function install(registers: EChartsRegisters): void
 
-export declare const name = 'echarts-extension-amap'
-export declare const version = '1.9.2'
-
-export default install
+export * from './types'
+export { install }
