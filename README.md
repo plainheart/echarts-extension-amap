@@ -150,8 +150,6 @@ const option: ECOption = {
 
 ### Usage
 
-This extension can be configured simply like [geo](https://echarts.apache.org/en/option.html#geo).
-
 ```js
 option = {
   // load amap component
