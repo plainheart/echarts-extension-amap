@@ -105,7 +105,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import {
   install as AMapComponent,
   AMapComponentOption
-} from './export';
+} from 'echarts-extension-amap/export';
 
 // import the official type definition for AMap 2.0
 import '@amap/amap-jsapi-types'

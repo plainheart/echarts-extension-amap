@@ -105,7 +105,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import {
   install as AMapComponent,
   AMapComponentOption
-} from './export';
+} from 'echarts-extension-amap/export';
 
 // 引入高德地图官方提供的 2.0 类型定义文件
 import '@amap/amap-jsapi-types'
