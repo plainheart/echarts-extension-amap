@@ -108,7 +108,7 @@ import {
 } from 'echarts-extension-amap/export';
 
 // import the official type definition for AMap 2.0
-import '@amap/amap-jsapi-types'
+import '@amap/amap-jsapi-types';
 
 // compose required options
 type ECOption = echarts.ComposeOption<
@@ -122,9 +122,9 @@ type ECOption = echarts.ComposeOption<
 echarts.use([
   CanvasRenderer,
   TooltipComponent,
+  AMapComponent,
   ScatterChart,
-  EffectScatterChart,
-  AMapComponent
+  EffectScatterChart
 ]);
 
 // define ECharts option
@@ -145,7 +145,7 @@ const option: ECOption = {
     }
   ]
   // ...
-}
+};
 ```
 
 ### Usage

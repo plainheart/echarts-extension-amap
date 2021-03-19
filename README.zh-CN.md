@@ -108,7 +108,7 @@ import {
 } from 'echarts-extension-amap/export';
 
 // 引入高德地图官方提供的 2.0 类型定义文件
-import '@amap/amap-jsapi-types'
+import '@amap/amap-jsapi-types';
 
 // 组装所需的 option type
 type ECOption = echarts.ComposeOption<
@@ -122,9 +122,9 @@ type ECOption = echarts.ComposeOption<
 echarts.use([
   CanvasRenderer,
   TooltipComponent,
+  AMapComponent,
   ScatterChart,
-  EffectScatterChart,
-  AMapComponent
+  EffectScatterChart
 ]);
 
 // 定义 ECharts option
@@ -145,7 +145,7 @@ const option: ECOption = {
     }
   ]
   // ...
-}
+};
 ```
 
 ### 使用
