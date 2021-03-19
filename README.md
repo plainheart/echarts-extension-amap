@@ -84,7 +84,7 @@ Use a specific version
 
 This extension will register itself as a component of `echarts` after it is imported.
 
-**Apache ECharts 5 import on diamond**
+**Apache ECharts 5 import on demand**
 
 Apache ECharts has provided us the [new tree-shaking API](https://echarts.apache.org/en/tutorial.html#Use%20ECharts%20with%20bundler%20and%20NPM) since v5.0.1. This is how to use it in this extension:
 
