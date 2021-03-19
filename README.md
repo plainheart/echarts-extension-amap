@@ -4,90 +4,92 @@
 [![jsDelivr Downloads](https://data.jsdelivr.com/v1/package/npm/echarts-extension-amap/badge?style=rounded)](https://www.jsdelivr.com/package/npm/echarts-extension-amap)
 [![License](https://img.shields.io/npm/l/echarts-extension-amap.svg)](https://www.npmjs.com/package/echarts-extension-amap)
 
-## Apache ECharts 高德地图扩展
+## AMap extension for Apache ECharts
 
-[在线示例](https://codepen.io/plainheart/pen/qBbdNYx)
+[中文说明](https://github.com/plainheart/echarts-extension-amap/blob/master/README.zh-CN.md)
 
-[Apache ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-lines)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap) 等可视化。
+[Online example on CodePen](https://codepen.io/plainheart/pen/qBbdNYx)
 
-### 示例
+This is an AMap extension for [Apache ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Lines](https://echarts.apache.org/en/option.html#series-lines), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap).
 
-Scatter 散点图: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/scatter_zh_CN.html)
+### Examples
+
+Scatter: [examples/scatter.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/scatter.html)
 
 ![Preview-Scatter](https://user-images.githubusercontent.com/26999792/53300484-e2979680-3882-11e9-8fb4-143c4ca4c416.png)
 
-Heatmap 热力图: [examples/heatmap.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/heatmap_zh_CN.html)
+Heatmap: [examples/heatmap.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/heatmap.html)
 
 ![Preview-Heatmap](https://user-images.githubusercontent.com/26999792/101314208-fadb7880-3892-11eb-902a-8f6f41ffe0fc.png)
 
-Lines 线图: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines_zh_CN.html)
+Lines: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines.html)
 
 ![Preview-Lines](https://user-images.githubusercontent.com/26999792/101313379-fca43c80-3890-11eb-9dea-46230dc432d5.gif)
 
-### 安装
+### Installation
 
 ```shell
 npm install echarts-extension-amap --save
 ```
 
-### 引入
+### Import
 
-可以直接引入打包好的扩展文件和高德地图的 JavaScript API
+Import packaged distribution file `echarts-extension-amap.min.js` and add AMap API script and ECharts script.
 
 ```html
-<!-- 引入高德地图的JavaScript API，这里需要使用你在高德地图开发者平台申请的 ak -->
-<!-- 如果你在使用的是 v1.9.0 之前的旧版本，还需要引入 `AMap.CustomLayer` 插件 -->
+<!-- import JavaScript API of AMap, please replace the ak with your own key and specify the version and plugins you need -->
+<!-- Plugin `AMap.CustomLayer` is required if you are using a version of library less than v1.9.0 -->
 <script src="https://webapi.amap.com/maps?v=1.4.15&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
-<!-- 引入 ECharts -->
+<!-- import ECharts -->
 <script src="/path/to/echarts.min.js"></script>
-<!-- 引入高德地图扩展 -->
+<!-- import echarts-extension-amap -->
 <script src="dist/echarts-extension-amap.min.js"></script>
 ```
 
-如果 `webpack` 等工具打包，也可以通过 `require` 或者 `import` 引入
+You can also import this extension by `require` or `import` if you are using `webpack` or any other bundler.
 
 ```js
-// 使用 require
+// use require
 require('echarts');
 require('echarts-extension-amap');
 
-// 使用 import
+// use import
 import * as echarts from 'echarts';
 import 'echarts-extension-amap';
 ```
 
-> 如需动态引入高德地图 API 脚本，可以使用 [amap-jsapi-loader](https://www.npmjs.com/package/@amap/amap-jsapi-loader) 或自行借助 `Promise` 封装一个动态异步 script 加载器。
+> If importing dynamically the API script is needed, it's suggested to use [amap-jsapi-loader](https://www.npmjs.com/package/@amap/amap-jsapi-loader) or wrap a dynamic and asynchronized script loader manually through `Promise`.
 
-**使用 CDN**
+**Use CDN**
 
 [**jsDelivr**](https://www.jsdelivr.com/)
 
-使用最新版
+Use the latest version
 
 [https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
-使用指定版本
+Use a specific version
 
 [https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.9.2/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.9.2/dist/echarts-extension-amap.min.js)
 
 [**unpkg**](https://unpkg.com/)
 
-使用最新版
+Use the latest version
 
 [https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap/dist/echarts-extension-amap.min.js)
 
-使用指定版本
+Use a specific version
 
 [https://unpkg.com/echarts-extension-amap@1.9.2/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.9.2/dist/echarts-extension-amap.min.js)
 
-插件会自动注册相应的组件。
+This extension will register itself as a component of `echarts` after it is imported.
 
-**Apache ECharts 5 按需引入**
+**Apache ECharts 5 import on diamond**
 
-Apache ECharts 从 v5.0.1 开始提供了[新的按需引入](https://echarts.apache.org/zh/tutorial.html#%E5%9C%A8%E6%89%93%E5%8C%85%E7%8E%AF%E5%A2%83%E4%B8%AD%E4%BD%BF%E7%94%A8%20ECharts)接口，因此也可以按需引入高德地图扩展组件。引入方法如下：
+Apache ECharts has provided us the [new tree-shaking API](https://echarts.apache.org/en/tutorial.html#Use%20ECharts%20with%20bundler%20and%20NPM) since v5.0.1. This is how to use it in this extension:
 
 ```ts
-// 按需引入 scatter、effectScatter 和 高德地图扩展
+// import scatter, effectScatter and amap extension component on demand
 import * as echarts from 'echarts/core';
 import {
   ScatterChart,
@@ -105,16 +107,18 @@ import {
   AMapComponentOption
 } from './export';
 
-// 引入高德地图官方提供的 2.0 类型定义文件
-// 并合并 MapOptions 属性到 AMapComponentOption
+// import the official type definition for AMap 2.0
 import '@amap/amap-jsapi-types'
 
+// compose required options
 type ECOption = echarts.ComposeOption<
   | ScatterSeriesOption
   | EffectScatterSeriesOption
   | TitleComponentOption
+  // unite AMapComponentOption with the initial options of AMap `AMap.MapOptions`
 > & AMapComponentOption<AMap.MapOptions>;
 
+// register renderers, components and charts
 echarts.use([
   CanvasRenderer,
   TooltipComponent,
@@ -123,8 +127,9 @@ echarts.use([
   AMapComponent
 ]);
 
+// define ECharts option
 const option: ECOption = {
-  // 高德地图组件 option
+  // AMap extension option
   amap: {
     // ...
   },
@@ -134,7 +139,7 @@ const option: ECOption = {
   series: [
     {
       type: 'scatter',
-      // 指定坐标系为高德地图
+      // Use AMap coordinate system
       coordinateSystem: 'amap',
       // ...
     }
@@ -143,68 +148,76 @@ const option: ECOption = {
 }
 ```
 
-### 使用
+### Usage
+
+This extension can be configured simply like [geo](https://echarts.apache.org/en/option.html#geo).
 
 ```js
 option = {
-  // 加载 amap 组件
+  // load amap component
   amap: {
-    // 3D模式，无论你使用的是1.x版本还是2.x版本，都建议开启此项以获得更好的渲染体验
+    // enable 3D mode
+    // Note that it's suggested to enable 3D mode to improve echarts rendering.
     viewMode: '3D',
-    // 高德地图支持的初始化地图配置
-    // 高德地图初始中心经纬度
+    // initial options of AMap
+    // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
+    // initial map center [lng, lat]
     center: [108.39, 39.9],
-    // 高德地图初始缩放级别
+    // initial map zoom
     zoom: 4,
-    // 是否开启resize
+    // whether the map and echarts automatically handles browser window resize to update itself.
     resizeEnable: true,
-    // 自定义地图样式主题
+    // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
     mapStyle: 'amap://styles/dark',
-    // 移动过程中实时渲染 默认为true 如数据量较大 建议置为false
+    // whether echarts layer should be rendered when the map is moving. Default is true.
+    // if false, it will only be re-rendered after the map `moveend`.
+    // It's better to set this option to false if data is large.
     renderOnMoving: true,
-    // ECharts 图层的 zIndex 默认 2000
-    // 从 v1.9.0 起 此配置项已被弃用 请使用 `echartsLayerInteractive` 代替
+    // the zIndex of echarts layer for AMap, default value is 2000.
+    // deprecated since v1.9.0, use `echartsLayerInteractive` instead.
     echartsLayerZIndex: 2019,
-    // 设置 ECharts 图层是否可交互 默认为 true
-    // 设置为 false 可实现高德地图自身图层交互
-    // 此配置项从 v1.9.0 起开始支持
+    // whether echarts layer is interactive. Default value is true
+    // supported since v1.9.0
     echartsLayerInteractive: true,
-    // 是否启用大数据模式 默认为 false
-    // 此配置项从 v1.9.0 起开始支持
+    // whether to enable large mode. Default value is false
+    // supported since v1.9.0
     largeMode: false
-    // 说明：如果想要添加卫星、路网等图层
-    // 暂时先不要使用layers配置，因为存在Bug
-    // 建议使用amap.add的方式，使用方式参见最下方代码
+    // Note: Please DO NOT use the initial option `layers` to add Satellite/RoadNet/Other layers now.
+    // There are some bugs about it, we can use `amap.add` instead.
+    // Refer to the codes at the bottom.
+
+    // More initial options...
   },
   series: [
     {
       type: 'scatter',
-      // 使用高德地图坐标系
+      // use `amap` as the coordinate system
       coordinateSystem: 'amap',
-      // 数据格式跟在 geo 坐标系上一样，每一项都是 [经度，纬度，数值大小，其它维度...]
+      // data items [[lng, lat, value], [lng, lat, value], ...]
       data: [[120, 30, 8], [120.1, 30.2, 20]],
       encode: {
+        // encode the third element of data item as the `value` dimension
         value: 2
       }
     }
   ]
 };
 
-// 获取 ECharts 高德地图组件
+// Get AMap extension component
 var amapComponent = chart.getModel().getComponent('amap');
-// 获取高德地图实例，使用高德地图自带的控件(需要在高德地图js API script标签手动引入)
+// Get the instance of AMap
 var amap = amapComponent.getAMap();
-// 添加控件
+// Add some controls provided by AMap.
 amap.addControl(new AMap.Scale());
 amap.addControl(new AMap.ToolBar());
-// 添加图层
+// Add SatelliteLayer and RoadNetLayer to map
 var satelliteLayer = new AMap.TileLayer.Satellite();
 var roadNetLayer = new AMap.TileLayer.RoadNet();
 amap.add([satelliteLayer, roadNetLayer]);
-//  添加一个 Marker
+// Add a marker to map
 amap.add(new AMap.Marker({
   position: [115, 35]
 }));
-// 禁用 ECharts 图层交互，从而使高德地图图层可以点击交互
+// Make the overlay layer of AMap interactive
 amapComponent.setEChartsLayerInteractive(false);
 ```
