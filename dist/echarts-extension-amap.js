@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.9.3
+ * @version 1.9.4
  * @author plainheart
  * 
  * MIT License
@@ -837,7 +837,7 @@
   var AMapView$1 = isV5 ? echarts.ComponentView.extend(AMapView) : AMapView;
 
   var name = "echarts-extension-amap";
-  var version = "1.9.3";
+  var version = "1.9.4";
 
   /**
    * AMap component extension
@@ -863,6 +863,11 @@
     });
   }
 
+  /**
+   * TODO use `echarts/core` rather than `echarts/lib/echarts`
+   * to avoid self-registered `CanvasRnederer` and `DataSetComponent` in Apache ECharts 5
+   * but it's not compatible with echarts v4. Leave it to 2.0.
+   */
   isV5 ? echarts.use(install) : install(echarts);
 
   exports.name = name;
