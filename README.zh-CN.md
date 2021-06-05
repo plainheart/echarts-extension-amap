@@ -70,7 +70,7 @@ import 'echarts-extension-amap';
 
 使用指定版本
 
-[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.9.4/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.9.4/dist/echarts-extension-amap.min.js)
+[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.9.5/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.9.5/dist/echarts-extension-amap.min.js)
 
 [**unpkg**](https://unpkg.com/)
 
@@ -80,7 +80,7 @@ import 'echarts-extension-amap';
 
 使用指定版本
 
-[https://unpkg.com/echarts-extension-amap@1.9.4/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.9.4/dist/echarts-extension-amap.min.js)
+[https://unpkg.com/echarts-extension-amap@1.9.5/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.9.5/dist/echarts-extension-amap.min.js)
 
 插件会自动注册相应的组件。
 
