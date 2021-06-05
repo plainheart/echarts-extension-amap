@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.9.4
+ * @version 1.9.5
  * @author plainheart
  * 
  * MIT License
@@ -834,7 +834,7 @@ var AMapView = {
 var AMapView$1 = isV5 ? ComponentView.extend(AMapView) : AMapView;
 
 var name = "echarts-extension-amap";
-var version = "1.9.4";
+var version = "1.9.5";
 
 /**
  * AMap component extension
