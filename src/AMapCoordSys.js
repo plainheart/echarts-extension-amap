@@ -121,6 +121,7 @@ AMapCoordSys.create = function(ecModel, api) {
       const root = api.getDom()
       const painter = api.getZr().painter
       const viewportRoot = painter.getViewportRoot()
+      viewportRoot.className = 'echarts-layer'
       // PENDING not hidden?
       viewportRoot.style.visibility = 'hidden'
       // Not support IE8
