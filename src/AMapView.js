@@ -1,5 +1,5 @@
 import { ComponentView, getInstanceByDom } from 'echarts/lib/echarts'
-import { isV5 } from './helper'
+import { isV5, isAMap2X, clearLogMap } from './helper'
 import debounce from 'lodash.debounce'
 
 /* global AMap */
@@ -22,13 +22,12 @@ const AMapView = {
     const renderOnMoving = amapModel.get('renderOnMoving')
     const resizeEnable = amapModel.get('resizeEnable')
     const largeMode = amapModel.get('largeMode')
+    const returnMapCameraState = amapModel.get('returnMapCameraState')
 
-    // `AMap.version` only exists in AMap 2.x
-    // For AMap 1.x, it's `AMap.v`
-    const is2X = AMap.version >= 2
-    const is3DMode = amap.getViewMode_() === '3D'
+    const viewMode = amap.getViewMode_()
+    const is3DMode = viewMode === '3D'
 
-    let moveHandler = function() {
+    let moveHandler = function(e) {
       if (rendering) {
         return
       }
@@ -51,14 +50,35 @@ const AMapView = {
 
       coordSys.setMapOffset(amapModel.__mapOffset = mapOffset)
 
-      api.dispatchAction({
+      const actionParams = {
         type: 'amapRoam',
         animation: {
           // compatible with ECharts 5.x
           // no delay for rendering but remain animation of elements
           duration: 0
         }
-      })
+      }
+
+      if (returnMapCameraState) {
+        let center = e.center
+        if (!center) {
+          // normalize center LngLat to Array
+          center = amap.getCenter()
+          center = [center.lng, center.lat]
+        }
+        actionParams.camera = {
+          viewMode,
+          center,
+          zoom: e.zoom || amap.getZoom(),
+          rotation: e.rotation == null ? amap.getRotation() : e.rotation,
+          pitch: e.pitch == null ? amap.getPitch() : e.pitch,
+          yaw: e.yaw,
+          scale: amap.getScale(),
+          bounds: amap.getBounds()
+        }
+      }
+
+      api.dispatchAction(actionParams)
     }
 
     amap.off('mapmove', this._moveHandler)
@@ -80,7 +100,7 @@ const AMapView = {
 
     amap.on(
       renderOnMoving
-        ? (is2X
+        ? (isAMap2X
           ? 'viewchange'
           : is3DMode
             ? 'camerachange'
@@ -88,12 +108,12 @@ const AMapView = {
         : 'moveend',
       // FIXME: bad performance in 1.x in the cases with large data, use debounce?
       // moveHandler
-      (!is2X && largeMode) ? (moveHandler = debounce(moveHandler, 20)) : moveHandler
+      (!isAMap2X && largeMode) ? (moveHandler = debounce(moveHandler, 20)) : moveHandler
     )
 
     this._moveHandler = moveHandler
 
-    if (renderOnMoving && !(is2X && is3DMode)) {
+    if (renderOnMoving && !(isAMap2X && is3DMode)) {
       // need to listen to zoom if 1.x & 2D mode
       // FIXME: unnecessary `mapmove` event triggered when zooming
       amap.on('zoom', moveHandler)
@@ -109,7 +129,7 @@ const AMapView = {
         ;(!e || e.type !== 'moveend') && moveHandler()
         setTimeout(function() {
           amapModel.setEChartsLayerVisiblity(true)
-        }, is2X || !largeMode ? 0 : 20)
+        }, isAMap2X || !largeMode ? 0 : 20)
       }
       amap.on('moveend', moveEndHandler)
       amap.on('zoomend', moveEndHandler)
@@ -132,7 +152,7 @@ const AMapView = {
       let resizeHandler = function() {
         getInstanceByDom(api.getDom()).resize()
       }
-      if (!is2X && largeMode) {
+      if (!isAMap2X && largeMode) {
         resizeHandler = debounce(resizeHandler, 20)
       }
       amap.on('resize', this._resizeHandler = resizeHandler)
@@ -142,6 +162,7 @@ const AMapView = {
   },
 
   dispose(ecModel) {
+    clearLogMap()
     const component = ecModel.getComponent('amap')
     if (component) {
       component.getAMap().destroy()

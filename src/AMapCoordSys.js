@@ -1,6 +1,7 @@
 /* global AMap */
 
 import { util as zrUtil, graphic, matrix } from 'echarts/lib/echarts'
+import { logWarn } from './helper'
 
 function dataToCoordSize(dataSize, dataItem) {
   dataItem = dataItem || [0, 0];
@@ -28,6 +29,7 @@ const excludedOptions = [
   'echartsLayerInteractive',
   'renderOnMoving',
   'largeMode',
+  'returnMapCameraState',
   'layers'
 ]
 
@@ -140,7 +142,7 @@ AMapCoordSys.create = function(ecModel, api) {
 
       const options = zrUtil.clone(amapModel.get())
       if ('echartsLayerZIndex' in options) {
-        console.warn('[ECharts][Extension][AMap] DEPRECATED: the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerInteractive` instead.')
+        logWarn('DEPRECATED', 'the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerInteractive` instead.')
       }
       // delete excluded options
       zrUtil.each(excludedOptions, function(key) {
@@ -148,7 +150,23 @@ AMapCoordSys.create = function(ecModel, api) {
       })
 
       amap = new AMap.Map(amapRoot, options)
-      amapModel.setAMap(amap)
+
+      // PENDING: should update the model option when the user call map.setXXX?
+
+      // const nativeSetMapStyle = amap.setMapStyle
+      // const nativeSetLang = amap.setLang
+
+      // // PENDING
+      // amap.setMapStyle = function () {
+      //   nativeSetMapStyle.apply(this, arguments)
+      //   amapModel.__mapStyle = amap.getMapStyle()
+      // }
+
+      // // PENDING
+      // nativeSetLang && (amap.setLang = function() {
+      //   nativeSetLang.apply(this, arguments)
+      //   amapModel.__mapLang = amap.getLang()
+      // })
 
       // use `complete` callback to avoid NPE when first load amap
       amap.on('complete', function() {
@@ -157,7 +175,9 @@ AMapCoordSys.create = function(ecModel, api) {
         viewportRoot.style.visibility = ''
       })
 
+      amapModel.setAMap(amap)
       amapModel.setEChartsLayer(viewportRoot)
+      amapModel.__api = api
 
       // Override
       painter.getViewportRootOffset = function() {
@@ -189,8 +209,7 @@ AMapCoordSys.create = function(ecModel, api) {
     const originalMapStyle = amapModel.__mapStyle
     const newMapStyle = amapModel.get('mapStyle')
     if (originalMapStyle !== newMapStyle) {
-      amap.setMapStyle(newMapStyle)
-      amapModel.__mapStyle = newMapStyle
+      amap.setMapStyle(amapModel.__mapStyle = newMapStyle)
     }
 
     // update map lang
@@ -199,9 +218,11 @@ AMapCoordSys.create = function(ecModel, api) {
       const originalMapLang = amapModel.__mapLang
       const newMapLang = amapModel.get('lang')
       if (originalMapLang !== newMapLang) {
-        amap.setLang(newMapLang)
-        amapModel.__mapLang = newMapLang
+        amap.setLang(amapModel.__mapLang = newMapLang)
       }
+    }
+    else {
+      logWarn('CAVEAT', 'The current map doesn\'t support `setLang` API!', true)
     }
 
     amapCoordSys = new AMapCoordSys(amap, api)
