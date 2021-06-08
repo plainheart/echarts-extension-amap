@@ -22,21 +22,16 @@ export function clearLogMap() {
   logMap = {}
 }
 
-let canvasGetContextOverriden = false
-
 export const nativeCanvasGetContext = HTMLCanvasElement.prototype.getContext
 
 // FIXME not override?
-export function overrideCanvasGetContext(recover) {
-  HTMLCanvasElement.prototype.getContext = recover
-    ? nativeCanvasGetContext
-    : function(ctx, opts) {
-        opts = opts || {}
-        // make webgl canvas can use `toDataURL` API
-        opts.preserveDrawingBuffer = true
-        return nativeCanvasGetContext.call(this, ctx, opts)
-      }
-  canvasGetContextOverriden = !recover
+export function overrideCanvasGetContext() {
+  HTMLCanvasElement.prototype.getContext = function(ctx, opts) {
+    opts = opts || {}
+    // make webgl canvas can use `toDataURL` API
+    opts.preserveDrawingBuffer = true
+    return nativeCanvasGetContext.call(this, ctx, opts)
+  }
 }
 
 export function getScreenshot(chartInstance, amapInstance, opts) {

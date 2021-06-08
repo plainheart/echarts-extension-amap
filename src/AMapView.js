@@ -72,7 +72,6 @@ const AMapView = {
           zoom: e.zoom || amap.getZoom(),
           rotation: e.rotation == null ? amap.getRotation() : e.rotation,
           pitch: e.pitch == null ? amap.getPitch() : e.pitch,
-          yaw: e.yaw,
           scale: amap.getScale(),
           bounds: amap.getBounds()
         }
