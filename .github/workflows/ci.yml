@@ -35,5 +35,5 @@ jobs:
       - name: Intsall dependencies
         run: npm ci
 
-      - name: Build release
-        run: npm run release
+      - name: Build from source
+        run: npm run build
