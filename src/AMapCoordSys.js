@@ -177,7 +177,6 @@ AMapCoordSys.create = function(ecModel, api) {
 
       amapModel.setAMap(amap)
       amapModel.setEChartsLayer(viewportRoot)
-      amapModel.__api = api
 
       // Override
       painter.getViewportRootOffset = function() {
