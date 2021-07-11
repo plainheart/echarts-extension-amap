@@ -55,8 +55,5 @@
     "chalk": "^4.1.0",
     "rollup": "^2.39.1",
     "rollup-plugin-terser": "^7.0.2"
-  },
-  "dependencies": {
-    "lodash.debounce": "^4.0.8"
   }
 }

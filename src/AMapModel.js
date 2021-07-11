@@ -50,7 +50,9 @@ const AMapModel = {
     // echartsLayerZIndex: 2000, // DEPRECATED since v1.9.0
     echartsLayerInteractive: true,
     renderOnMoving: true,
-    largeMode: false
+    largeMode: false,
+    // since v1.10.0
+    returnMapCameraState: false
   }
 }
 
