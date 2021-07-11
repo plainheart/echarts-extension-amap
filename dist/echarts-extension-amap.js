@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.9.5
+ * @version 1.10.0
  * @author plainheart
  * 
  * MIT License
@@ -32,6 +32,23 @@
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.echarts = global.echarts || {}, global.echarts.amap = {}), global.echarts));
 }(this, (function (exports, echarts) { 'use strict';
 
+  var isV5 = echarts.version.split('.')[0] > 4; // `AMap.version` only exists in AMap 2.x
+  // For AMap 1.x, it's `AMap.v`
+
+  var isAMap2X = AMap.version >= 2;
+  function v2Equal(a, b) {
+    return a && b && a[0] === b[0] && a[1] === b[1];
+  }
+  var logMap = {};
+  function logWarn(tag, msg, once) {
+    var log = "[ECharts][Extension][AMap]".concat(tag ? ' ' + tag + ':' : '', " ").concat(msg);
+    once && logMap[log] || console.warn(log);
+    once && (logMap[log] = true);
+  }
+  function clearLogMap() {
+    logMap = {};
+  }
+
   /* global AMap */
 
   function dataToCoordSize(dataSize, dataItem) {
@@ -50,7 +67,7 @@
 
 
   var excludedOptions = ['echartsLayerZIndex', // DEPRECATED since v1.9.0
-  'echartsLayerInteractive', 'renderOnMoving', 'largeMode', 'layers'];
+  'echartsLayerInteractive', 'renderOnMoving', 'largeMode', 'returnMapCameraState', 'layers'];
 
   function AMapCoordSys(amap, api) {
     this._amap = amap;
@@ -142,7 +159,8 @@
       if (!amap) {
         var root = api.getDom();
         var painter = api.getZr().painter;
-        var viewportRoot = painter.getViewportRoot(); // PENDING not hidden?
+        var viewportRoot = painter.getViewportRoot();
+        viewportRoot.className = 'amap-ec-layer'; // PENDING not hidden?
 
         viewportRoot.style.visibility = 'hidden'; // Not support IE8
 
@@ -163,21 +181,34 @@
         var options = echarts.util.clone(amapModel.get());
 
         if ('echartsLayerZIndex' in options) {
-          console.warn('[ECharts][Extension][AMap] DEPRECATED: the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerInteractive` instead.');
+          logWarn('DEPRECATED', 'the option `echartsLayerZIndex` has been removed since v1.9.0, use `echartsLayerInteractive` instead.');
         } // delete excluded options
 
 
         echarts.util.each(excludedOptions, function (key) {
           delete options[key];
         });
-        amap = new AMap.Map(amapRoot, options);
-        amapModel.setAMap(amap); // use `complete` callback to avoid NPE when first load amap
+        amap = new AMap.Map(amapRoot, options); // PENDING: should update the model option when the user call map.setXXX?
+        // const nativeSetMapStyle = amap.setMapStyle
+        // const nativeSetLang = amap.setLang
+        // // PENDING
+        // amap.setMapStyle = function () {
+        //   nativeSetMapStyle.apply(this, arguments)
+        //   amapModel.__mapStyle = amap.getMapStyle()
+        // }
+        // // PENDING
+        // nativeSetLang && (amap.setLang = function() {
+        //   nativeSetLang.apply(this, arguments)
+        //   amapModel.__mapLang = amap.getLang()
+        // })
+        // use `complete` callback to avoid NPE when first load amap
 
         amap.on('complete', function () {
           amapRoot.querySelector('.amap-maps').appendChild(viewportRoot); // PENDING
 
           viewportRoot.style.visibility = '';
         });
+        amapModel.setAMap(amap);
         amapModel.setEChartsLayer(viewportRoot); // Override
 
         painter.getViewportRootOffset = function () {
@@ -213,8 +244,7 @@
       var newMapStyle = amapModel.get('mapStyle');
 
       if (originalMapStyle !== newMapStyle) {
-        amap.setMapStyle(newMapStyle);
-        amapModel.__mapStyle = newMapStyle;
+        amap.setMapStyle(amapModel.__mapStyle = newMapStyle);
       } // update map lang
       // PENDING: AMap 2.x does not support `setLang` yet
 
@@ -224,9 +254,10 @@
         var newMapLang = amapModel.get('lang');
 
         if (originalMapLang !== newMapLang) {
-          amap.setLang(newMapLang);
-          amapModel.__mapLang = newMapLang;
+          amap.setLang(amapModel.__mapLang = newMapLang);
         }
+      } else {
+        logWarn('CAVEAT', 'The current map doesn\'t support `setLang` API!', true);
       }
 
       amapCoordSys = new AMapCoordSys(amap, api);
@@ -243,11 +274,6 @@
   };
 
   AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat'];
-
-  var isV5 = echarts.version.split('.')[0] > 4;
-  function v2Equal(a, b) {
-    return a && b && a[0] === b[0] && a[1] === b[1];
-  }
 
   var AMapModel = {
     type: 'amap',
@@ -288,401 +314,12 @@
       // echartsLayerZIndex: 2000, // DEPRECATED since v1.9.0
       echartsLayerInteractive: true,
       renderOnMoving: true,
-      largeMode: false
+      largeMode: false,
+      // since v1.10.0
+      returnMapCameraState: false
     }
   };
   var AMapModel$1 = isV5 ? echarts.ComponentModel.extend(AMapModel) : AMapModel;
-
-  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-  /**
-   * lodash (Custom Build) <https://lodash.com/>
-   * Build: `lodash modularize exports="npm" -o ./`
-   * Copyright jQuery Foundation and other contributors <https://jquery.org/>
-   * Released under MIT license <https://lodash.com/license>
-   * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
-   * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-   */
-
-  /** Used as the `TypeError` message for "Functions" methods. */
-
-  var FUNC_ERROR_TEXT = 'Expected a function';
-  /** Used as references for various `Number` constants. */
-
-  var NAN = 0 / 0;
-  /** `Object#toString` result references. */
-
-  var symbolTag = '[object Symbol]';
-  /** Used to match leading and trailing whitespace. */
-
-  var reTrim = /^\s+|\s+$/g;
-  /** Used to detect bad signed hexadecimal string values. */
-
-  var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-  /** Used to detect binary string values. */
-
-  var reIsBinary = /^0b[01]+$/i;
-  /** Used to detect octal string values. */
-
-  var reIsOctal = /^0o[0-7]+$/i;
-  /** Built-in method references without a dependency on `root`. */
-
-  var freeParseInt = parseInt;
-  /** Detect free variable `global` from Node.js. */
-
-  var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
-  /** Detect free variable `self`. */
-
-  var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-  /** Used as a reference to the global object. */
-
-  var root = freeGlobal || freeSelf || Function('return this')();
-  /** Used for built-in method references. */
-
-  var objectProto = Object.prototype;
-  /**
-   * Used to resolve the
-   * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
-   * of values.
-   */
-
-  var objectToString = objectProto.toString;
-  /* Built-in method references for those with the same name as other `lodash` methods. */
-
-  var nativeMax = Math.max,
-      nativeMin = Math.min;
-  /**
-   * Gets the timestamp of the number of milliseconds that have elapsed since
-   * the Unix epoch (1 January 1970 00:00:00 UTC).
-   *
-   * @static
-   * @memberOf _
-   * @since 2.4.0
-   * @category Date
-   * @returns {number} Returns the timestamp.
-   * @example
-   *
-   * _.defer(function(stamp) {
-   *   console.log(_.now() - stamp);
-   * }, _.now());
-   * // => Logs the number of milliseconds it took for the deferred invocation.
-   */
-
-  var now = function () {
-    return root.Date.now();
-  };
-  /**
-   * Creates a debounced function that delays invoking `func` until after `wait`
-   * milliseconds have elapsed since the last time the debounced function was
-   * invoked. The debounced function comes with a `cancel` method to cancel
-   * delayed `func` invocations and a `flush` method to immediately invoke them.
-   * Provide `options` to indicate whether `func` should be invoked on the
-   * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
-   * with the last arguments provided to the debounced function. Subsequent
-   * calls to the debounced function return the result of the last `func`
-   * invocation.
-   *
-   * **Note:** If `leading` and `trailing` options are `true`, `func` is
-   * invoked on the trailing edge of the timeout only if the debounced function
-   * is invoked more than once during the `wait` timeout.
-   *
-   * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-   * until to the next tick, similar to `setTimeout` with a timeout of `0`.
-   *
-   * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-   * for details over the differences between `_.debounce` and `_.throttle`.
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Function
-   * @param {Function} func The function to debounce.
-   * @param {number} [wait=0] The number of milliseconds to delay.
-   * @param {Object} [options={}] The options object.
-   * @param {boolean} [options.leading=false]
-   *  Specify invoking on the leading edge of the timeout.
-   * @param {number} [options.maxWait]
-   *  The maximum time `func` is allowed to be delayed before it's invoked.
-   * @param {boolean} [options.trailing=true]
-   *  Specify invoking on the trailing edge of the timeout.
-   * @returns {Function} Returns the new debounced function.
-   * @example
-   *
-   * // Avoid costly calculations while the window size is in flux.
-   * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
-   *
-   * // Invoke `sendMail` when clicked, debouncing subsequent calls.
-   * jQuery(element).on('click', _.debounce(sendMail, 300, {
-   *   'leading': true,
-   *   'trailing': false
-   * }));
-   *
-   * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
-   * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
-   * var source = new EventSource('/stream');
-   * jQuery(source).on('message', debounced);
-   *
-   * // Cancel the trailing debounced invocation.
-   * jQuery(window).on('popstate', debounced.cancel);
-   */
-
-
-  function debounce(func, wait, options) {
-    var lastArgs,
-        lastThis,
-        maxWait,
-        result,
-        timerId,
-        lastCallTime,
-        lastInvokeTime = 0,
-        leading = false,
-        maxing = false,
-        trailing = true;
-
-    if (typeof func != 'function') {
-      throw new TypeError(FUNC_ERROR_TEXT);
-    }
-
-    wait = toNumber(wait) || 0;
-
-    if (isObject(options)) {
-      leading = !!options.leading;
-      maxing = 'maxWait' in options;
-      maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-      trailing = 'trailing' in options ? !!options.trailing : trailing;
-    }
-
-    function invokeFunc(time) {
-      var args = lastArgs,
-          thisArg = lastThis;
-      lastArgs = lastThis = undefined;
-      lastInvokeTime = time;
-      result = func.apply(thisArg, args);
-      return result;
-    }
-
-    function leadingEdge(time) {
-      // Reset any `maxWait` timer.
-      lastInvokeTime = time; // Start the timer for the trailing edge.
-
-      timerId = setTimeout(timerExpired, wait); // Invoke the leading edge.
-
-      return leading ? invokeFunc(time) : result;
-    }
-
-    function remainingWait(time) {
-      var timeSinceLastCall = time - lastCallTime,
-          timeSinceLastInvoke = time - lastInvokeTime,
-          result = wait - timeSinceLastCall;
-      return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
-    }
-
-    function shouldInvoke(time) {
-      var timeSinceLastCall = time - lastCallTime,
-          timeSinceLastInvoke = time - lastInvokeTime; // Either this is the first call, activity has stopped and we're at the
-      // trailing edge, the system time has gone backwards and we're treating
-      // it as the trailing edge, or we've hit the `maxWait` limit.
-
-      return lastCallTime === undefined || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
-    }
-
-    function timerExpired() {
-      var time = now();
-
-      if (shouldInvoke(time)) {
-        return trailingEdge(time);
-      } // Restart the timer.
-
-
-      timerId = setTimeout(timerExpired, remainingWait(time));
-    }
-
-    function trailingEdge(time) {
-      timerId = undefined; // Only invoke if we have `lastArgs` which means `func` has been
-      // debounced at least once.
-
-      if (trailing && lastArgs) {
-        return invokeFunc(time);
-      }
-
-      lastArgs = lastThis = undefined;
-      return result;
-    }
-
-    function cancel() {
-      if (timerId !== undefined) {
-        clearTimeout(timerId);
-      }
-
-      lastInvokeTime = 0;
-      lastArgs = lastCallTime = lastThis = timerId = undefined;
-    }
-
-    function flush() {
-      return timerId === undefined ? result : trailingEdge(now());
-    }
-
-    function debounced() {
-      var time = now(),
-          isInvoking = shouldInvoke(time);
-      lastArgs = arguments;
-      lastThis = this;
-      lastCallTime = time;
-
-      if (isInvoking) {
-        if (timerId === undefined) {
-          return leadingEdge(lastCallTime);
-        }
-
-        if (maxing) {
-          // Handle invocations in a tight loop.
-          timerId = setTimeout(timerExpired, wait);
-          return invokeFunc(lastCallTime);
-        }
-      }
-
-      if (timerId === undefined) {
-        timerId = setTimeout(timerExpired, wait);
-      }
-
-      return result;
-    }
-
-    debounced.cancel = cancel;
-    debounced.flush = flush;
-    return debounced;
-  }
-  /**
-   * Checks if `value` is the
-   * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
-   * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
-   *
-   * @static
-   * @memberOf _
-   * @since 0.1.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is an object, else `false`.
-   * @example
-   *
-   * _.isObject({});
-   * // => true
-   *
-   * _.isObject([1, 2, 3]);
-   * // => true
-   *
-   * _.isObject(_.noop);
-   * // => true
-   *
-   * _.isObject(null);
-   * // => false
-   */
-
-
-  function isObject(value) {
-    var type = typeof value;
-    return !!value && (type == 'object' || type == 'function');
-  }
-  /**
-   * Checks if `value` is object-like. A value is object-like if it's not `null`
-   * and has a `typeof` result of "object".
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
-   * @example
-   *
-   * _.isObjectLike({});
-   * // => true
-   *
-   * _.isObjectLike([1, 2, 3]);
-   * // => true
-   *
-   * _.isObjectLike(_.noop);
-   * // => false
-   *
-   * _.isObjectLike(null);
-   * // => false
-   */
-
-
-  function isObjectLike(value) {
-    return !!value && typeof value == 'object';
-  }
-  /**
-   * Checks if `value` is classified as a `Symbol` primitive or object.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
-   * @example
-   *
-   * _.isSymbol(Symbol.iterator);
-   * // => true
-   *
-   * _.isSymbol('abc');
-   * // => false
-   */
-
-
-  function isSymbol(value) {
-    return typeof value == 'symbol' || isObjectLike(value) && objectToString.call(value) == symbolTag;
-  }
-  /**
-   * Converts `value` to a number.
-   *
-   * @static
-   * @memberOf _
-   * @since 4.0.0
-   * @category Lang
-   * @param {*} value The value to process.
-   * @returns {number} Returns the number.
-   * @example
-   *
-   * _.toNumber(3.2);
-   * // => 3.2
-   *
-   * _.toNumber(Number.MIN_VALUE);
-   * // => 5e-324
-   *
-   * _.toNumber(Infinity);
-   * // => Infinity
-   *
-   * _.toNumber('3.2');
-   * // => 3.2
-   */
-
-
-  function toNumber(value) {
-    if (typeof value == 'number') {
-      return value;
-    }
-
-    if (isSymbol(value)) {
-      return NAN;
-    }
-
-    if (isObject(value)) {
-      var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-      value = isObject(other) ? other + '' : other;
-    }
-
-    if (typeof value != 'string') {
-      return value === 0 ? value : +value;
-    }
-
-    value = value.replace(reTrim, '');
-    var isBinary = reIsBinary.test(value);
-    return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
-  }
-
-  var lodash_debounce = debounce;
 
   /* global AMap */
 
@@ -699,13 +336,12 @@
       var coordSys = amapModel.coordinateSystem;
       var renderOnMoving = amapModel.get('renderOnMoving');
       var resizeEnable = amapModel.get('resizeEnable');
-      var largeMode = amapModel.get('largeMode'); // `AMap.version` only exists in AMap 2.x
-      // For AMap 1.x, it's `AMap.v`
+      var largeMode = amapModel.get('largeMode');
+      var returnMapCameraState = amapModel.get('returnMapCameraState');
+      var viewMode = amap.getViewMode_();
+      var is3DMode = viewMode === '3D';
 
-      var is2X = AMap.version >= 2;
-      var is3DMode = amap.getViewMode_() === '3D';
-
-      var moveHandler = function moveHandler() {
+      var moveHandler = function moveHandler(e) {
         if (rendering) {
           return;
         }
@@ -726,14 +362,37 @@
         }
 
         coordSys.setMapOffset(amapModel.__mapOffset = mapOffset);
-        api.dispatchAction({
+        var actionParams = {
           type: 'amapRoam',
           animation: {
             // compatible with ECharts 5.x
             // no delay for rendering but remain animation of elements
             duration: 0
           }
-        });
+        };
+
+        if (returnMapCameraState) {
+          e = e || {};
+          var center = e.center;
+
+          if (!center) {
+            // normalize center LngLat to Array
+            center = amap.getCenter();
+            center = [center.lng, center.lat];
+          }
+
+          actionParams.camera = {
+            viewMode: viewMode,
+            center: center,
+            zoom: e.zoom || amap.getZoom(),
+            rotation: e.rotation == null ? amap.getRotation() : e.rotation,
+            pitch: e.pitch == null ? amap.getPitch() : e.pitch,
+            scale: amap.getScale(),
+            bounds: amap.getBounds()
+          };
+        }
+
+        api.dispatchAction(actionParams);
       };
 
       amap.off('mapmove', this._moveHandler);
@@ -755,12 +414,12 @@
         amap.off('zoomend', this._moveEndHandler);
       }
 
-      amap.on(renderOnMoving ? is2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove' : 'moveend', // FIXME: bad performance in 1.x in the cases with large data, use debounce?
+      amap.on(renderOnMoving ? isAMap2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove' : 'moveend', // FIXME: bad performance in 1.x in the cases with large data, use debounce?
       // moveHandler
-      !is2X && largeMode ? moveHandler = lodash_debounce(moveHandler, 20) : moveHandler);
+      !isAMap2X && largeMode ? moveHandler = echarts.throttle(moveHandler, 20, true) : moveHandler);
       this._moveHandler = moveHandler;
 
-      if (renderOnMoving && !(is2X && is3DMode)) {
+      if (renderOnMoving && !(isAMap2X && is3DMode)) {
         // need to listen to zoom if 1.x & 2D mode
         // FIXME: unnecessary `mapmove` event triggered when zooming
         amap.on('zoom', moveHandler);
@@ -774,10 +433,10 @@
         });
 
         var moveEndHandler = this._moveEndHandler = function (e) {
-          (!e || e.type !== 'moveend') && moveHandler();
+          (!e || e.type !== 'moveend') && moveHandler(e);
           setTimeout(function () {
             amapModel.setEChartsLayerVisiblity(true);
-          }, is2X || !largeMode ? 0 : 20);
+          }, isAMap2X || !largeMode ? 0 : 20);
         };
 
         amap.on('moveend', moveEndHandler);
@@ -805,8 +464,8 @@
           echarts.getInstanceByDom(api.getDom()).resize();
         };
 
-        if (!is2X && largeMode) {
-          resizeHandler = lodash_debounce(resizeHandler, 20);
+        if (!isAMap2X && largeMode) {
+          resizeHandler = echarts.throttle(resizeHandler, 20, true);
         }
 
         amap.on('resize', this._resizeHandler = resizeHandler);
@@ -815,6 +474,7 @@
       this._isFirstRender = rendering = false;
     },
     dispose: function dispose(ecModel) {
+      clearLogMap();
       var component = ecModel.getComponent('amap');
 
       if (component) {
@@ -837,7 +497,7 @@
   var AMapView$1 = isV5 ? echarts.ComponentView.extend(AMapView) : AMapView;
 
   var name = "echarts-extension-amap";
-  var version = "1.9.5";
+  var version = "1.10.0";
 
   /**
    * AMap component extension
@@ -865,7 +525,7 @@
 
   /**
    * TODO use `echarts/core` rather than `echarts/lib/echarts`
-   * to avoid self-registered `CanvasRnederer` and `DataSetComponent` in Apache ECharts 5
+   * to avoid self-registered `CanvasRenderer` and `DataSetComponent` in Apache ECharts 5
    * but it's not compatible with echarts v4. Leave it to 2.0.
    */
   isV5 ? echarts.use(install) : install(echarts);
