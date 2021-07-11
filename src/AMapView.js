@@ -1,6 +1,5 @@
-import { ComponentView, getInstanceByDom } from 'echarts/lib/echarts'
+import { ComponentView, getInstanceByDom, throttle } from 'echarts/lib/echarts'
 import { isV5, isAMap2X, clearLogMap } from './helper'
-import debounce from 'lodash.debounce'
 
 /* global AMap */
 
@@ -107,7 +106,7 @@ const AMapView = {
         : 'moveend',
       // FIXME: bad performance in 1.x in the cases with large data, use debounce?
       // moveHandler
-      (!isAMap2X && largeMode) ? (moveHandler = debounce(moveHandler, 20)) : moveHandler
+      (!isAMap2X && largeMode) ? (moveHandler = throttle(moveHandler, 20, true)) : moveHandler
     )
 
     this._moveHandler = moveHandler
@@ -152,7 +151,7 @@ const AMapView = {
         getInstanceByDom(api.getDom()).resize()
       }
       if (!isAMap2X && largeMode) {
-        resizeHandler = debounce(resizeHandler, 20)
+        resizeHandler = throttle(resizeHandler, 20, true)
       }
       amap.on('resize', this._resizeHandler = resizeHandler)
     }
