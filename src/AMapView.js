@@ -59,6 +59,7 @@ const AMapView = {
       }
 
       if (returnMapCameraState) {
+        e = e || {}
         let center = e.center
         if (!center) {
           // normalize center LngLat to Array
@@ -124,7 +125,7 @@ const AMapView = {
         }, 0)
       })
       const moveEndHandler = this._moveEndHandler = function(e) {
-        ;(!e || e.type !== 'moveend') && moveHandler()
+        ;(!e || e.type !== 'moveend') && moveHandler(e)
         setTimeout(function() {
           amapModel.setEChartsLayerVisiblity(true)
         }, isAMap2X || !largeMode ? 0 : 20)
