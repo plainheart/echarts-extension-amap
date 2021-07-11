@@ -2,6 +2,7 @@ name: Build CI
 
 on:
   workflow_dispatch:
+  push:
   pull_request:
     types: [opened, synchronize]
 
