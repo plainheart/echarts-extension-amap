@@ -1,5 +1,5 @@
 import { ComponentModel } from 'echarts/lib/echarts'
-import { isV5, v2Equal, dispatchEvent, on, off, oldIE } from './helper'
+import { isV5, v2Equal, dispatchEvent, on, off, watchStyle, unwatchStyle } from './helper'
 
 const AMapModel = {
   type: 'amap',
@@ -29,32 +29,21 @@ const AMapModel = {
     this.option.echartsLayerInteractive = !!interactive
     const echartsLayer = this.__echartsLayer
     echartsLayer.style.pointerEvents = interactive ? 'auto' : 'none'
-    const mapContainer = this.__amap.getContainer()
+    const map = this.__amap
+    const mapContainer = map.getContainer()
     const handler = mapContainer.__evtHandler
-    const pteHandler = echartsLayer.__pteHandler
     const evts = 'mousemove mousedown mouseup click dblclick mousewheel mouseout contextmenu mouseleave mouseenter mouseover'
-    console.log('oldIE', oldIE, 'pteHandler', pteHandler)
-    if (oldIE) {
-      pteHandler || on(document, evts, echartsLayer.__pteHandler = function(e) {
-        console.log(e)
-        let target = e.target
-        if (target.parentElement && target.parentElement === echartsLayer) {
-          const style = echartsLayer.style
-          const originalDisplay = style.display
-          style.display = 'none'
-          target = document.elementFromPoint(e.clientX, e.clientY)
-          style.display = originalDisplay || ''
-          dispatchEvent(target, e)
-        }
-      })
-    }
     if (interactive) {
       handler || on(mapContainer, evts, mapContainer.__evtHandler = function(e) {
         dispatchEvent(echartsLayer, e)
       })
+      watchStyle(echartsLayer, function(newStyle) {
+        map.setDefaultCursor(newStyle.cursor === 'default' ? '' : newStyle.cursor)
+      })
     }
     else {
       handler && off(mapContainer, evts, handler)
+      unwatchStyle(echartsLayer)
     }
   },
 
