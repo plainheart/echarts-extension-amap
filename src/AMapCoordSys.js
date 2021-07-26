@@ -118,8 +118,12 @@ AMapCoordSys.create = function(ecModel, api) {
       throw new Error('Only one amap component can exist')
     }
     let amap = amapModel.getAMap()
-    const echartsLayerInteractive = amapModel.get('echartsLayerInteractive')
     if (!amap) {
+      const styleEl = document.createElement('style')
+      styleEl.type = 'text/css'
+      styleEl.innerText = '.amap-ec-layer{pointer-events:none!important}'
+      document.head.appendChild(styleEl)
+
       const root = api.getDom()
       const painter = api.getZr().painter
       const viewportRoot = painter.getViewportRoot()
@@ -131,7 +135,7 @@ AMapCoordSys.create = function(ecModel, api) {
       if (amapRoot) {
         // Reset viewport left and top, which will be changed
         // in moving handler in AMapView
-        viewportRoot.style.left = '0px'
+        viewportRoot.style.left =
         viewportRoot.style.top = '0px'
         root.removeChild(amapRoot)
       }
@@ -170,7 +174,12 @@ AMapCoordSys.create = function(ecModel, api) {
 
       // use `complete` callback to avoid NPE when first load amap
       amap.on('complete', function() {
-        amapRoot.querySelector('.amap-maps').appendChild(viewportRoot)
+        const amapMaps = amapRoot.querySelector('.amap-maps')
+        // move DOM
+        const tooltipDOM = viewportRoot.nextElementSibling
+        amapMaps.appendChild(viewportRoot)
+        // PENDING seems unnecessary
+        tooltipDOM && tooltipDOM.domBelongToZr && amapMaps.appendChild(tooltipDOM)
         // PENDING
         viewportRoot.style.visibility = ''
       })
@@ -184,6 +193,7 @@ AMapCoordSys.create = function(ecModel, api) {
       }
     }
 
+    const echartsLayerInteractive = amapModel.get('echartsLayerInteractive')
     const oldEChartsLayerInteractive = amapModel.__echartsLayerInteractive
     if (oldEChartsLayerInteractive !== echartsLayerInteractive) {
       amapModel.setEChartsLayerInteractive(echartsLayerInteractive)

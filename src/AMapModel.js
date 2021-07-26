@@ -1,5 +1,5 @@
 import { ComponentModel } from 'echarts/lib/echarts'
-import { isV5, v2Equal } from './helper'
+import { isV5, v2Equal, dispatchEvent, on, off, oldIE } from './helper'
 
 const AMapModel = {
   type: 'amap',
@@ -27,7 +27,35 @@ const AMapModel = {
   // FIXME: NOT SUPPORT <= IE 10
   setEChartsLayerInteractive(interactive) {
     this.option.echartsLayerInteractive = !!interactive
-    this.__echartsLayer.style.pointerEvents = interactive ? 'auto' : 'none'
+    const echartsLayer = this.__echartsLayer
+    echartsLayer.style.pointerEvents = interactive ? 'auto' : 'none'
+    const mapContainer = this.__amap.getContainer()
+    const handler = mapContainer.__evtHandler
+    const pteHandler = echartsLayer.__pteHandler
+    const evts = 'mousemove mousedown mouseup click dblclick mousewheel mouseout contextmenu mouseleave mouseenter mouseover'
+    console.log('oldIE', oldIE, 'pteHandler', pteHandler)
+    if (oldIE) {
+      pteHandler || on(document, evts, echartsLayer.__pteHandler = function(e) {
+        console.log(e)
+        let target = e.target
+        if (target.parentElement && target.parentElement === echartsLayer) {
+          const style = echartsLayer.style
+          const originalDisplay = style.display
+          style.display = 'none'
+          target = document.elementFromPoint(e.clientX, e.clientY)
+          style.display = originalDisplay || ''
+          dispatchEvent(target, e)
+        }
+      })
+    }
+    if (interactive) {
+      handler || on(mapContainer, evts, mapContainer.__evtHandler = function(e) {
+        dispatchEvent(echartsLayer, e)
+      })
+    }
+    else {
+      handler && off(mapContainer, evts, handler)
+    }
   },
 
   setCenterAndZoom(center, zoom) {
