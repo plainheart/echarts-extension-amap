@@ -193,11 +193,15 @@ AMapCoordSys.create = function(ecModel, api) {
       }
     }
 
-    const echartsLayerInteractive = amapModel.get('echartsLayerInteractive')
-    const oldEChartsLayerInteractive = amapModel.__echartsLayerInteractive
-    if (oldEChartsLayerInteractive !== echartsLayerInteractive) {
-      amapModel.setEChartsLayerInteractive(echartsLayerInteractive)
-      amapModel.__echartsLayerInteractive = echartsLayerInteractive
+    // PENDING
+    // waiting until amap loaded
+    if (amap.loaded) {
+      const echartsLayerInteractive = amapModel.get('echartsLayerInteractive')
+      const oldEChartsLayerInteractive = amapModel.__echartsLayerInteractive
+      if (oldEChartsLayerInteractive !== echartsLayerInteractive) {
+        amapModel.setEChartsLayerInteractive(echartsLayerInteractive)
+        amapModel.__echartsLayerInteractive = echartsLayerInteractive
+      }
     }
 
     const center = amapModel.get('center')
