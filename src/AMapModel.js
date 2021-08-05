@@ -1,4 +1,4 @@
-import { ComponentModel, util as zrUtil } from 'echarts/lib/echarts'
+import { ComponentModel, util as zrUtil, env } from 'echarts/lib/echarts'
 import { isV5, v2Equal, dispatchEvent, on, off, watchStyle, unwatchStyle } from './helper'
 
 const AMapModel = {
@@ -35,7 +35,10 @@ const AMapModel = {
     const mapContainer = map.getContainer().querySelector('.amap-maps')
     const handler = mapContainer.__evtHandler4
     // PENDING no wheel
-    const evts = 'click dblclick mousewheel mouseout mouseup mousedown mousemove contextmenu pointerout pointerup pointerdown pointermove touchstart touchend touchmove'
+    let evts = 'click dblclick mousewheel mouseout mouseup mousedown mousemove contextmenu pointerout pointerup pointerdown pointermove touchstart touchend touchmove'
+    if (env.browser.ie) {
+      evts += ' wheel'
+    }
     if (interactive) {
       handler || on(mapContainer, evts, mapContainer.__evtHandler = function(e) {
         dispatchEvent(echartsLayer, e)

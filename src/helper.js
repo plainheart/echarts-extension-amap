@@ -22,10 +22,6 @@ export function clearLogMap() {
   logMap = {}
 }
 
-// export const MOUSE_EVENTS = 'click dblclick mousewheel wheel mouseout mouseup mousedown mousemove contextmenu'.split(' ')
-// export const POINTER_EVENTS = 'pointerout pointerup pointerdown pointermove'.split(' ')
-// export const TOUCH_EVENTS = 'touchstart touchend touchmove'.split(' ')
-
 const ALL_MODIFIERS = 'Alt AltGraph CapsLock Control Meta NumLock Scroll Shift Win'.split(' ')
 
 // NOT SUPPORT IE <= 10
@@ -39,97 +35,72 @@ export function dispatchEvent(ele, eventArgs) {
     evtInitDict.cancelBubble = true
     evtInitDict.bubbles = false
     evtInitDict.cancelable = true
+    // FIXME
+    // zrender is still using the stale un-standard layerX/layerY in Firefox
+    // but Firefox has supported offsetX/offsetY since version 39
+    // To make this feature working, some changes need to be applied to zrender
+    // https://github.com/ecomfe/zrender/blob/master/src/core/event.ts#L69
+    // add one condition `&& env.browser.version < '39'`
     evt = new eventArgs.constructor(eventArgs.type, evtInitDict)
   }
   else {
-    const evtType = original.constructor.name
+    // FIXME: recursive issue in IE and some old versions of firefox
+    const evtType = eventArgs.constructor.toString().split(' ')[1].slice(0, -1)
     evt = document.createEvent(evtType)
 
     if (evtType === 'MouseEvent') {
-      original.initMouseEvent(
-        original.type, false, true,
-        original.view, original.detail,
-        original.screenX, original.screenY,
-        original.clientX, original.clientY,
-        original.ctrlKey, original.altKey,
-        original.shiftKey, original.metaKey,
-        original.button, original.relatedTarget
+      evt.initMouseEvent(
+        eventArgs.type, false, true,
+        eventArgs.view, eventArgs.detail,
+        eventArgs.screenX, eventArgs.screenY,
+        eventArgs.clientX, eventArgs.clientY,
+        eventArgs.ctrlKey, eventArgs.altKey,
+        eventArgs.shiftKey, eventArgs.metaKey,
+        eventArgs.button, eventArgs.relatedTarget
       )
     }
     if (evtType === 'WheelEvent') {
-      original.initWheelEvent(
-        original.type, false, true,
-        original.view, original.detail,
-        original.screenX, original.screenY,
-        original.clientX, original.clientY,
-        original.button, original.relatedTarget, modifiersList,
-        original.deltaX, original.deltaY, original.deltaZ, original.deltaMode
+      evt.initWheelEvent(
+        eventArgs.type, false, true,
+        eventArgs.view, eventArgs.detail,
+        eventArgs.screenX, eventArgs.screenY,
+        eventArgs.clientX, eventArgs.clientY,
+        eventArgs.button, eventArgs.relatedTarget,
+        // modifiersList
+        eventArgs.getModifierState
+          && zrUtil.filter(ALL_MODIFIERS, eventArgs.getModifierState, eventArgs).join(' '),
+        eventArgs.deltaX, eventArgs.deltaY, eventArgs.deltaZ, eventArgs.deltaMode
       )
     }
     if (evtType === 'PointerEvent') {
-      original.initPointerEvent(
-        original.type, false, true,
-        original.view, original.detail,
-        original.screenX, original.screenY,
-        original.clientX, original.clientY,
-        original.ctrlKey, original.altKey,
-        original.shiftKey, original.metaKey,
-        original.button, original.relatedTarget,
-        original.offsetX, original.offsetY,
-        original.width, original.height,
-        original.pressure, original.rotation,
-        original.tiltX, original.tiltY,
-        original.pointerId, original.pointerType,
-        original.timeStamp, original.isPrimary
+      evt.initPointerEvent(
+        eventArgs.type, false, true,
+        eventArgs.view, eventArgs.detail,
+        eventArgs.screenX, eventArgs.screenY,
+        eventArgs.clientX, eventArgs.clientY,
+        eventArgs.ctrlKey, eventArgs.altKey,
+        eventArgs.shiftKey, eventArgs.metaKey,
+        eventArgs.button, eventArgs.relatedTarget,
+        eventArgs.offsetX, eventArgs.offsetY,
+        eventArgs.width, eventArgs.height,
+        eventArgs.pressure, eventArgs.rotation,
+        eventArgs.tiltX, eventArgs.tiltY,
+        eventArgs.pointerId, eventArgs.pointerType,
+        eventArgs.timeStamp, eventArgs.isPrimary
       )
     }
     if (evtType === 'TouchEvent') {
-      original.initTouchEvent(
-        original.type, false, true,
-        original.view, original.detail, original.screenX, original.screenY,
-        original.clientX, original.clientY, original.ctrlKey,
-        original.altKey, original.shiftKey, original.metaKey,
-        original.touches, original.targetTouches, original.changedTouches,
-        original.scale, original.rotation
+      evt.initTouchEvent(
+        eventArgs.type, false, true,
+        eventArgs.view, eventArgs.detail, eventArgs.screenX, eventArgs.screenY,
+        eventArgs.clientX, eventArgs.clientY, eventArgs.ctrlKey,
+        eventArgs.altKey, eventArgs.shiftKey, eventArgs.metaKey,
+        eventArgs.touches, eventArgs.targetTouches, eventArgs.changedTouches,
+        eventArgs.scale, eventArgs.rotation
       )
     }
-    // if (evtType === 'TextEvent') {
-    //   original.initTextEvent(
-    //     original.type, false, true,
-    //     original.view,
-    //     original.data, original.inputMethod, original.locale
-    //   )
-    // }
-    // if (evtType === 'CompositionEvent') {
-    //   original.initTextEvent(
-    //     original.type, false, true,
-    //     original.view,
-    //     original.data, original.inputMethod, original.locale
-    //   )
-    // }
-    // if (evtType === 'KeyboardEvent') {
-    //   original.initKeyboardEvent(
-    //     original.type, false, true,
-    //     original.view, original.char, original.key,
-    //     original.location,
-    //     original.getModifierState
-    //       && zrUtil.filter(ALL_MODIFIERS, original.getModifierState, original).join(' '),
-    //     original.repeat
-    //   )
-    // }
-    // if (evtType === 'InputEvent' || eventType === 'UIEvent') {
-    //   original.initUIEvent(
-    //     original.type, false, true,
-    //     original.view, original.detail
-    //   )
-    // }
-    // if (evtType === 'FocusEvent') {
-    //   original.initFocusEvent(
-    //     original.type, false, true,
-    //     original.view, original.detail, original.relatedTarget
-    //   )
-    // }
   }
+  // FIXME potential IllegalState error in IE
   ele.dispatchEvent(evt)
 }
 
