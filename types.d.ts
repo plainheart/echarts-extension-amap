@@ -27,6 +27,12 @@ interface InnerAMapComponentOption {
    * @default true
    */
   renderOnMoving?: boolean
+  /**
+   * Whether to return map camera state in `amaproam` event
+   * @default false
+   * @since v1.10.0
+   */
+  returnMapCameraState?: boolean
 }
 
 /**
