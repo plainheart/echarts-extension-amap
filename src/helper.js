@@ -2,9 +2,12 @@ import { version } from 'echarts/lib/echarts'
 
 export const isV5 = version.split('.')[0] > 4
 
+/* global AMap */
+
 // `AMap.version` only exists in AMap 2.x
 // For AMap 1.x, it's `AMap.v`
-export const isAMap2X = AMap.version >= 2
+// use function instead of constant to allow importing the plugin before AMap is loaded
+export const isAMap2X = () => AMap.version >= 2
 
 export function v2Equal(a, b) {
   return a && b && a[0] === b[0] && a[1] === b[1]

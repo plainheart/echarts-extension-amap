@@ -1,13 +1,15 @@
 import { ComponentView, getInstanceByDom, throttle } from 'echarts/lib/echarts'
 import { isV5, isAMap2X, clearLogMap } from './helper'
 
-/* global AMap */
+let _isAMap2X
 
 const AMapView = {
   type: 'amap',
 
   init() {
     this._isFirstRender = true
+
+    _isAMap2X = isAMap2X()
   },
 
   render(amapModel, ecModel, api) {
@@ -99,7 +101,7 @@ const AMapView = {
 
     amap.on(
       renderOnMoving
-        ? (isAMap2X
+        ? (_isAMap2X
           ? 'viewchange'
           : is3DMode
             ? 'camerachange'
@@ -107,19 +109,19 @@ const AMapView = {
         : 'moveend',
       // FIXME: bad performance in 1.x in the cases with large data, use debounce?
       // moveHandler
-      (!isAMap2X && largeMode) ? (moveHandler = throttle(moveHandler, 20, true)) : moveHandler
+      (!_isAMap2X && largeMode) ? (moveHandler = throttle(moveHandler, 20, true)) : moveHandler
     )
 
     this._moveHandler = moveHandler
 
-    if (renderOnMoving && !(isAMap2X && is3DMode)) {
+    if (renderOnMoving && !(_isAMap2X && is3DMode)) {
       // need to listen to zoom if 1.x & 2D mode
       // FIXME: unnecessary `mapmove` event triggered when zooming
       amap.on('zoom', moveHandler)
     }
 
     if (!renderOnMoving) {
-      amap.on('movestart', this._moveStartHandler = function(e) {
+      amap.on('movestart', this._moveStartHandler = function() {
         setTimeout(function() {
           amapModel.setEChartsLayerVisiblity(false)
         }, 0)
@@ -128,7 +130,7 @@ const AMapView = {
         ;(!e || e.type !== 'moveend') && moveHandler(e)
         setTimeout(function() {
           amapModel.setEChartsLayerVisiblity(true)
-        }, isAMap2X || !largeMode ? 0 : 20)
+        }, _isAMap2X || !largeMode ? 0 : 20)
       }
       amap.on('moveend', moveEndHandler)
       amap.on('zoomend', moveEndHandler)
@@ -151,7 +153,7 @@ const AMapView = {
       let resizeHandler = function() {
         getInstanceByDom(api.getDom()).resize()
       }
-      if (!isAMap2X && largeMode) {
+      if (!_isAMap2X && largeMode) {
         resizeHandler = throttle(resizeHandler, 20, true)
       }
       amap.on('resize', this._resizeHandler = resizeHandler)

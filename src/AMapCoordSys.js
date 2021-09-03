@@ -1,5 +1,3 @@
-/* global AMap */
-
 import { util as zrUtil, graphic, matrix } from 'echarts/lib/echarts'
 import { logWarn } from './helper'
 
