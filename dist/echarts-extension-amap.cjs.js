@@ -1,6 +1,6 @@
 /*!
  * echarts-extension-amap 
- * @version 1.10.0
+ * @version 1.10.1
  * @author plainheart
  * 
  * MIT License
@@ -32,10 +32,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var echarts = require('echarts/lib/echarts');
 
-var isV5 = echarts.version.split('.')[0] > 4; // `AMap.version` only exists in AMap 2.x
+var isV5 = echarts.version.split('.')[0] > 4;
+/* global AMap */
+// `AMap.version` only exists in AMap 2.x
 // For AMap 1.x, it's `AMap.v`
+// use function instead of constant to allow importing the plugin before AMap is loaded
 
-var isAMap2X = AMap.version >= 2;
+var isAMap2X = function isAMap2X() {
+  return AMap.version >= 2;
+};
 function v2Equal(a, b) {
   return a && b && a[0] === b[0] && a[1] === b[1];
 }
@@ -48,8 +53,6 @@ function logWarn(tag, msg, once) {
 function clearLogMap() {
   logMap = {};
 }
-
-/* global AMap */
 
 function dataToCoordSize(dataSize, dataItem) {
   dataItem = dataItem || [0, 0];
@@ -321,12 +324,13 @@ var AMapModel = {
 };
 var AMapModel$1 = isV5 ? echarts.ComponentModel.extend(AMapModel) : AMapModel;
 
-/* global AMap */
+var _isAMap2X;
 
 var AMapView = {
   type: 'amap',
   init: function init() {
     this._isFirstRender = true;
+    _isAMap2X = isAMap2X();
   },
   render: function render(amapModel, ecModel, api) {
     var rendering = true;
@@ -414,19 +418,19 @@ var AMapView = {
       amap.off('zoomend', this._moveEndHandler);
     }
 
-    amap.on(renderOnMoving ? isAMap2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove' : 'moveend', // FIXME: bad performance in 1.x in the cases with large data, use debounce?
+    amap.on(renderOnMoving ? _isAMap2X ? 'viewchange' : is3DMode ? 'camerachange' : 'mapmove' : 'moveend', // FIXME: bad performance in 1.x in the cases with large data, use debounce?
     // moveHandler
-    !isAMap2X && largeMode ? moveHandler = echarts.throttle(moveHandler, 20, true) : moveHandler);
+    !_isAMap2X && largeMode ? moveHandler = echarts.throttle(moveHandler, 20, true) : moveHandler);
     this._moveHandler = moveHandler;
 
-    if (renderOnMoving && !(isAMap2X && is3DMode)) {
+    if (renderOnMoving && !(_isAMap2X && is3DMode)) {
       // need to listen to zoom if 1.x & 2D mode
       // FIXME: unnecessary `mapmove` event triggered when zooming
       amap.on('zoom', moveHandler);
     }
 
     if (!renderOnMoving) {
-      amap.on('movestart', this._moveStartHandler = function (e) {
+      amap.on('movestart', this._moveStartHandler = function () {
         setTimeout(function () {
           amapModel.setEChartsLayerVisiblity(false);
         }, 0);
@@ -436,7 +440,7 @@ var AMapView = {
         (!e || e.type !== 'moveend') && moveHandler(e);
         setTimeout(function () {
           amapModel.setEChartsLayerVisiblity(true);
-        }, isAMap2X || !largeMode ? 0 : 20);
+        }, _isAMap2X || !largeMode ? 0 : 20);
       };
 
       amap.on('moveend', moveEndHandler);
@@ -464,7 +468,7 @@ var AMapView = {
         echarts.getInstanceByDom(api.getDom()).resize();
       };
 
-      if (!isAMap2X && largeMode) {
+      if (!_isAMap2X && largeMode) {
         resizeHandler = echarts.throttle(resizeHandler, 20, true);
       }
 
@@ -497,7 +501,7 @@ var AMapView = {
 var AMapView$1 = isV5 ? echarts.ComponentView.extend(AMapView) : AMapView;
 
 var name = "echarts-extension-amap";
-var version = "1.10.0";
+var version = "1.10.1";
 
 /**
  * AMap component extension

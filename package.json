@@ -1,6 +1,6 @@
 {
   "name": "echarts-extension-amap",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "description": "An AMap(https://lbs.amap.com) extension for Apache ECharts (https://github.com/apache/echarts)",
   "main": "dist/echarts-extension-amap.min.js",
   "module": "dist/echarts-extension-amap.esm.js",
