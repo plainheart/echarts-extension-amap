@@ -2,7 +2,7 @@
 [![Build Status](https://github.com/plainheart/echarts-extension-amap/actions/workflows/build.yml/badge.svg)](https://github.com/plainheart/echarts-extension-amap/actions/workflows/build.yml)
 [![NPM Downloads](https://img.shields.io/npm/dm/echarts-extension-amap.svg)](https://npmcharts.com/compare/echarts-extension-amap?minimal=true)
 [![jsDelivr Downloads](https://data.jsdelivr.com/v1/package/npm/echarts-extension-amap/badge?style=rounded)](https://www.jsdelivr.com/package/npm/echarts-extension-amap)
-[![License](https://img.shields.io/npm/l/echarts-extension-amap.svg)](https://www.npmjs.com/package/echarts-extension-amap)
+[![License](https://img.shields.io/npm/l/echarts-extension-amap.svg)](https://github.com/plainheart/echarts-extension-amap/blob/master/LICENSE)
 
 ## AMap extension for Apache ECharts
 
