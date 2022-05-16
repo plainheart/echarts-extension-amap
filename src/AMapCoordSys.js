@@ -106,6 +106,21 @@ AMapCoordSysProto.prepareCustoms = function() {
   }
 }
 
+AMapCoordSysProto.convertToPixel = function(ecModel, finder, value) {
+  // here we don't use finder as only one amap component is allowed
+  return this.dataToPoint(value);
+}
+
+AMapCoordSysProto.convertFromPixel = function(ecModel, finder, value) {
+  // here we don't use finder as only one amap component is allowed
+  return this.pointToData(value);
+}
+
+// less useful
+// AMapCoordSysProto.containPoint = function(point) {
+//   return this._amap.getBounds().contains(this.pointToData(point));
+// }
+
 AMapCoordSys.create = function(ecModel, api) {
   let amapCoordSys
   ecModel.eachComponent('amap', function(amapModel) {
@@ -235,6 +250,9 @@ AMapCoordSys.create = function(ecModel, api) {
       seriesModel.coordinateSystem = amapCoordSys
     }
   })
+
+  // return created coordinate systems
+  return [amapCoordSys]
 }
 
 AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat']
