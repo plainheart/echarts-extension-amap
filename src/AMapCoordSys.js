@@ -257,4 +257,7 @@ AMapCoordSys.create = function(ecModel, api) {
 
 AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat']
 
+AMapCoordSysProto.type = 'amap'
+
+
 export default AMapCoordSys
