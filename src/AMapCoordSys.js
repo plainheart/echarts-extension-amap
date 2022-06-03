@@ -252,7 +252,7 @@ AMapCoordSys.create = function(ecModel, api) {
   })
 
   // return created coordinate systems
-  return [amapCoordSys]
+  return amapCoordSys && [amapCoordSys]
 }
 
 AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat']

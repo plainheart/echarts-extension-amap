@@ -1,6 +1,8 @@
 import { version } from 'echarts/lib/echarts'
 
-export const isV5 = version.split('.')[0] > 4
+export const ecVer = version.split('.')
+
+export const isV5 = ecVer[0] > 4
 
 /* global AMap */
 

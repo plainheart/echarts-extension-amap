@@ -5,28 +5,30 @@
 import AMapCoordSys from './AMapCoordSys'
 import AMapModel from './AMapModel'
 import AMapView from './AMapView'
-import { isV5 } from './helper'
+import { isV5, ecVer } from './helper'
 
 export { version, name } from '../package.json'
 
 export function install(registers) {
-  // PENDING implement in ECharts?
-  registers.registerLayout(function(ecModel, api) {
-    ecModel.eachSeriesByType('pie', function (seriesModel) {
-      const coordSys = seriesModel.coordinateSystem
-      const data = seriesModel.getData()
-      const valueDim = data.mapDimension('value')
-      if (coordSys && coordSys.type === 'amap') {
-        const center = seriesModel.get('center')
-        const [cx, cy] = coordSys.dataToPoint(center)
-        data.each(valueDim, function (value, idx) {
-          const layout = data.getItemLayout(idx)
-          layout.cx = cx
-          layout.cy = cy
-        })
-      }
+  // add coordinate system support for pie series for ECharts < 5.3.3
+  if (!isV5 || (ecVer[1] <= 3 && ecVer[2] < 3)) {
+    registers.registerLayout(function(ecModel, api) {
+      ecModel.eachSeriesByType('pie', function (seriesModel) {
+        const coordSys = seriesModel.coordinateSystem
+        const data = seriesModel.getData()
+        const valueDim = data.mapDimension('value')
+        if (coordSys && coordSys.type === 'amap') {
+          const center = seriesModel.get('center')
+          const [cx, cy] = coordSys.dataToPoint(center)
+          data.each(valueDim, function (value, idx) {
+            const layout = data.getItemLayout(idx)
+            layout.cx = cx
+            layout.cy = cy
+          })
+        }
+      })
     })
-  })
+  }
   // Model
   isV5
     ? registers.registerComponentModel(AMapModel)
