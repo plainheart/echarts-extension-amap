@@ -5,13 +5,13 @@
 import AMapCoordSys from './AMapCoordSys'
 import AMapModel from './AMapModel'
 import AMapView from './AMapView'
-import { isV5, ecVer } from './helper'
+import { isNewEC, ecVer } from './helper'
 
 export { version, name } from '../package.json'
 
 export function install(registers) {
-  // add coordinate system support for pie series for ECharts < 5.3.3
-  if (!isV5 || (ecVer[1] <= 3 && ecVer[2] < 3)) {
+  // add coordinate system support for pie series for ECharts < 5.4.0
+  if (!isNewEC || (ecVer[0] == 5 && ecVer[1] < 4)) {
     registers.registerLayout(function(ecModel, api) {
       ecModel.eachSeriesByType('pie', function (seriesModel) {
         const coordSys = seriesModel.coordinateSystem
@@ -30,11 +30,11 @@ export function install(registers) {
     })
   }
   // Model
-  isV5
+  isNewEC
     ? registers.registerComponentModel(AMapModel)
     : registers.extendComponentModel(AMapModel)
   // View
-  isV5
+  isNewEC
     ? registers.registerComponentView(AMapView)
     : registers.extendComponentView(AMapView)
   // Coordinate System

@@ -1,5 +1,5 @@
 import { ComponentView, getInstanceByDom, throttle } from 'echarts/lib/echarts'
-import { isV5, isAMap2X, clearLogMap } from './helper'
+import { isNewEC, isAMap2X, clearLogMap } from './helper'
 
 let _isAMap2X
 
@@ -181,6 +181,6 @@ const AMapView = {
   }
 }
 
-export default isV5
+export default isNewEC
   ? ComponentView.extend(AMapView)
   : AMapView

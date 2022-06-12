@@ -1,5 +1,5 @@
 import { ComponentModel } from 'echarts/lib/echarts'
-import { isV5, v2Equal } from './helper'
+import { isNewEC, v2Equal } from './helper'
 
 const AMapModel = {
   type: 'amap',
@@ -56,6 +56,6 @@ const AMapModel = {
   }
 }
 
-export default isV5
+export default isNewEC
   ? ComponentModel.extend(AMapModel)
   : AMapModel
