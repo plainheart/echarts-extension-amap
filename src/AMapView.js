@@ -162,9 +162,9 @@ const AMapView = {
     this._isFirstRender = rendering = false
   },
 
-  dispose(ecModel) {
+  dispose() {
     clearLogMap()
-    const component = ecModel.getComponent('amap')
+    const component = this.__model
     if (component) {
       component.getAMap().destroy()
       component.setAMap(null)

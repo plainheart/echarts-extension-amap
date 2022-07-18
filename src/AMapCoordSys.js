@@ -128,7 +128,7 @@ AMapCoordSys.create = function(ecModel, api) {
       throw new Error('AMap api is not loaded')
     }
     if (amapCoordSys) {
-      throw new Error('Only one amap component can exist')
+      throw new Error('Only one amap component is allowed')
     }
     let amap = amapModel.getAMap()
     const echartsLayerInteractive = amapModel.get('echartsLayerInteractive')
@@ -247,6 +247,7 @@ AMapCoordSys.create = function(ecModel, api) {
 
   ecModel.eachSeries(function(seriesModel) {
     if (seriesModel.get('coordinateSystem') === 'amap') {
+      // inject coordinate system
       seriesModel.coordinateSystem = amapCoordSys
     }
   })
