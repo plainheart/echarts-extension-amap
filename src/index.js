@@ -19,7 +19,9 @@ export function install(registers) {
         const valueDim = data.mapDimension('value')
         if (coordSys && coordSys.type === 'amap') {
           const center = seriesModel.get('center')
-          const [cx, cy] = coordSys.dataToPoint(center)
+          const point = coordSys.dataToPoint(center)
+          const cx = point[0]
+          const cy = point[1]
           data.each(valueDim, function (value, idx) {
             const layout = data.getItemLayout(idx)
             layout.cx = cx
