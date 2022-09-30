@@ -14,15 +14,14 @@ type TuplifyUnion<T, L = LastOf<T>, N = [T] extends [never] ? true : false> =
 
 type EChartsExtensionInstallRegisters = Parameters<TuplifyUnion<Parameters<typeof use>[0]>[0]>[0]
 
-type EChartsRegisters = EChartsExtensionInstallRegisters extends never
+export type EChartsExtensionRegisters = EChartsExtensionInstallRegisters extends never
   ? typeof EChartsV4
   : EChartsExtensionInstallRegisters
 
 /**
  * To install AMap component
- * @param registersregisters echarts registers. If using v4, it should be echarts namespace.
+ * @param registers echarts registers. If using v4, it should be echarts namespace.
  */
-declare function install(registers: EChartsRegisters): void
+export declare function install(registers: EChartsExtensionRegisters): void
 
 export * from './types'
-export { install }
