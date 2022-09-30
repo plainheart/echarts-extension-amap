@@ -19,7 +19,7 @@ function generateExamples() {
         : libVersion
     ).trim()
   })
-  const exampleTypes = ['scatter', 'heatmap', 'lines']
+  const exampleTypes = ['scatter', 'heatmap', 'lines', 'pie']
   ;[['en', false], ['zh_CN']].forEach(function(lang) {
     lang = `${lang[1] === false ? '' : '_' + lang[0]}`
     exampleTypes.forEach(function(type) {
