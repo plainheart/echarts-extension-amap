@@ -10,7 +10,7 @@
 
 [Online example on CodePen](https://codepen.io/plainheart/pen/qBbdNYx)
 
-This is an AMap extension for [Apache ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Lines](https://echarts.apache.org/en/option.html#series-lines), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap).
+This is an AMap extension for [Apache ECharts](https://echarts.apache.org/en/index.html) which is used to display visualizations such as [Scatter](https://echarts.apache.org/en/option.html#series-scatter), [Lines](https://echarts.apache.org/en/option.html#series-lines), [Heatmap](https://echarts.apache.org/en/option.html#series-heatmap), and [Pie](https://echarts.apache.org/en/option.html#series-pie).
 
 ### Examples
 
@@ -25,6 +25,10 @@ Heatmap: [examples/heatmap.html](https://github.com/plainheart/echarts-extension
 Lines: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines.html)
 
 ![Preview-Lines](https://user-images.githubusercontent.com/26999792/101313379-fca43c80-3890-11eb-9dea-46230dc432d5.gif)
+
+Pie: [examples/pie.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/pie.html) (**Since v1.11.0**)
+
+![Preview-Pie](https://user-images.githubusercontent.com/26999792/193215980-cd6736f5-a63d-4085-8012-d519e9e78398.png)
 
 ### Installation
 
@@ -70,7 +74,7 @@ Use the latest version
 
 Use a specific version
 
-[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js)
+[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js)
 
 [**unpkg**](https://unpkg.com/)
 
@@ -80,7 +84,7 @@ Use the latest version
 
 Use a specific version
 
-[https://unpkg.com/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js)
+[https://unpkg.com/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js)
 
 This extension will register itself as a component of `echarts` after it is imported.
 

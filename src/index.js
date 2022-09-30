@@ -9,6 +9,14 @@ import { isNewEC, ecVer } from './helper'
 
 export { version, name } from '../package.json'
 
+/**
+ * @typedef {import('../export').EChartsExtensionRegisters} EChartsExtensionRegisters
+ */
+
+/**
+ * AMap extension installer
+ * @param {EChartsExtensionRegisters} registers
+ */
 export function install(registers) {
   // add coordinate system support for pie series for ECharts < 5.4.0
   if (!isNewEC || (ecVer[0] == 5 && ecVer[1] < 4)) {

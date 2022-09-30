@@ -1,11 +1,11 @@
 /*!
  * echarts-extension-amap 
- * @version 1.10.1
+ * @version 1.11.0
  * @author plainheart
  * 
  * MIT License
  * 
- * Copyright (c) 2019-2021 Zhongxiang.Wang
+ * Copyright (c) 2019-2022 Zhongxiang.Wang
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,8 @@
 import * as echarts from 'echarts/lib/echarts';
 import { version as version$1, graphic, matrix, util, ComponentModel, ComponentView, throttle, getInstanceByDom } from 'echarts/lib/echarts';
 
-var isV5 = version$1.split('.')[0] > 4;
+var ecVer = version$1.split('.');
+var isNewEC = ecVer[0] > 4;
 /* global AMap */
 // `AMap.version` only exists in AMap 2.x
 // For AMap 1.x, it's `AMap.v`
@@ -142,6 +143,20 @@ AMapCoordSysProto.prepareCustoms = function () {
   };
 };
 
+AMapCoordSysProto.convertToPixel = function (ecModel, finder, value) {
+  // here we don't use finder as only one amap component is allowed
+  return this.dataToPoint(value);
+};
+
+AMapCoordSysProto.convertFromPixel = function (ecModel, finder, value) {
+  // here we don't use finder as only one amap component is allowed
+  return this.pointToData(value);
+}; // less useful
+// AMapCoordSysProto.containPoint = function(point) {
+//   return this._amap.getBounds().contains(this.pointToData(point));
+// }
+
+
 AMapCoordSys.create = function (ecModel, api) {
   var amapCoordSys;
   ecModel.eachComponent('amap', function (amapModel) {
@@ -150,7 +165,7 @@ AMapCoordSys.create = function (ecModel, api) {
     }
 
     if (amapCoordSys) {
-      throw new Error('Only one amap component can exist');
+      throw new Error('Only one amap component is allowed');
     }
 
     var amap = amapModel.getAMap();
@@ -268,12 +283,16 @@ AMapCoordSys.create = function (ecModel, api) {
   });
   ecModel.eachSeries(function (seriesModel) {
     if (seriesModel.get('coordinateSystem') === 'amap') {
+      // inject coordinate system
       seriesModel.coordinateSystem = amapCoordSys;
     }
-  });
+  }); // return created coordinate systems
+
+  return amapCoordSys && [amapCoordSys];
 };
 
 AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat'];
+AMapCoordSysProto.type = 'amap';
 
 var AMapModel = {
   type: 'amap',
@@ -319,7 +338,7 @@ var AMapModel = {
     returnMapCameraState: false
   }
 };
-var AMapModel$1 = isV5 ? ComponentModel.extend(AMapModel) : AMapModel;
+var AMapModel$1 = isNewEC ? ComponentModel.extend(AMapModel) : AMapModel;
 
 var _isAMap2X;
 
@@ -474,9 +493,9 @@ var AMapView = {
 
     this._isFirstRender = rendering = false;
   },
-  dispose: function dispose(ecModel) {
+  dispose: function dispose() {
     clearLogMap();
-    var component = ecModel.getComponent('amap');
+    var component = this.__model;
 
     if (component) {
       component.getAMap().destroy();
@@ -495,19 +514,51 @@ var AMapView = {
     }
   }
 };
-var AMapView$1 = isV5 ? ComponentView.extend(AMapView) : AMapView;
+var AMapView$1 = isNewEC ? ComponentView.extend(AMapView) : AMapView;
 
 var name = "echarts-extension-amap";
-var version = "1.10.1";
+var version = "1.11.0";
 
 /**
  * AMap component extension
  */
-function install(registers) {
-  // Model
-  isV5 ? registers.registerComponentModel(AMapModel$1) : registers.extendComponentModel(AMapModel$1); // View
+/**
+ * @typedef {import('../export').EChartsExtensionRegisters} EChartsExtensionRegisters
+ */
 
-  isV5 ? registers.registerComponentView(AMapView$1) : registers.extendComponentView(AMapView$1); // Coordinate System
+/**
+ * AMap extension installer
+ * @param {EChartsExtensionRegisters} registers
+ */
+
+function install(registers) {
+  // add coordinate system support for pie series for ECharts < 5.4.0
+  if (!isNewEC || ecVer[0] == 5 && ecVer[1] < 4) {
+    registers.registerLayout(function (ecModel, api) {
+      ecModel.eachSeriesByType('pie', function (seriesModel) {
+        var coordSys = seriesModel.coordinateSystem;
+        var data = seriesModel.getData();
+        var valueDim = data.mapDimension('value');
+
+        if (coordSys && coordSys.type === 'amap') {
+          var center = seriesModel.get('center');
+          var point = coordSys.dataToPoint(center);
+          var cx = point[0];
+          var cy = point[1];
+          data.each(valueDim, function (value, idx) {
+            var layout = data.getItemLayout(idx);
+            layout.cx = cx;
+            layout.cy = cy;
+          });
+        }
+      });
+    });
+  } // Model
+
+
+  isNewEC ? registers.registerComponentModel(AMapModel$1) : registers.extendComponentModel(AMapModel$1); // View
+
+  isNewEC ? registers.registerComponentView(AMapView$1) : registers.extendComponentView(AMapView$1); // Coordinate System
 
   registers.registerCoordinateSystem('amap', AMapCoordSys); // Action
 
@@ -529,6 +580,6 @@ function install(registers) {
  * to avoid self-registered `CanvasRenderer` and `DataSetComponent` in Apache ECharts 5
  * but it's not compatible with echarts v4. Leave it to 2.0.
  */
-isV5 ? echarts.use(install) : install(echarts);
+isNewEC ? echarts.use(install) : install(echarts);
 
 export { name, version };

@@ -1,5 +1,5 @@
 declare const name = 'echarts-extension-amap'
-declare const version = '1.10.1'
+declare const version = '1.11.0'
 
 interface InnerAMapComponentOption {
   /**

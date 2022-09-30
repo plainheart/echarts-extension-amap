@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="renderer" content="webkit">
@@ -7,15 +7,14 @@
   <meta http-equiv="x-dns-prefetch-control" content="on">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <title>an example for echarts-extension-amap</title>
-  <!-- 引入高德地图的JavaScript API并定义版本号和插件 这里需要使用你在高德地图开发者平台申请的 ak -->
-  <!-- 如果你使用的是 v1.9.0 之前的旧版本，还需要引入 `AMap.CustomLayer` 插件 -->
+  <!-- please replace {ak} with your ak & customize your plugins -->
+  <!-- Plugin `AMap.CustomLayer` is required if you are using a version of library less than v1.9.0 -->
   <script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key={ak}&plugin=AMap.Scale,AMap.ToolBar"></script>
-  <!-- 引入ECharts -->
+  <!-- ECharts CDN -->
   <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
-  <!-- 引入ECharts高德地图扩展 -->
+  <!-- echarts amap extension -->
   <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
   <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js"></script>
-  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
   <style type="text/css">
     * {
       margin: 0;
@@ -30,9 +29,53 @@
 </head>
 <body>
   <div id="echarts-amap"></div>
-  <!-- 数据来源于百度地图 仅作示例 与高德坐标稍有偏差 -->
+  <!-- 数据仅作示例 -->
   <script type="text/javascript">
-    var heatmapDataURI = 'https://fastly.jsdelivr.net/gh/apache/echarts-examples/public/data/asset/data/hangzhou-tracks.json';
+    var data = {
+      '北京': [10, 20, 30, 40],
+      '攀枝花': [15, 20, 36, 42],
+      '开封': [17, 42, 15, 31],
+      '上海': [46, 50, 59, 80],
+      '广州': [90, 45, 36, 15]
+    };
+    var geoCoords = {
+      '北京': [116.46, 39.92],
+      '攀枝花': [101.718637, 26.582347],
+      '开封': [114.35, 34.79],
+      '上海': [121.48, 31.22],
+      '广州': [113.23, 23.16]
+    };
+    var pieDimensions = ['A', 'B', 'C', 'D'];
+    var pieSeries = [];
+    echarts.util.each(data, function (values, name) {
+      pieSeries.push({
+        type: 'pie',
+        name: name,
+        coordinateSystem: 'amap',
+        center: geoCoords[name],
+        radius: 20,
+        data: echarts.util.map(values, function (value, idx) {
+          return {
+            name: pieDimensions[idx],
+            value: value
+          }
+        }),
+        label: {
+          show: false
+        },
+        emphasis: {
+          label: {
+            show: true
+          },
+          labelLine: {
+            show: true,
+            lineStyle: {
+              color: '#fff'
+            }
+          }
+        }
+      })
+    });
 
     var option = {
       // 加载 amap 组件
@@ -40,9 +83,9 @@
         // 3D模式，无论你使用的是1.x版本还是2.x版本，都建议开启此项以获得更好的渲染体验
         viewMode: '3D',
         // 高德地图中心经纬度
-        center: [120.098776, 30.226665],
+        center: [102.278269, 35.391011],
         // 高德地图缩放
-        zoom: 13,
+        zoom: 4,
         // 启用resize
         resizeEnable: true,
         // 自定义地图样式主题
@@ -63,59 +106,32 @@
         // 暂时先不要使用layers配置，因为存在Bug
         // 建议使用amap.add的方式，使用方式参见最下方代码
       },
-      visualMap: {
-        show: true,
-        right: 20,
-        min: 0,
-        max: 5,
-        seriesIndex: 0,
-        calculable: true,
-        inRange: {
-          color: ['blue', 'blue', 'green', 'yellow', 'red']
-        }
+      tooltip : {
+        trigger: 'item'
       },
-      animation: false,
-      series: [
-        {
-          type: 'heatmap',
-          // 使用高德地图坐标系
-          coordinateSystem: 'amap',
-          data: [],
-          pointSize: 5,
-          blurSize: 6
-        }
-      ]
+      animation: true,
+      series: pieSeries
     };
     // 初始化 ECharts
     var chart = echarts.init(document.getElementById('echarts-amap'));
-    // 请求热力图数据
-    $.get(heatmapDataURI, function (data) {
-      // 转换数据
-      var points = [].concat.apply([], data.map(function (track) {
-        return track.map(function (seg) {
-          return seg.coord.concat([1]);
-        });
-      }));
-      option.series[0].data = points;
-      chart.setOption(option);
-      // 获取 ECharts 高德地图组件
-      var amapComponent = chart.getModel().getComponent('amap');
-      // 获取高德地图实例，使用高德地图自带的控件
-      var amap = amapComponent.getAMap();
-      // 添加控件 和高德地图API用法相同
-      amap.addControl(new AMap.Scale());
-      amap.addControl(new AMap.ToolBar());
-      // 添加图层
-      // var satelliteLayer = new AMap.TileLayer.Satellite();
-      // var roadNetLayer = new AMap.TileLayer.RoadNet();
-      // amap.add([satelliteLayer, roadNetLayer]);
-      //  添加一个 Marker
-      // amap.add(new AMap.Marker({
-      //   position: [115, 35]
-      // }));
-      // 禁用 ECharts 图层交互，从而使高德地图图层可以点击交互
-      // amapComponent.setEChartsLayerInteractive(false);
-    });
+    chart.setOption(option);
+    // 获取 ECharts 高德地图组件
+    var amapComponent = chart.getModel().getComponent('amap');
+    // 获取高德地图实例，使用高德地图自带的控件
+    var amap = amapComponent.getAMap();
+    // 添加控件 和高德地图API用法相同
+    amap.addControl(new AMap.Scale());
+    amap.addControl(new AMap.ToolBar());
+    // 添加图层
+    // var satelliteLayer = new AMap.TileLayer.Satellite();
+    // var roadNetLayer = new AMap.TileLayer.RoadNet();
+    // amap.add([satelliteLayer, roadNetLayer]);
+    //  添加一个 Marker
+    // amap.add(new AMap.Marker({
+    //   position: [115, 35]
+    // }));
+    // 禁用 ECharts 图层交互，从而使高德地图图层可以点击交互
+    // amapComponent.setEChartsLayerInteractive(false);
   </script>
 </body>
 </html>

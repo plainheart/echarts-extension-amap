@@ -10,7 +10,7 @@
 
 [在线示例](https://codepen.io/plainheart/pen/qBbdNYx)
 
-[Apache ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-lines)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap) 等可视化。
+[Apache ECharts](https://echarts.apache.org/zh/index.html) 高德地图扩展，可以在高德地图上展现 [点图](https://echarts.apache.org/zh/option.html#series-scatter)，[线图](https://echarts.apache.org/zh/option.html#series-lines)，[热力图](https://echarts.apache.org/zh/option.html#series-heatmap)，[饼图](https://echarts.apache.org/zh/option.html#series-pie) 等可视化。
 
 ### 示例
 
@@ -25,6 +25,10 @@ Heatmap 热力图: [examples/heatmap.html](https://github.com/plainheart/echarts
 Lines 线图: [examples/lines.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/lines_zh_CN.html)
 
 ![Preview-Lines](https://user-images.githubusercontent.com/26999792/101313379-fca43c80-3890-11eb-9dea-46230dc432d5.gif)
+
+Pie 饼图: [examples/pie.html](https://github.com/plainheart/echarts-extension-amap/blob/master/examples/pie_zh_CN.html) (**自 v1.11.0 开始支持**)
+
+![Preview-Pie](https://user-images.githubusercontent.com/26999792/193215980-cd6736f5-a63d-4085-8012-d519e9e78398.png)
 
 ### 安装
 
@@ -70,7 +74,7 @@ import 'echarts-extension-amap';
 
 使用指定版本
 
-[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js)
+[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js)
 
 [**unpkg**](https://unpkg.com/)
 
@@ -80,7 +84,7 @@ import 'echarts-extension-amap';
 
 使用指定版本
 
-[https://unpkg.com/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.10.1/dist/echarts-extension-amap.min.js)
+[https://unpkg.com/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js)
 
 插件会自动注册相应的组件。
 

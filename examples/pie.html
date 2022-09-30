@@ -15,7 +15,6 @@
   <!-- echarts amap extension -->
   <!-- <script type="text/javascript" src="../dist/echarts-extension-amap.min.js"></script> -->
   <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js"></script>
-  <script type="text/javascript" src="https://fastly.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
   <style type="text/css">
     * {
       margin: 0;
@@ -30,9 +29,53 @@
 </head>
 <body>
   <div id="echarts-amap"></div>
-  <!-- data comes from Baidu Map, just for example -->
+  <!-- data is only for example -->
   <script type="text/javascript">
-    var heatmapDataURI = 'https://fastly.jsdelivr.net/gh/apache/echarts-examples/public/data/asset/data/hangzhou-tracks.json';
+    var data = {
+      '北京': [10, 20, 30, 40],
+      '攀枝花': [15, 20, 36, 42],
+      '开封': [17, 42, 15, 31],
+      '上海': [46, 50, 59, 80],
+      '广州': [90, 45, 36, 15]
+    };
+    var geoCoords = {
+      '北京': [116.46, 39.92],
+      '攀枝花': [101.718637, 26.582347],
+      '开封': [114.35, 34.79],
+      '上海': [121.48, 31.22],
+      '广州': [113.23, 23.16]
+    };
+    var pieDimensions = ['A', 'B', 'C', 'D'];
+    var pieSeries = [];
+    echarts.util.each(data, function (values, name) {
+      pieSeries.push({
+        type: 'pie',
+        name: name,
+        coordinateSystem: 'amap',
+        center: geoCoords[name],
+        radius: 20,
+        data: echarts.util.map(values, function (value, idx) {
+          return {
+            name: pieDimensions[idx],
+            value: value
+          }
+        }),
+        label: {
+          show: false
+        },
+        emphasis: {
+          label: {
+            show: true
+          },
+          labelLine: {
+            show: true,
+            lineStyle: {
+              color: '#fff'
+            }
+          }
+        }
+      })
+    });
 
     var option = {
       // amap component option
@@ -43,14 +86,14 @@
         // initial options of AMap
         // See https://lbs.amap.com/api/javascript-api/reference/map#MapOption for details
         // initial map center [lng, lat]
-        center: [120.098776, 30.226665],
+        center: [102.278269, 35.391011],
         // initial map zoom
-        zoom: 13,
+        zoom: 4,
         // whether the map and echarts automatically handles browser window resize to update itself.
         resizeEnable: true,
         // customized map style, see https://lbs.amap.com/dev/mapstyle/index for details
         mapStyle: 'amap://styles/dark',
-        // whether echarts layer should be rendered when the map is moving. Default value is true.
+        // whether echarts layer should be rendered when the map is moving. Default is true.
         // if false, it will only be re-rendered after the map `moveend`.
         // It's better to set this option to false if data is large.
         renderOnMoving: true,
@@ -69,60 +112,32 @@
 
         // More initial options...
       },
-      visualMap: {
-        show: true,
-        right: 20,
-        min: 0,
-        max: 5,
-        seriesIndex: 0,
-        calculable: true,
-        inRange: {
-          color: ['blue', 'blue', 'green', 'yellow', 'red']
-        }
+      tooltip : {
+        trigger: 'item'
       },
-      animation: false,
-      series: [
-        {
-          type: 'heatmap',
-          // use `amap` as the coordinate system
-          coordinateSystem: 'amap',
-          data: [],
-          pointSize: 5,
-          blurSize: 6
-        }
-      ]
+      animation: true,
+      series: pieSeries
     };
     // initialize echarts
     var chart = echarts.init(document.getElementById('echarts-amap'));
-    // fetch the heatmap data
-    $.get(heatmapDataURI, function (data) {
-      // convert
-      var points = [].concat.apply([], data.map(function (track) {
-        return track.map(function (seg) {
-          return seg.coord.concat([1]);
-        });
-      }));
-      // set the data for heatmap
-      option.series[0].data = points;
-      chart.setOption(option);
-      // get AMap extension component
-      var amapComponent = chart.getModel().getComponent('amap');
-      // get the instance of AMap
-      var amap = amapComponent.getAMap();
-      // operations below are the same as amap
-      amap.addControl(new AMap.Scale());
-      amap.addControl(new AMap.ToolBar());
-      // add layers
-      // var satelliteLayer = new AMap.TileLayer.Satellite();
-      // var roadNetLayer = new AMap.TileLayer.RoadNet();
-      // amap.add([satelliteLayer, roadNetLayer]);
-      // Add a marker to map
-      // amap.add(new AMap.Marker({
-      //   position: [115, 35]
-      // }));
-      // Make the overlay layer of AMap interactive
-      // amapComponent.setEChartsLayerInteractive(false);
-    });
+    chart.setOption(option);
+    // get AMap extension component
+    var amapComponent = chart.getModel().getComponent('amap');
+    // get the instance of AMap
+    var amap = amapComponent.getAMap();
+    // operations below are the same as amap
+    amap.addControl(new AMap.Scale());
+    amap.addControl(new AMap.ToolBar());
+    // add layers
+    // var satelliteLayer = new AMap.TileLayer.Satellite();
+    // var roadNetLayer = new AMap.TileLayer.RoadNet();
+    // amap.add([satelliteLayer, roadNetLayer]);
+    // Add a marker to map
+    // amap.add(new AMap.Marker({
+    //   position: [115, 35]
+    // }));
+    // Make the overlay layer of AMap interactive
+    // amapComponent.setEChartsLayerInteractive(false);
   </script>
 </body>
 </html>
