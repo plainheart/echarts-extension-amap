@@ -1,5 +1,5 @@
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 const { name, version, author } = require('../package.json')
 
 const COMMENT_END_REGEX = /\*\//g
