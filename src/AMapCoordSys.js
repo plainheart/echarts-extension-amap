@@ -1,5 +1,5 @@
 import { util as zrUtil, graphic, matrix } from 'echarts/lib/echarts'
-import { logWarn } from './helper'
+import { COMPONENT_TYPE, logWarn } from './helper'
 
 function dataToCoordSize(dataSize, dataItem) {
   dataItem = dataItem || [0, 0];
@@ -92,8 +92,7 @@ AMapCoordSysProto.prepareCustoms = function() {
   const rect = this.getViewRect()
   return {
     coordSys: {
-      // The name exposed to user is always 'cartesian2d' but not 'grid'.
-      type: 'amap',
+      type: COMPONENT_TYPE,
       x: rect.x,
       y: rect.y,
       width: rect.width,
@@ -123,7 +122,7 @@ AMapCoordSysProto.convertFromPixel = function(ecModel, finder, value) {
 
 AMapCoordSys.create = function(ecModel, api) {
   let amapCoordSys
-  ecModel.eachComponent('amap', function(amapModel) {
+  ecModel.eachComponent(COMPONENT_TYPE, function(amapModel) {
     if (typeof AMap === 'undefined') {
       throw new Error('AMap api is not loaded')
     }
@@ -136,11 +135,12 @@ AMapCoordSys.create = function(ecModel, api) {
       const root = api.getDom()
       const painter = api.getZr().painter
       const viewportRoot = painter.getViewportRoot()
-      viewportRoot.className = 'amap-ec-layer'
+      viewportRoot.className = COMPONENT_TYPE + '-ec-layer'
       // PENDING not hidden?
       viewportRoot.style.visibility = 'hidden'
+      const className = 'ec-extension-' + COMPONENT_TYPE
       // Not support IE8
-      let amapRoot = root.querySelector('.ec-extension-amap')
+      let amapRoot = root.querySelector('.' + className)
       if (amapRoot) {
         // Reset viewport left and top, which will be changed
         // in moving handler in AMapView
@@ -149,7 +149,7 @@ AMapCoordSys.create = function(ecModel, api) {
         root.removeChild(amapRoot)
       }
       amapRoot = document.createElement('div')
-      amapRoot.className = 'ec-extension-amap'
+      amapRoot.className = className
       amapRoot.style.cssText = 'position:absolute;top:0;left:0;bottom:0;right:0;'
       root.appendChild(amapRoot)
 
@@ -246,7 +246,7 @@ AMapCoordSys.create = function(ecModel, api) {
   })
 
   ecModel.eachSeries(function(seriesModel) {
-    if (seriesModel.get('coordinateSystem') === 'amap') {
+    if (seriesModel.get('coordinateSystem') === COMPONENT_TYPE) {
       // inject coordinate system
       seriesModel.coordinateSystem = amapCoordSys
     }
@@ -258,7 +258,7 @@ AMapCoordSys.create = function(ecModel, api) {
 
 AMapCoordSysProto.dimensions = AMapCoordSys.dimensions = ['lng', 'lat']
 
-AMapCoordSysProto.type = 'amap'
+AMapCoordSysProto.type = COMPONENT_TYPE
 
 
 export default AMapCoordSys

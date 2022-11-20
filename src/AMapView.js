@@ -1,10 +1,10 @@
 import { ComponentView, getInstanceByDom, throttle } from 'echarts/lib/echarts'
-import { isNewEC, isAMap2X, clearLogMap } from './helper'
+import { COMPONENT_TYPE, isNewEC, isAMap2X, clearLogMap } from './helper'
 
 let _isAMap2X
 
 const AMapView = {
-  type: 'amap',
+  type: COMPONENT_TYPE,
 
   init() {
     this._isFirstRender = true

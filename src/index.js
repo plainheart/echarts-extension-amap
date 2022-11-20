@@ -5,7 +5,7 @@
 import AMapCoordSys from './AMapCoordSys'
 import AMapModel from './AMapModel'
 import AMapView from './AMapView'
-import { isNewEC, ecVer } from './helper'
+import { isNewEC, ecVer, COMPONENT_TYPE } from './helper'
 
 export { version, name } from '../package.json'
 
@@ -20,12 +20,12 @@ export { version, name } from '../package.json'
 export function install(registers) {
   // add coordinate system support for pie series for ECharts < 5.4.0
   if (!isNewEC || (ecVer[0] == 5 && ecVer[1] < 4)) {
-    registers.registerLayout(function(ecModel, api) {
+    registers.registerLayout(function(ecModel) {
       ecModel.eachSeriesByType('pie', function (seriesModel) {
         const coordSys = seriesModel.coordinateSystem
         const data = seriesModel.getData()
         const valueDim = data.mapDimension('value')
-        if (coordSys && coordSys.type === 'amap') {
+        if (coordSys && coordSys.type === COMPONENT_TYPE) {
           const center = seriesModel.get('center')
           const point = coordSys.dataToPoint(center)
           const cx = point[0]
@@ -48,16 +48,16 @@ export function install(registers) {
     ? registers.registerComponentView(AMapView)
     : registers.extendComponentView(AMapView)
   // Coordinate System
-  registers.registerCoordinateSystem('amap', AMapCoordSys)
+  registers.registerCoordinateSystem(COMPONENT_TYPE, AMapCoordSys)
   // Action
   registers.registerAction(
     {
-      type: 'amapRoam',
-      event: 'amapRoam',
+      type: COMPONENT_TYPE + 'Roam',
+      event: COMPONENT_TYPE + 'Roam',
       update: 'updateLayout'
     },
     function(payload, ecModel) {
-      ecModel.eachComponent('amap', function(amapModel) {
+      ecModel.eachComponent(COMPONENT_TYPE, function(amapModel) {
         const amap = amapModel.getAMap()
         const center = amap.getCenter()
         amapModel.setCenterAndZoom([center.lng, center.lat], amap.getZoom())

@@ -4,6 +4,8 @@ export const ecVer = version.split('.')
 
 export const isNewEC = ecVer[0] > 4
 
+export const COMPONENT_TYPE = 'amap'
+
 /* global AMap */
 
 // `AMap.version` only exists in AMap 2.x

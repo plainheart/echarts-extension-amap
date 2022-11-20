@@ -1,8 +1,8 @@
 import { ComponentModel } from 'echarts/lib/echarts'
-import { isNewEC, v2Equal } from './helper'
+import { COMPONENT_TYPE, isNewEC, v2Equal } from './helper'
 
 const AMapModel = {
-  type: 'amap',
+  type: COMPONENT_TYPE,
 
   setAMap(amap) {
     this.__amap = amap
