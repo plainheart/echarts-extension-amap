@@ -20,7 +20,7 @@ const AMapModel = {
     return this.__echartsLayer
   },
 
-  setEChartsLayerVisiblity(visible) {
+  setEChartsLayerVisibility(visible) {
     this.__echartsLayer.style.display = visible ? 'block' : 'none'
   },
 

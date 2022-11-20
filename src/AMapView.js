@@ -123,13 +123,13 @@ const AMapView = {
     if (!renderOnMoving) {
       amap.on('movestart', this._moveStartHandler = function() {
         setTimeout(function() {
-          amapModel.setEChartsLayerVisiblity(false)
+          amapModel.setEChartsLayerVisibility(false)
         }, 0)
       })
       const moveEndHandler = this._moveEndHandler = function(e) {
         ;(!e || e.type !== 'moveend') && moveHandler(e)
         setTimeout(function() {
-          amapModel.setEChartsLayerVisiblity(true)
+          amapModel.setEChartsLayerVisibility(true)
         }, _isAMap2X || !largeMode ? 0 : 20)
       }
       amap.on('moveend', moveEndHandler)
