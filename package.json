@@ -20,8 +20,7 @@
     "build": "rollup -c --environment NODE_ENV:production",
     "postbuild": "node build/post-build.js",
     "release": "npm run build && npm run generate:example",
-    "generate:example": "node build/generateExamples.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "generate:example": "node build/generateExamples.js"
   },
   "repository": {
     "type": "git",
