@@ -136,10 +136,10 @@ const AMapView = {
       amap.on('zoomend', moveEndHandler)
       if (this._isFirstRender && is3DMode) {
         // FIXME: not rewrite AMap instance method
-        const nativeSetPicth = amap.setPitch
+        const nativeSetPitch = amap.setPitch
         const nativeSetRotation = amap.setRotation
         amap.setPitch = function() {
-          nativeSetPicth.apply(this, arguments)
+          nativeSetPitch.apply(this, arguments)
           moveEndHandler()
         }
         amap.setRotation = function() {
