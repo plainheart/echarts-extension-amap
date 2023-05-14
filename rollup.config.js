@@ -1,7 +1,10 @@
 import path from 'node:path'
+import chalk from 'chalk'
 import json from '@rollup/plugin-json'
 import commonjs from '@rollup/plugin-commonjs'
+import terser from '@rollup/plugin-terser'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
+import { babel } from '@rollup/plugin-babel'
 import { name, version } from './package.json'
 
 const resolve = p => path.resolve(__dirname, p)
@@ -24,7 +27,7 @@ const outputConfigs = {
 const env = process.env.NODE_ENV
 const isProd = env === 'production'
 
-console.log(require('chalk').bgCyan(`🚩 Building ${version} for ${env}... `))
+console.log(chalk.bgCyan(`🚩 Building ${version} for ${env}... `))
 
 const packageFormats = isProd
   ? ['esm', 'cjs', 'umd']
@@ -36,9 +39,6 @@ const packageConfigs = packageFormats.map(
 
 if (isProd) {
   packageFormats.forEach(format => {
-    // if (format === 'cjs') {
-    //   packageConfigs.push(createProductionConfig(format))
-    // }
     if (format === 'umd') {
       packageConfigs.push(createMinifiedConfig(format))
     }
@@ -48,17 +48,14 @@ if (isProd) {
 function createConfig(format, output, specificPlugins = []) {
   output.externalLiveBindings = false
 
-  const isProdBuild = /\.min\.js$/.test(output.file)
-  // const isESMBuild = format === 'esm'
-  // const isNodeBuild = format === 'cjs'
   const isUMDBuild = format === 'umd'
 
   if (isUMDBuild) {
     output.name = 'echarts.amap'
-    output.sourcemap = isProd /* && isProdBuild */
+    output.sourcemap = isProd
   }
 
-  output.interop = false
+  output.interop = 'esModule'
 
   const external = ['echarts/lib/echarts']
   output.globals = {
@@ -71,13 +68,9 @@ function createConfig(format, output, specificPlugins = []) {
 
   const plugins = []
 
-  //if (isNodeBuild) {
-    //plugins.push(require('@rollup/plugin-commonjs')())
-  //}
-
   if (isProd) {
     plugins.push(
-      require('@rollup/plugin-babel').babel({
+      babel({
         babelHelpers: 'bundled'
       })
     )
@@ -106,15 +99,7 @@ function createConfig(format, output, specificPlugins = []) {
   }
 }
 
-function createProductionConfig(format) {
-  return createConfig(format, {
-    file: resolve(`dist/${name}.${format}.min.js`),
-    format: outputConfigs[format].format
-  })
-}
-
 function createMinifiedConfig(format) {
-  const { terser } = require('rollup-plugin-terser')
   return createConfig(
     format,
     {
