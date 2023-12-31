@@ -8,10 +8,11 @@ export const COMPONENT_TYPE = 'amap'
 
 /* global AMap */
 
-// `AMap.version` only exists in AMap 2.x
-// For AMap 1.x, it's `AMap.v`
+// The version property is `AMap.v` in AMap 1.x,
+// but `AMap.version` may also exist (See #51)
+// In AMap 2.x, it's `AMap.version` (Not sure if `AMap.v` exists)
 // use function instead of constant to allow importing the plugin before AMap is loaded
-export const isAMap2X = () => AMap.version && AMap.version.split('.')[0] >= 2
+export const isAMap2X = () => !AMap.v && AMap.version && AMap.version.split('.')[0] >= 2
 
 export function v2Equal(a, b) {
   return a && b && a[0] === b[0] && a[1] === b[1]
