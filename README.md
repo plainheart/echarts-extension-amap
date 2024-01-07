@@ -74,7 +74,7 @@ Use the latest version
 
 Use a specific version
 
-[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js)
+[https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.12.0/dist/echarts-extension-amap.min.js](https://cdn.jsdelivr.net/npm/echarts-extension-amap@1.12.0/dist/echarts-extension-amap.min.js)
 
 [**unpkg**](https://unpkg.com/)
 
@@ -84,7 +84,7 @@ Use the latest version
 
 Use a specific version
 
-[https://unpkg.com/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.11.0/dist/echarts-extension-amap.min.js)
+[https://unpkg.com/echarts-extension-amap@1.12.0/dist/echarts-extension-amap.min.js](https://unpkg.com/echarts-extension-amap@1.12.0/dist/echarts-extension-amap.min.js)
 
 This extension will register itself as a component of `echarts` after it is imported.
 
