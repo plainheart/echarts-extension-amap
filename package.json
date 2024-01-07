@@ -46,16 +46,16 @@
   },
   "homepage": "https://github.com/plainheart/echarts-extension-amap#readme",
   "devDependencies": {
-    "@babel/core": "^7.21.8",
-    "@babel/preset-env": "^7.21.5",
-    "@rollup/plugin-babel": "^6.0.3",
-    "@rollup/plugin-commonjs": "^25.0.0",
-    "@rollup/plugin-json": "^6.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.2",
-    "@rollup/plugin-terser": "^0.4.1",
-    "@types/echarts": "^4.9.17",
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.7",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/echarts": "^4.9.22",
     "chalk": "^4.1.2",
-    "echarts": "^5.4.2",
-    "rollup": "^3.21.7"
+    "echarts": "^5.4.3",
+    "rollup": "^4.9.4"
   }
 }
