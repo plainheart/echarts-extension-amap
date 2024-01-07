@@ -150,8 +150,9 @@ const AMapView = {
     }
 
     if (resizeEnable) {
-      let resizeHandler = function() {
-        getInstanceByDom(api.getDom()).resize()
+      let resizeHandler = () => {
+        clearTimeout(this._resizeTimeout)
+        this._resizeTimeout = setTimeout(() => getInstanceByDom(api.getDom()).resize(), 0)
       }
       if (!_isAMap2X && largeMode) {
         resizeHandler = throttle(resizeHandler, 20, true)
@@ -163,6 +164,7 @@ const AMapView = {
   },
 
   dispose() {
+    clearTimeout(this._resizeTimeout)
     clearLogMap()
     const component = this.__model
     if (component) {
@@ -173,11 +175,12 @@ const AMapView = {
         component.coordinateSystem.setAMap(null)
         component.coordinateSystem = null
       }
-      delete this._moveHandler
-      delete this._resizeHandler
-      delete this._moveStartHandler
-      delete this._moveEndHandler
     }
+    delete this._moveHandler
+    delete this._moveStartHandler
+    delete this._moveEndHandler
+    delete this._resizeHandler
+    delete this._resizeTimeout
   }
 }
 
