@@ -55,7 +55,7 @@
     "@rollup/plugin-terser": "^1.0.0",
     "@types/echarts": "^4.9.22",
     "chalk": "^4.1.2",
-    "echarts": "^5.4.3",
+    "echarts": "^6.1.0",
     "rollup": "^4.9.4"
   }
 }
